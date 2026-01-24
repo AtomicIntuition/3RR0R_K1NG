@@ -471,6 +471,7 @@ export const metadata: Metadata = {
   }
 
   return fixes;
+}
 
 function getRoastIntensity(score: number): string {
   if (score >= 90) return 'mild teasing with genuine compliments';

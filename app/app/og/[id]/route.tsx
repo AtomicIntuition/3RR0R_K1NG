@@ -1,17 +1,31 @@
 import { ImageResponse } from 'next/og';
-import { createServiceClient } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 import { getGrade, getScoreColor } from '@/lib/scoring';
 
 export const runtime = 'edge';
 
+// Create Supabase client for edge runtime
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+  return createClient(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+}
+
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
+  // Await params in Next.js 14+
+  const { id } = await params;
 
   try {
-    const supabase = createServiceClient();
+    const supabase = getSupabaseClient();
 
     const { data: scan } = await supabase
       .from('scans')

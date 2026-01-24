@@ -73,7 +73,6 @@ ${input.techStack.map(t => `- ${t.name} (${t.category}, ${t.confidence}% confide
       report += `#### [${finding.severity.toUpperCase()}] ${finding.title}
 - **Problem:** ${finding.description}
 - **Fix:** ${finding.recommendation}
-${finding.value ? `- **Current Value:** \`${finding.value}\`` : ''}
 
 `;
     }

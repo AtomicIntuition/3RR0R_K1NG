@@ -115,7 +115,7 @@ export async function runSecurityAudit(
   // Check security headers
   for (const header of SECURITY_HEADERS) {
     const value = headers[header.name.toLowerCase()] || null;
-    const passed = header.check(value);
+    const passed = header.check(value) ?? false;
 
     findings.push({
       id: header.id,

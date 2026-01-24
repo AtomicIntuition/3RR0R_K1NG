@@ -79,6 +79,7 @@ export async function runAccessibilityAudit(page: Page): Promise<AccessibilityAu
         help: 'Unable to complete accessibility analysis',
         helpUrl: 'https://www.deque.com/axe/',
         nodes: 0,
+        selectors: [],
       }],
       passes: 0,
     };

@@ -40,6 +40,7 @@ export interface ScanUpdate {
   roast_title?: string;
   roast_body?: string;
   roast_fixes?: unknown;
+  llm_report?: string;
   screenshot_url?: string;
   error_message?: string;
   started_at?: string;

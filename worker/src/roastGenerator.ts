@@ -41,12 +41,19 @@ interface RoastInput {
   url: string;
   scores: {
     overall: number;
+    letterGrade: string;
     performance: number;
     security: number;
     seo: number;
     accessibility: number;
     codeQuality: number;
   };
+  scoringBreakdown?: {
+    category: string;
+    score: number;
+    weight: number;
+    contribution: number;
+  }[];
   securityFindings: SecurityFinding[];
   performanceMetrics: PerformanceMetric[];
   seoFindings: SeoFinding[];
@@ -75,14 +82,14 @@ function generateLLMReport(input: RoastInput): string {
 
   let report = `# Website Audit Report - LLM Fix Instructions
 ## URL: ${input.url}
-## Overall Score: ${input.scores.overall}/100
+## Overall Score: ${input.scores.overall}/100 (Grade: ${input.scores.letterGrade})
 
-### SCORES BREAKDOWN
-- Performance: ${input.scores.performance}/100
+### COMPREHENSIVE SCORING BREAKDOWN
+${input.scoringBreakdown?.map(c => `- **${c.category}:** ${c.score}/100 (${c.weight}% weight, contributes ${c.contribution} points)`).join('\n') || `- Performance: ${input.scores.performance}/100
 - Security: ${input.scores.security}/100
 - SEO: ${input.scores.seo}/100
 - Accessibility: ${input.scores.accessibility}/100
-- Code Quality: ${input.scores.codeQuality}/100
+- Code Quality: ${input.scores.codeQuality}/100`}
 
 ### TECH STACK DETECTED
 ${input.techStack.map(t => `- ${t.name} (${t.category}, ${t.confidence}% confidence)`).join('\n') || 'None detected'}

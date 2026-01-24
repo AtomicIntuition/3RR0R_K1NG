@@ -59,6 +59,9 @@ export type Database = {
           results_pwa: unknown | null;
           results_structured_data: unknown | null;
           results_links: unknown | null;
+          // Scoring
+          letter_grade: string | null;
+          scoring_breakdown: unknown | null;
           roast_title: string | null;
           roast_body: string | null;
           roast_fixes: unknown | null;
@@ -114,6 +117,9 @@ export type Database = {
           results_pwa?: unknown | null;
           results_structured_data?: unknown | null;
           results_links?: unknown | null;
+          // Scoring
+          letter_grade?: string | null;
+          scoring_breakdown?: unknown | null;
           roast_title?: string | null;
           roast_body?: string | null;
           roast_fixes?: unknown | null;

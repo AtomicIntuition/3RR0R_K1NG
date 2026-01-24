@@ -21,6 +21,14 @@ import { runStructuredDataAudit, type StructuredDataAuditResult } from './audits
 import { runLinkAudit, type LinkAuditResult } from './audits/links.js';
 import { generateRoast, generateUploadRoast, type RoastResult } from './roastGenerator.js';
 import { updateScan } from './lib/supabase.js';
+import {
+  calculateComprehensiveScore,
+  getVulnerabilityScore,
+  getProtocolScore,
+  getRedirectScore,
+  getLetterGrade,
+  type ScoringResult,
+} from './lib/scoring.js';
 
 export interface ScanResult {
   security: SecurityAuditResult;
@@ -42,6 +50,8 @@ export interface ScanResult {
   links?: LinkAuditResult;
   roast: RoastResult;
   overallScore: number;
+  letterGrade: string;
+  scoringBreakdown?: ScoringResult;
 }
 
 // Phase 2: Upload scan result
@@ -51,35 +61,12 @@ export interface UploadScanResult {
   codePatterns: CodePatternsAuditResult;
   roast: RoastResult;
   overallScore: number;
+  letterGrade: string;
 }
 
 export interface UploadedFile {
   path: string;
   content: string;
-}
-
-// Score weights
-const WEIGHTS = {
-  performance: 0.25,
-  security: 0.30,
-  seo: 0.15,
-  accessibility: 0.20,
-  codeQuality: 0.10,
-};
-
-function calculateOverallScore(scores: Record<string, number>): number {
-  let weightedSum = 0;
-  let totalWeight = 0;
-
-  for (const [key, weight] of Object.entries(WEIGHTS)) {
-    const score = scores[key];
-    if (score !== undefined) {
-      weightedSum += score * weight;
-      totalWeight += weight;
-    }
-  }
-
-  return totalWeight > 0 ? Math.round(weightedSum / totalWeight) : 0;
 }
 
 let browser: Browser | null = null;
@@ -279,26 +266,43 @@ export async function runScan(scanId: string, url: string): Promise<ScanResult> 
     });
     console.log(`Performance audit complete: ${performanceResult.score}`);
 
-    // Calculate overall score
-    const overallScore = calculateOverallScore({
+    // Calculate comprehensive score including all audits
+    const scoringResult = calculateComprehensiveScore({
+      // Core audits
       performance: performanceResult.score,
       security: securityResult.score,
       seo: seoResult.score,
       accessibility: accessibilityResult.score,
       codeQuality: codeQualityResult.score,
+      // Phase 1 audits
+      vulnerabilities: getVulnerabilityScore(vulnerabilityResult.vulnerableLibraries),
+      protocol: getProtocolScore(protocolResult),
+      images: imageResult.score,
+      caching: cacheResult.score,
+      redirects: getRedirectScore(redirectResult),
+      // Phase 3 audits
+      pwa: pwaResult.score,
+      structuredData: structuredDataResult.score,
+      links: linksResult.score,
     });
+
+    const overallScore = scoringResult.overall;
+    const letterGrade = scoringResult.letterGrade;
+    console.log(`Comprehensive score calculated: ${overallScore}/100 (${letterGrade})`);
 
     // Generate roast
     const roast = await generateRoast({
       url,
       scores: {
         overall: overallScore,
+        letterGrade,
         performance: performanceResult.score,
         security: securityResult.score,
         seo: seoResult.score,
         accessibility: accessibilityResult.score,
         codeQuality: codeQualityResult.score,
       },
+      scoringBreakdown: scoringResult.breakdown,
       securityFindings: securityResult.findings,
       performanceMetrics: performanceResult.metrics,
       seoFindings: seoResult.findings,
@@ -322,6 +326,8 @@ export async function runScan(scanId: string, url: string): Promise<ScanResult> 
     await updateScan(scanId, {
       status: 'completed',
       score_overall: overallScore,
+      letter_grade: letterGrade,
+      scoring_breakdown: scoringResult,
       roast_title: roast.title,
       roast_body: roast.body,
       roast_fixes: roast.fixes,
@@ -331,7 +337,7 @@ export async function runScan(scanId: string, url: string): Promise<ScanResult> 
       completed_at: new Date().toISOString(),
     });
 
-    console.log(`Scan complete for ${scanId}: Overall score ${overallScore}`);
+    console.log(`Scan complete for ${scanId}: Overall score ${overallScore}/100 (${letterGrade})`);
 
     return {
       security: securityResult,
@@ -351,6 +357,8 @@ export async function runScan(scanId: string, url: string): Promise<ScanResult> 
       links: linksResult,
       roast,
       overallScore,
+      letterGrade,
+      scoringBreakdown: scoringResult,
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -421,6 +429,7 @@ export async function runUploadScan(
         secretsResult.score * 0.4 +
         codePatternsResult.score * 0.2
     );
+    const letterGrade = getLetterGrade(overallScore);
 
     // Generate roast for upload scan
     const roast = await generateUploadRoast({
@@ -435,6 +444,7 @@ export async function runUploadScan(
     await updateScan(scanId, {
       status: 'completed',
       score_overall: overallScore,
+      letter_grade: letterGrade,
       score_security: secretsResult.score,
       score_code_quality: codePatternsResult.score,
       roast_title: roast.title,
@@ -446,7 +456,7 @@ export async function runUploadScan(
       completed_at: new Date().toISOString(),
     });
 
-    console.log(`Upload scan complete for ${scanId}: Overall score ${overallScore}`);
+    console.log(`Upload scan complete for ${scanId}: Overall score ${overallScore}/100 (${letterGrade})`);
 
     return {
       dependencies: dependenciesResult,
@@ -454,6 +464,7 @@ export async function runUploadScan(
       codePatterns: codePatternsResult,
       roast,
       overallScore,
+      letterGrade,
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';

@@ -54,6 +54,9 @@ export interface ScanUpdate {
   results_pwa?: unknown;
   results_structured_data?: unknown;
   results_links?: unknown;
+  // Scoring
+  letter_grade?: string;
+  scoring_breakdown?: unknown;
   roast_title?: string;
   roast_body?: string;
   roast_fixes?: unknown;

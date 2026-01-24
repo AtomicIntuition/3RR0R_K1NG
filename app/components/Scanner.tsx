@@ -87,7 +87,7 @@ export function Scanner({ className }: ScannerProps) {
             <span className="w-3 h-3 rounded-full bg-neon-yellow/80" />
             <span className="w-3 h-3 rounded-full bg-terminal/80" />
           </div>
-          <span className="text-xs text-gray-500 ml-2">target_scanner.exe</span>
+          <span className="text-xs text-gray-400 ml-2">target_scanner.exe</span>
         </div>
 
         {/* Input container */}

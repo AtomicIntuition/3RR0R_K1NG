@@ -137,7 +137,7 @@ export default function HomePage() {
 
       {/* Terminal decoration */}
       <div className="mt-20 w-full max-w-2xl">
-        <div className="bg-void-50 rounded-lg border border-void-100 p-4 font-mono text-xs text-gray-500">
+        <div className="bg-void-50 rounded-lg border border-void-100 p-4 font-mono text-xs text-gray-400">
           <div className="flex items-center gap-2 mb-3 pb-2 border-b border-void-100">
             <span className="text-terminal">guest@3rror_k1ng</span>
             <span className="text-gray-400">~</span>

@@ -1,8 +1,21 @@
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
-import { createServiceClient } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 
 export const runtime = 'edge';
+
+// Create Supabase client for edge runtime
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+  return createClient(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+}
 
 // Helper to get grade color
 function getGradeColor(grade: string): string {
@@ -22,13 +35,14 @@ function getScoreColor(score: number): string {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const scanId = params.id;
+    // Await params in Next.js 14+
+    const { id: scanId } = await params;
 
     // Fetch scan data
-    const supabase = createServiceClient();
+    const supabase = getSupabaseClient();
     const { data: scan, error } = await supabase
       .from('scans')
       .select('url, score_overall, letter_grade, roast_title, twitter_roast, roast_persona')
@@ -211,20 +225,18 @@ export async function GET(
                   backgroundColor: 'rgba(0, 255, 65, 0.05)',
                   border: `2px solid ${scoreColor}33`,
                   borderRadius: '12px',
+                  maxHeight: '180px',
+                  overflow: 'hidden',
                 }}
               >
                 <div
                   style={{
-                    fontSize: '28px',
+                    fontSize: '26px',
                     color: '#e5e7eb',
                     lineHeight: 1.4,
-                    display: '-webkit-box',
-                    WebkitLineClamp: 3,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden',
                   }}
                 >
-                  "{roast}"
+                  "{roast.length > 200 ? roast.slice(0, 200) + '...' : roast}"
                 </div>
               </div>
             </div>

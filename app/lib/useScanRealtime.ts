@@ -8,17 +8,45 @@ interface ScanProgress {
   phase: string;
   percentage: number;
   completedAudits: string[];
+  currentPhase: string;
 }
 
-const AUDIT_PHASES = [
-  { key: 'results_security', name: 'Security', phase: 'Analyzing security headers...', weight: 12 },
-  { key: 'results_seo', name: 'SEO', phase: 'Checking SEO configuration...', weight: 12 },
-  { key: 'results_accessibility', name: 'Accessibility', phase: 'Testing accessibility...', weight: 12 },
-  { key: 'results_code_quality', name: 'Code Quality', phase: 'Auditing code quality...', weight: 8 },
-  { key: 'results_tech_stack', name: 'Tech Stack', phase: 'Detecting technologies...', weight: 5 },
-  { key: 'results_resources', name: 'Resources', phase: 'Analyzing resource waterfall...', weight: 10 },
-  { key: 'results_performance', name: 'Performance', phase: 'Running Lighthouse audit...', weight: 23 },
-  { key: 'roast_title', name: 'AI Roast', phase: 'Generating roast...', weight: 18 },
+// Map internal phase names to display names and weights
+const PHASE_CONFIG: Record<string, { displayName: string; description: string; weight: number }> = {
+  security: { displayName: 'Security', description: 'Analyzing security headers...', weight: 12 },
+  seo: { displayName: 'SEO', description: 'Checking SEO configuration...', weight: 10 },
+  accessibility: { displayName: 'Accessibility', description: 'Testing accessibility...', weight: 12 },
+  code_quality: { displayName: 'Code Quality', description: 'Auditing code quality...', weight: 8 },
+  tech_stack: { displayName: 'Tech Stack', description: 'Detecting technologies...', weight: 5 },
+  resources: { displayName: 'Resources', description: 'Analyzing resource waterfall...', weight: 8 },
+  extended_audits: { displayName: 'Deep Scan', description: 'Running extended audits...', weight: 15 },
+  performance: { displayName: 'Performance', description: 'Running Lighthouse audit...', weight: 20 },
+  roast: { displayName: 'AI Roast', description: 'Generating brutal roast...', weight: 10 },
+};
+
+// Ordered list of phases for display
+const PHASE_ORDER = [
+  'security',
+  'seo',
+  'accessibility',
+  'code_quality',
+  'tech_stack',
+  'resources',
+  'extended_audits',
+  'performance',
+  'roast',
+];
+
+// Display names for the UI grid
+const DISPLAY_AUDITS = [
+  'Security',
+  'SEO',
+  'Accessibility',
+  'Code Quality',
+  'Tech Stack',
+  'Resources',
+  'Deep Scan',
+  'Performance',
 ];
 
 function calculateProgress(scan: DbScan): ScanProgress {
@@ -27,6 +55,7 @@ function calculateProgress(scan: DbScan): ScanProgress {
       phase: 'Waiting in queue...',
       percentage: 5,
       completedAudits: [],
+      currentPhase: 'pending',
     };
   }
 
@@ -34,34 +63,34 @@ function calculateProgress(scan: DbScan): ScanProgress {
     return {
       phase: scan.status === 'completed' ? 'Complete!' : 'Failed',
       percentage: 100,
-      completedAudits: AUDIT_PHASES.map(p => p.name),
+      completedAudits: DISPLAY_AUDITS,
+      currentPhase: 'complete',
     };
   }
 
-  // Processing - calculate real progress
-  const completedAudits: string[] = [];
+  // Use the new completed_phases array from the backend
+  const rawCompletedPhases: string[] = (scan as any).completed_phases || [];
+  const currentPhase: string = (scan as any).current_phase || 'security';
+
+  // Map internal phase names to display names
+  const completedAudits = rawCompletedPhases
+    .map(phase => PHASE_CONFIG[phase]?.displayName)
+    .filter(Boolean) as string[];
+
+  // Calculate progress based on completed phase weights
   let totalWeight = 0;
-
-  for (const audit of AUDIT_PHASES) {
-    if ((scan as any)[audit.key]) {
-      completedAudits.push(audit.name);
-      totalWeight += audit.weight;
-    }
+  for (const phase of rawCompletedPhases) {
+    totalWeight += PHASE_CONFIG[phase]?.weight || 0;
   }
 
-  // Find current phase (first incomplete audit)
-  let currentPhase = 'Processing...';
-  for (const audit of AUDIT_PHASES) {
-    if (!(scan as any)[audit.key]) {
-      currentPhase = audit.phase;
-      break;
-    }
-  }
+  // Get current phase description
+  const phaseDescription = PHASE_CONFIG[currentPhase]?.description || 'Processing...';
 
   return {
-    phase: currentPhase,
+    phase: phaseDescription,
     percentage: Math.min(5 + totalWeight, 95),
     completedAudits,
+    currentPhase,
   };
 }
 
@@ -71,6 +100,7 @@ export function useScanRealtime(scanId: string) {
     phase: 'Connecting...',
     percentage: 0,
     completedAudits: [],
+    currentPhase: 'pending',
   });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);

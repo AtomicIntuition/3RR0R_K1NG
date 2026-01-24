@@ -32,10 +32,78 @@ export interface RoastResult {
   title: string;
   body: string;
   fixes: RoastFix[];
-  llmReport?: string; // New: LLM-ready detailed report
+  twitterRoast?: string; // Short 280-char roast for Twitter sharing
+  llmReport?: string; // LLM-ready detailed report
   isFallback?: boolean; // Track if AI generation failed
   fallbackReason?: string; // Why AI failed (for debugging)
+  persona?: RoastPersona; // Which persona generated this roast
 }
+
+// ============================================
+// Roast Personas - User-Selectable Styles
+// ============================================
+
+export type RoastPersona = 'hacker' | 'gordon' | 'parent' | 'interviewer' | 'drill' | 'meme' | 'therapist';
+
+export interface PersonaConfig {
+  id: RoastPersona;
+  name: string;
+  description: string;
+  emoji: string;
+  prompt: string;
+}
+
+export const ROAST_PERSONAS: Record<RoastPersona, PersonaConfig> = {
+  hacker: {
+    id: 'hacker',
+    name: '3RROR_K1NG',
+    description: 'Classic hacker roast with security metaphors',
+    emoji: '💀',
+    prompt: `You are 3RROR_K1NG, a legendary hacker who reviews websites with brutal honesty. You speak with a mix of technical expertise and devastating wit. Use hacking/security metaphors and terminology. Your reviews are memorable, shareable, and actually helpful. Reference penetration testing, exploits, and security culture.`,
+  },
+  gordon: {
+    id: 'gordon',
+    name: 'Gordon Websy',
+    description: 'Kitchen nightmare but for websites',
+    emoji: '👨‍🍳',
+    prompt: `You are Gordon Websy, a world-famous website chef who treats bad websites like a disastrous kitchen. You're absolutely APPALLED by what you're seeing. Use cooking metaphors - this code is RAW, the CSS is BURNT, the JavaScript is BLAND. Yell (IN CAPS) when appropriate. Ask rhetorical questions like "WHERE'S THE LAMB SAUCE?" but for web elements. Be dramatic but ultimately want to help them improve. Call them "donkey" when they mess up basics.`,
+  },
+  parent: {
+    id: 'parent',
+    name: 'Disappointed Parent',
+    description: 'Guilt-trip style disappointment',
+    emoji: '😔',
+    prompt: `You are a disappointed parent reviewing your child's website. You're not angry, just... disappointed. Use phrases like "I'm not mad, I'm just disappointed", "Your sibling's website got an A+", "We raised you better than this", "This isn't the code I thought I raised". Sigh heavily through the text. Reference how you expected more. Guilt-trip them into fixing issues. End with something like "I still love you, but please fix this."`,
+  },
+  interviewer: {
+    id: 'interviewer',
+    name: 'Tech Interviewer',
+    description: 'FAANG interviewer energy',
+    emoji: '🤔',
+    prompt: `You are a senior FAANG tech interviewer reviewing a candidate's portfolio website. Be condescending in a professional way. Use phrases like "Can you walk me through your thought process here?", "Interesting choice...", "At Google, we would never...", "I see you went with the... creative approach". Ask probing questions they can't answer. Rate their "culture fit" based on their code. Mention that other candidates' sites loaded faster. End with "We'll be in touch" (they won't).`,
+  },
+  drill: {
+    id: 'drill',
+    name: 'Drill Sergeant',
+    description: 'Military-style tough love',
+    emoji: '🎖️',
+    prompt: `You are a Drill Sergeant for websites. YELL EVERYTHING. Drop and give me 20 Lighthouse points! This website is OUT OF SHAPE and needs DISCIPLINE. Use military metaphors - the JavaScript is AWOL, the CSS went DESERTER, the security has GONE SOFT. Call the website "maggot" or "private". Demand they "FIX THOSE HEADERS, SOLDIER!" Give orders, not suggestions. End with "NOW MOVE IT, MOVE IT, MOVE IT!"`,
+  },
+  meme: {
+    id: 'meme',
+    name: 'Meme Lord',
+    description: 'Internet culture and Gen-Z speak',
+    emoji: '🗿',
+    prompt: `You are a chronically online zoomer meme lord reviewing this website. Use current internet slang - "no cap", "it's giving...", "that's so sus", "big yikes energy", "main character syndrome but make it broken". Reference popular memes. The website is either "bussin" or "mid" (it's probably mid). Rate things on a scale of "slay" to "flop". Use emojis ironically. Everything is either "iconic" or "the Roman Empire of bad decisions". Compare bad code to popular meme formats.`,
+  },
+  therapist: {
+    id: 'therapist',
+    name: 'Website Therapist',
+    description: 'Gentle but devastating analysis',
+    emoji: '🛋️',
+    prompt: `You are a therapist... but for websites. Speak softly but say devastating things. "Let's unpack that performance score, shall we?" "I'm sensing some unresolved JavaScript trauma here." "Have you considered that your security headers might be a cry for help?" Use therapy-speak but make it cutting. Create a safe space while absolutely destroying them. "This is a judgment-free zone, but I am judging this code." End sessions with homework assignments for fixing issues.`,
+  },
+};
 
 interface RoastInput {
   url: string;
@@ -71,6 +139,8 @@ interface RoastInput {
   pwa?: PWAAuditResult;
   structuredData?: StructuredDataAuditResult;
   links?: LinkAuditResult;
+  // Persona selection
+  persona?: RoastPersona;
 }
 
 /**
@@ -733,7 +803,13 @@ function buildPrompt(input: RoastInput): string {
   const failedSecurity = input.securityFindings.filter(f => !f.passed);
   const failedSeo = input.seoFindings.filter(f => !f.passed);
 
-  return `You are 3RROR_K1NG, a legendary hacker who reviews websites with brutal honesty. You speak with a mix of technical expertise and devastating wit. Your reviews are memorable, shareable, and actually helpful.
+  // Get persona config (default to hacker)
+  const persona = input.persona || 'hacker';
+  const personaConfig = ROAST_PERSONAS[persona];
+
+  return `${personaConfig.prompt}
+
+Your reviews are memorable, shareable, and actually helpful despite the persona.
 
 WEBSITE: ${input.url}
 
@@ -793,12 +869,14 @@ LINKS:
 - Insecure HTTP: ${input.links?.insecureLinks.length || 0}
 
 ROAST INTENSITY: ${getRoastIntensity(input.scores.overall)}
+PERSONA: ${personaConfig.name} (${personaConfig.description})
 
-Generate a roast in the following JSON format. The roast should be memorable, technically accurate, and include specific references to the actual issues found. Use hacker/tech terminology and metaphors. Be creative with the title - it should be punchy and shareable.
+Generate a roast in the following JSON format. The roast should be memorable, technically accurate, and include specific references to the actual issues found. STAY IN CHARACTER for your persona throughout. Be creative with the title - it should be punchy and shareable.
 
 {
   "title": "A devastating one-liner roast title (max 60 chars)",
   "body": "2-3 paragraph roast that references specific findings. Be savage but helpful. End with either praise (if deserved) or a call to action.",
+  "twitterRoast": "A punchy 280-char max roast perfect for Twitter. Include the score and 1 devastating observation. Make it viral-worthy.",
   "fixes": [
     {
       "priority": "critical|high|medium|low",
@@ -812,13 +890,14 @@ Generate a roast in the following JSON format. The roast should be memorable, te
 
 RULES:
 - Title must be under 60 characters
+- twitterRoast must be under 280 characters (for Twitter sharing)
 - Include 3-5 of the most impactful fixes
 - Fixes should be ordered by priority (critical first)
 - Be specific - reference actual URLs, headers, or metrics found
 - If the site actually scores well (85+), acknowledge it while still finding something to roast
 - Use technical terms correctly
 - The body should be 100-200 words
-- Make references to hacking/security culture where appropriate
+- STAY IN CHARACTER for your ${personaConfig.name} persona - use the style and vocabulary from your character description
 - Do NOT use markdown formatting in the body text
 
 Return ONLY the JSON, no other text.`;
@@ -945,6 +1024,14 @@ export async function generateRoast(input: RoastInput): Promise<RoastResult> {
   // Ensure title is not too long
   result.title = result.title.slice(0, 60);
 
+  // Ensure twitterRoast is not too long (280 chars for Twitter)
+  if (result.twitterRoast) {
+    result.twitterRoast = result.twitterRoast.slice(0, 280);
+  } else {
+    // Generate a default twitter roast from the title and score
+    result.twitterRoast = `${input.url.replace(/^https?:\/\//, '')} scored ${input.scores.overall}/100 (${input.scores.letterGrade}). ${result.title}`.slice(0, 280);
+  }
+
   // Validate fixes
   result.fixes = result.fixes.slice(0, 5).map(fix => ({
     priority: ['critical', 'high', 'medium', 'low'].includes(fix.priority)
@@ -963,8 +1050,9 @@ export async function generateRoast(input: RoastInput): Promise<RoastResult> {
   // Generate LLM-ready report
   result.llmReport = generateLLMReport(input);
   result.isFallback = false;
+  result.persona = input.persona || 'hacker';
 
-  console.log('AI roast generated successfully');
+  console.log(`AI roast generated successfully with ${result.persona} persona`);
   return result;
 }
 
@@ -1039,7 +1127,19 @@ function generateFallbackRoast(input: RoastInput, reason?: string): RoastResult 
   // Generate LLM report for fallback too
   const llmReport = generateLLMReport(input);
 
-  return { title, body, fixes, llmReport, isFallback: true, fallbackReason: reason };
+  // Generate twitter roast for fallback
+  const twitterRoast = `${input.url.replace(/^https?:\/\//, '')} scored ${scores.overall}/100. ${title}`.slice(0, 280);
+
+  return {
+    title,
+    body,
+    fixes,
+    twitterRoast,
+    llmReport,
+    isFallback: true,
+    fallbackReason: reason,
+    persona: input.persona || 'hacker',
+  };
 }
 
 // ============================================

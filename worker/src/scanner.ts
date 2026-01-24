@@ -19,7 +19,7 @@ import { scanCodePatterns, type CodePatternsAuditResult } from './audits/codePat
 import { runPWAAudit, type PWAAuditResult } from './audits/pwa.js';
 import { runStructuredDataAudit, type StructuredDataAuditResult } from './audits/structuredData.js';
 import { runLinkAudit, type LinkAuditResult } from './audits/links.js';
-import { generateRoast, generateUploadRoast, type RoastResult } from './roastGenerator.js';
+import { generateRoast, generateUploadRoast, type RoastResult, type RoastPersona } from './roastGenerator.js';
 import { updateScan } from './lib/supabase.js';
 import {
   calculateComprehensiveScore,
@@ -93,13 +93,46 @@ export async function closeBrowser(): Promise<void> {
   }
 }
 
-export async function runScan(scanId: string, url: string): Promise<ScanResult> {
-  console.log(`Starting scan for ${url} (${scanId})`);
+// Phase definitions for progress tracking
+const SCAN_PHASES = [
+  'security',
+  'seo',
+  'accessibility',
+  'code_quality',
+  'tech_stack',
+  'resources',
+  'extended_audits',
+  'performance',
+  'roast',
+] as const;
+
+type ScanPhase = typeof SCAN_PHASES[number];
+
+export async function runScan(scanId: string, url: string, persona: RoastPersona = 'hacker'): Promise<ScanResult> {
+  console.log(`Starting scan for ${url} (${scanId}) with persona: ${persona}`);
+
+  const completedPhases: string[] = [];
+
+  // Helper to update phase progress
+  const updatePhase = async (phase: ScanPhase) => {
+    await updateScan(scanId, {
+      current_phase: phase,
+      completed_phases: completedPhases,
+    });
+  };
+
+  // Helper to mark phase complete
+  const completePhase = (phase: ScanPhase) => {
+    completedPhases.push(phase);
+  };
 
   // Update status to processing
   await updateScan(scanId, {
     status: 'processing',
     started_at: new Date().toISOString(),
+    current_phase: 'security',
+    completed_phases: [],
+    roast_persona: persona,
   });
 
   const browserInstance = await getBrowser();
@@ -141,128 +174,130 @@ export async function runScan(scanId: string, url: string): Promise<ScanResult> 
     // Give the page a moment to settle (for JS-heavy sites)
     await page.waitForTimeout(2000);
 
-    // Run audits in parallel where possible
+    // Run audits sequentially with proper phase tracking
     console.log(`Running audits for ${scanId}...`);
 
     // Security audit (needs response headers)
+    await updatePhase('security');
     const securityResult = await runSecurityAudit(page, response);
+    completePhase('security');
     await updateScan(scanId, {
       score_security: securityResult.score,
       results_security: securityResult,
+      completed_phases: completedPhases,
     });
     console.log(`Security audit complete: ${securityResult.score}`);
 
-    // SEO audit (can run in parallel with accessibility)
+    // SEO audit
+    await updatePhase('seo');
     const seoResult = await runSeoAudit(page, url);
+    completePhase('seo');
     await updateScan(scanId, {
       score_seo: seoResult.score,
       results_seo: seoResult,
+      completed_phases: completedPhases,
     });
     console.log(`SEO audit complete: ${seoResult.score}`);
 
     // Accessibility audit
+    await updatePhase('accessibility');
     const accessibilityResult = await runAccessibilityAudit(page);
+    completePhase('accessibility');
     await updateScan(scanId, {
       score_accessibility: accessibilityResult.score,
       results_accessibility: accessibilityResult,
+      completed_phases: completedPhases,
     });
     console.log(`Accessibility audit complete: ${accessibilityResult.score}`);
 
     // Code quality audit
+    await updatePhase('code_quality');
     const codeQualityResult = await runCodeQualityAudit(page, consoleErrors, pageErrors);
+    completePhase('code_quality');
     await updateScan(scanId, {
       score_code_quality: codeQualityResult.score,
       results_code_quality: codeQualityResult,
+      completed_phases: completedPhases,
     });
     console.log(`Code quality audit complete: ${codeQualityResult.score}`);
 
     // Tech stack detection
+    await updatePhase('tech_stack');
     const techStack = await detectTechStack(page, response);
+    completePhase('tech_stack');
     await updateScan(scanId, {
       results_tech_stack: techStack,
+      completed_phases: completedPhases,
     });
     console.log(`Tech stack detection complete: ${techStack.length} technologies found`);
 
     // Resource analysis (waterfall, third-party impact)
+    await updatePhase('resources');
     const resourceAnalysis = await runResourceAnalysis(page);
+    completePhase('resources');
     await updateScan(scanId, {
       results_resources: resourceAnalysis,
+      completed_phases: completedPhases,
     });
     console.log(`Resource analysis complete: ${resourceAnalysis.totalResources} resources, ${resourceAnalysis.thirdParty.domains.length} third-party domains`);
 
-    // === Phase 1 New Audits ===
+    // === Extended Audits (Phase 1 + Phase 3) ===
+    // Run as a single phase for smooth progress tracking
+    await updatePhase('extended_audits');
 
-    // Run new audits in parallel
-    const [vulnerabilityResult, protocolResult, imageResult, cacheResult, redirectResult] = await Promise.all([
+    // Run all extended audits in parallel (internal optimization)
+    const [
+      vulnerabilityResult,
+      protocolResult,
+      imageResult,
+      cacheResult,
+      redirectResult,
+      pwaResult,
+      structuredDataResult,
+      linksResult,
+    ] = await Promise.all([
       runVulnerabilityAudit(page),
       runProtocolAudit(page, url),
       runImageAudit(page),
       runCacheAudit(page),
       runRedirectAudit(url),
-    ]);
-
-    // Save vulnerability audit results
-    await updateScan(scanId, {
-      results_vulnerabilities: vulnerabilityResult,
-    });
-    console.log(`Vulnerability audit complete: ${vulnerabilityResult.vulnerableLibraries.length} vulnerable libraries found`);
-
-    // Save protocol audit results
-    await updateScan(scanId, {
-      results_protocol: protocolResult,
-    });
-    console.log(`Protocol audit complete: ${protocolResult.httpVersion}, HTTP/2: ${protocolResult.http2Supported}`);
-
-    // Save image audit results
-    await updateScan(scanId, {
-      results_images: imageResult,
-    });
-    console.log(`Image audit complete: ${imageResult.totalImages} images, ${imageResult.issues.length} issues`);
-
-    // Save cache audit results
-    await updateScan(scanId, {
-      results_caching: cacheResult,
-    });
-    console.log(`Cache audit complete: score ${cacheResult.score}`);
-
-    // Save redirect audit results
-    await updateScan(scanId, {
-      results_redirects: redirectResult,
-    });
-    console.log(`Redirect audit complete: ${redirectResult.totalRedirects} redirects, ${redirectResult.totalTime}ms`);
-
-    // === Phase 3 New Audits ===
-
-    // Run Phase 3 audits in parallel
-    const [pwaResult, structuredDataResult, linksResult] = await Promise.all([
       runPWAAudit(page, url),
       runStructuredDataAudit(page),
       runLinkAudit(page, url),
     ]);
 
-    // Save PWA audit results
+    // Save all extended audit results in one batch
+    completePhase('extended_audits');
     await updateScan(scanId, {
+      results_vulnerabilities: vulnerabilityResult,
+      results_protocol: protocolResult,
+      results_images: imageResult,
+      results_caching: cacheResult,
+      results_redirects: redirectResult,
       results_pwa: pwaResult,
-    });
-    console.log(`PWA audit complete: score ${pwaResult.score}, installable: ${pwaResult.installable}`);
-
-    // Save structured data audit results
-    await updateScan(scanId, {
       results_structured_data: structuredDataResult,
-    });
-    console.log(`Structured data audit complete: ${structuredDataResult.types.length} types found`);
-
-    // Save links audit results
-    await updateScan(scanId, {
       results_links: linksResult,
+      completed_phases: completedPhases,
     });
-    console.log(`Links audit complete: ${linksResult.brokenLinks.length} broken, ${linksResult.insecureLinks.length} insecure`);
 
-    // Performance audit (Lighthouse - runs separately)
+    console.log(`Extended audits complete:`);
+    console.log(`  - Vulnerabilities: ${vulnerabilityResult.vulnerableLibraries.length} vulnerable libraries`);
+    console.log(`  - Protocol: ${protocolResult.httpVersion}, HTTP/2: ${protocolResult.http2Supported}`);
+    console.log(`  - Images: ${imageResult.totalImages} images, ${imageResult.issues.length} issues`);
+    console.log(`  - Caching: score ${cacheResult.score}`);
+    console.log(`  - Redirects: ${redirectResult.totalRedirects} redirects, ${redirectResult.totalTime}ms`);
+    console.log(`  - PWA: score ${pwaResult.score}, installable: ${pwaResult.installable}`);
+    console.log(`  - Structured Data: ${structuredDataResult.types.length} types found`);
+    console.log(`  - Links: ${linksResult.brokenLinks.length} broken, ${linksResult.insecureLinks.length} insecure`);
+
+    // Performance audit (Lighthouse - runs separately, most expensive)
+    await updatePhase('performance');
     const performanceResult = await runPerformanceAudit(url);
+    completePhase('performance');
     await updateScan(scanId, {
       score_performance: performanceResult.score,
       results_performance: performanceResult,
+      completed_phases: completedPhases,
     });
     console.log(`Performance audit complete: ${performanceResult.score}`);
 
@@ -290,7 +325,8 @@ export async function runScan(scanId: string, url: string): Promise<ScanResult> 
     const letterGrade = scoringResult.letterGrade;
     console.log(`Comprehensive score calculated: ${overallScore}/100 (${letterGrade})`);
 
-    // Generate roast
+    // Generate roast with selected persona
+    await updatePhase('roast');
     const roast = await generateRoast({
       url,
       scores: {
@@ -320,7 +356,10 @@ export async function runScan(scanId: string, url: string): Promise<ScanResult> 
       pwa: pwaResult,
       structuredData: structuredDataResult,
       links: linksResult,
+      // Persona for roast style
+      persona,
     });
+    completePhase('roast');
 
     // Update final results
     await updateScan(scanId, {
@@ -332,8 +371,11 @@ export async function runScan(scanId: string, url: string): Promise<ScanResult> 
       roast_body: roast.body,
       roast_fixes: roast.fixes,
       llm_report: roast.llmReport,
+      twitter_roast: roast.twitterRoast,
       roast_is_fallback: roast.isFallback || false,
       roast_fallback_reason: roast.fallbackReason || null,
+      current_phase: 'complete',
+      completed_phases: completedPhases,
       completed_at: new Date().toISOString(),
     });
 

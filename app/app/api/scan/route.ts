@@ -37,7 +37,11 @@ const PRIORITY_ANONYMOUS = 10;
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { url, fingerprint, userId } = body;
+    const { url, fingerprint, userId, persona = 'hacker' } = body;
+
+    // Validate persona
+    const validPersonas = ['hacker', 'gordon', 'parent', 'interviewer', 'drill', 'meme', 'therapist'];
+    const selectedPersona = validPersonas.includes(persona) ? persona : 'hacker';
 
     // Validate URL
     if (!url || typeof url !== 'string') {
@@ -150,6 +154,7 @@ export async function POST(request: NextRequest) {
         ip_address: ip,
         fingerprint: fingerprint || null,
         user_id: userId || null,
+        roast_persona: selectedPersona,
       })
       .select('id')
       .single();
@@ -171,6 +176,7 @@ export async function POST(request: NextRequest) {
           scanId: scan.id,
           url: parsedUrl.href,
           userTier,
+          persona: selectedPersona,
         },
         {
           jobId: scan.id,

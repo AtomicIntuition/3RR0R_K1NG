@@ -60,6 +60,8 @@ export interface ScanUpdate {
   roast_title?: string;
   roast_body?: string;
   roast_fixes?: unknown;
+  twitter_roast?: string;
+  roast_persona?: string;
   llm_report?: string;
   roast_is_fallback?: boolean;
   roast_fallback_reason?: string | null;
@@ -67,6 +69,9 @@ export interface ScanUpdate {
   error_message?: string;
   started_at?: string;
   completed_at?: string;
+  // Progress tracking
+  current_phase?: string;
+  completed_phases?: string[];
 }
 
 export async function updateScan(scanId: string, update: ScanUpdate): Promise<void> {

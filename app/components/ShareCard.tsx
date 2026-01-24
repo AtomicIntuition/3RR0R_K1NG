@@ -8,20 +8,29 @@ interface ShareCardProps {
   scanId: string;
   url: string;
   score: number;
+  twitterRoast?: string;
   className?: string;
 }
 
-export function ShareCard({ scanId, url, score, className }: ShareCardProps) {
+export function ShareCard({ scanId, url, score, twitterRoast, className }: ShareCardProps) {
   const [copied, setCopied] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   const shareUrl = typeof window !== 'undefined'
     ? `${window.location.origin}/scan/${scanId}`
     : '';
 
+  const ogImageUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/api/og/${scanId}`
+    : '';
+
   const grade = getGrade(score);
   const domain = new URL(url).hostname;
 
-  const shareText = `I just got my website roasted by 3RROR_K1NG! ${domain} scored ${score}/100 (Grade: ${grade}). Check out the brutal truth:`;
+  // Use the custom Twitter roast if available, otherwise fall back to generic message
+  const shareText = twitterRoast
+    ? `${twitterRoast}\n\nGet roasted:`
+    : `I just got my website roasted by 3RROR_K1NG! ${domain} scored ${score}/100 (Grade: ${grade}). Check out the brutal truth:`;
 
   const handleCopy = async () => {
     try {
@@ -49,6 +58,26 @@ export function ShareCard({ scanId, url, score, className }: ShareCardProps) {
   const handleLinkedInShare = () => {
     const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
     window.open(linkedInUrl, '_blank', 'width=550,height=420');
+  };
+
+  const handleDownloadImage = async () => {
+    setDownloading(true);
+    try {
+      const response = await fetch(ogImageUrl);
+      const blob = await response.blob();
+      const downloadUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `3rror-k1ng-roast-${scanId.slice(0, 8)}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      console.error('Failed to download image:', error);
+    } finally {
+      setDownloading(false);
+    }
   };
 
   return (
@@ -103,24 +132,70 @@ export function ShareCard({ scanId, url, score, className }: ShareCardProps) {
           </svg>
           <span>Share on LinkedIn</span>
         </button>
+
+        <button
+          onClick={handleDownloadImage}
+          disabled={downloading}
+          className="flex items-center gap-2 px-4 py-2 bg-terminal/10 border border-terminal/30 text-terminal rounded hover:bg-terminal/20 transition-colors disabled:opacity-50"
+        >
+          {downloading ? (
+            <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+          ) : (
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+          )}
+          <span>{downloading ? 'Generating...' : 'Download Image'}</span>
+        </button>
       </div>
 
-      {/* Preview card */}
-      <div className="mt-6 p-4 bg-void-100 rounded-lg border border-void-200">
-        <p className="text-xs text-gray-500 mb-2">Social preview:</p>
-        <div className="flex items-start gap-4">
-          <div className="w-16 h-16 bg-void-200 rounded flex items-center justify-center text-2xl font-bold text-terminal">
-            {grade}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-medium text-gray-200 truncate">{domain}</p>
-            <p className="text-sm text-gray-400">
-              Scored {score}/100 on 3RROR_K1NG
-            </p>
-            <p className="text-xs text-gray-500 mt-1">3rror-k1ng.vercel.app</p>
-          </div>
+      {/* Twitter Image Preview */}
+      <div className="mt-6">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-sm text-gray-400">Twitter/X Card Preview:</p>
+          <a
+            href={ogImageUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-terminal hover:underline"
+          >
+            Open full size
+          </a>
         </div>
+        <div className="relative aspect-[1200/675] rounded-lg overflow-hidden border border-void-200 bg-void-100">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={ogImageUrl}
+            alt="Twitter card preview"
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        </div>
+        <p className="text-xs text-gray-500 mt-2">
+          This image will appear when you share on Twitter/X. Download it to post manually for maximum impact.
+        </p>
       </div>
+
+      {/* Twitter roast text */}
+      {twitterRoast && (
+        <div className="mt-4 p-3 bg-void-100 rounded-lg border border-void-200">
+          <p className="text-xs text-gray-500 mb-2">Twitter-ready roast:</p>
+          <p className="text-sm text-gray-300 font-mono">{twitterRoast}</p>
+          <button
+            onClick={async () => {
+              await navigator.clipboard.writeText(`${twitterRoast}\n\nGet roasted: ${shareUrl}`);
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            }}
+            className="mt-2 text-xs text-terminal hover:underline"
+          >
+            {copied ? 'Copied!' : 'Copy tweet text'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

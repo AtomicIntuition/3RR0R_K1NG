@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { Scanner } from '@/components/Scanner';
 import { GlitchText } from '@/components/GlitchText';
 import { Navbar } from '@/components/Navbar';
+import { Stats } from '@/components/Stats';
+import { ExampleRoasts } from '@/components/ExampleRoasts';
 
 export default function HomePage() {
   return (
@@ -57,19 +59,13 @@ export default function HomePage() {
       </div>
 
       {/* Stats/Social Proof */}
-      <div className="mt-16 flex flex-wrap justify-center gap-8 text-center">
-        <div>
-          <div className="text-3xl font-bold text-terminal">10K+</div>
-          <div className="text-xs text-gray-500">Sites Roasted</div>
-        </div>
-        <div>
-          <div className="text-3xl font-bold text-neon-cyan">50+</div>
-          <div className="text-xs text-gray-500">Security Checks</div>
-        </div>
-        <div>
-          <div className="text-3xl font-bold text-neon-purple">100%</div>
-          <div className="text-xs text-gray-500">Brutal Honesty</div>
-        </div>
+      <div className="mt-16">
+        <Stats />
+      </div>
+
+      {/* Example Roasts Carousel */}
+      <div className="mt-16 w-full">
+        <ExampleRoasts />
       </div>
 
       {/* How it works */}

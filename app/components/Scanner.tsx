@@ -4,6 +4,7 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
 import { useAuth } from '@/lib/auth-context';
+import { PersonaSelector, type RoastPersona } from './PersonaSelector';
 
 interface ScannerProps {
   className?: string;
@@ -33,6 +34,7 @@ export function Scanner({ className }: ScannerProps) {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [scanPhase, setScanPhase] = useState('');
+  const [persona, setPersona] = useState<RoastPersona>('hacker');
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -57,6 +59,7 @@ export function Scanner({ className }: ScannerProps) {
         body: JSON.stringify({
           url: normalizedUrl,
           userId: user?.id || null,
+          persona,
         }),
       });
 
@@ -166,6 +169,15 @@ export function Scanner({ className }: ScannerProps) {
             <span className="font-bold">ERROR:</span> {error}
           </div>
         )}
+
+        {/* Persona Selector */}
+        <div className="mt-4">
+          <PersonaSelector
+            selected={persona}
+            onSelect={setPersona}
+            compact={false}
+          />
+        </div>
       </form>
 
       {/* Example URLs */}

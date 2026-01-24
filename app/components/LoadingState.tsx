@@ -8,6 +8,7 @@ interface LoadingStateProps {
   phase?: string;
   percentage?: number;
   completedAudits?: string[];
+  currentPhase?: string;
   className?: string;
 }
 
@@ -18,13 +19,26 @@ const AUDIT_ICONS: Record<string, string> = {
   'Code Quality': '🧹',
   'Tech Stack': '⚙️',
   'Resources': '📊',
+  'Deep Scan': '🔬',
   'Performance': '⚡',
-  'AI Roast': '🔥',
 };
 
-const ALL_AUDITS = ['Security', 'SEO', 'Accessibility', 'Code Quality', 'Tech Stack', 'Resources', 'Performance', 'AI Roast'];
+// Ordered list for display - matches backend PHASE_ORDER
+const ALL_AUDITS = ['Security', 'SEO', 'Accessibility', 'Code Quality', 'Tech Stack', 'Resources', 'Deep Scan', 'Performance'];
 
-export function LoadingState({ phase, percentage = 0, completedAudits = [], className }: LoadingStateProps) {
+// Map display names back to internal phase names for current detection
+const DISPLAY_TO_PHASE: Record<string, string> = {
+  'Security': 'security',
+  'SEO': 'seo',
+  'Accessibility': 'accessibility',
+  'Code Quality': 'code_quality',
+  'Tech Stack': 'tech_stack',
+  'Resources': 'resources',
+  'Deep Scan': 'extended_audits',
+  'Performance': 'performance',
+};
+
+export function LoadingState({ phase, percentage = 0, completedAudits = [], currentPhase = '', className }: LoadingStateProps) {
   const [dots, setDots] = useState('');
   const [pulseIndex, setPulseIndex] = useState(0);
 
@@ -43,6 +57,12 @@ export function LoadingState({ phase, percentage = 0, completedAudits = [], clas
     }, 300);
     return () => clearInterval(interval);
   }, []);
+
+  // Helper to check if an audit is the current one
+  const isCurrentAudit = (auditName: string): boolean => {
+    const phaseKey = DISPLAY_TO_PHASE[auditName];
+    return phaseKey === currentPhase;
+  };
 
   return (
     <div className={clsx('flex flex-col items-center justify-center py-12', className)}>
@@ -92,8 +112,7 @@ export function LoadingState({ phase, percentage = 0, completedAudits = [], clas
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           {ALL_AUDITS.slice(0, 4).map((audit) => {
             const isComplete = completedAudits.includes(audit);
-            const isCurrent = !isComplete && completedAudits.length < ALL_AUDITS.indexOf(audit) + 1 &&
-              completedAudits.length >= ALL_AUDITS.indexOf(audit);
+            const isCurrent = isCurrentAudit(audit);
 
             return (
               <div
@@ -107,7 +126,7 @@ export function LoadingState({ phase, percentage = 0, completedAudits = [], clas
               >
                 <span className="text-xl mb-1">{AUDIT_ICONS[audit]}</span>
                 <span className={clsx(
-                  'text-xs font-medium',
+                  'text-xs font-medium text-center',
                   isComplete && 'text-terminal',
                   isCurrent && 'text-neon-yellow',
                   !isComplete && !isCurrent && 'text-gray-500'
@@ -121,11 +140,10 @@ export function LoadingState({ phase, percentage = 0, completedAudits = [], clas
           })}
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-4 gap-3">
           {ALL_AUDITS.slice(4).map((audit) => {
             const isComplete = completedAudits.includes(audit);
-            const isCurrent = !isComplete && completedAudits.length < ALL_AUDITS.indexOf(audit) + 1 &&
-              completedAudits.length >= ALL_AUDITS.indexOf(audit);
+            const isCurrent = isCurrentAudit(audit);
 
             return (
               <div
@@ -139,7 +157,7 @@ export function LoadingState({ phase, percentage = 0, completedAudits = [], clas
               >
                 <span className="text-xl mb-1">{AUDIT_ICONS[audit]}</span>
                 <span className={clsx(
-                  'text-xs font-medium',
+                  'text-xs font-medium text-center',
                   isComplete && 'text-terminal',
                   isCurrent && 'text-neon-yellow',
                   !isComplete && !isCurrent && 'text-gray-500'

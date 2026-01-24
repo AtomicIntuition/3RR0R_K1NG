@@ -52,6 +52,7 @@ export default function ScanResultsPage() {
           phase={progress.phase}
           percentage={progress.percentage}
           completedAudits={progress.completedAudits}
+          currentPhase={progress.currentPhase}
         />
       </div>
     );
@@ -152,6 +153,7 @@ export default function ScanResultsPage() {
               title={scan.roastTitle}
               body={scan.roastBody}
               score={scan.scoreOverall || 0}
+              persona={scan.roastPersona}
             />
           </section>
         )}
@@ -254,6 +256,7 @@ export default function ScanResultsPage() {
             scanId={scan.id}
             url={scan.url}
             score={scan.scoreOverall || 0}
+            twitterRoast={scan.twitterRoast}
           />
         </section>
 

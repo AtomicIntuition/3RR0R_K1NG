@@ -8,17 +8,17 @@ console.log('Starting 3RROR_K1NG Worker...');
 
 // Process scan jobs
 async function processScanJob(job: Job<ScanJobData>): Promise<void> {
-  const { scanId, url, scanType, files } = job.data;
+  const { scanId, url, scanType, files, persona = 'hacker' } = job.data;
 
-  console.log(`Processing job ${job.id}: ${scanType === 'upload' ? 'File Upload' : url}`);
+  console.log(`Processing job ${job.id}: ${scanType === 'upload' ? 'File Upload' : url} (persona: ${persona})`);
 
   try {
     if (scanType === 'upload' && files) {
       // Process file upload scan
       await runUploadScan(scanId, files);
     } else if (url) {
-      // Process URL scan
-      await runScan(scanId, url);
+      // Process URL scan with persona
+      await runScan(scanId, url, persona);
     } else {
       throw new Error('Invalid job data: missing url or files');
     }

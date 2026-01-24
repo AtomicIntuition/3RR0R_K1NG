@@ -283,6 +283,8 @@ export interface Scan {
   roastTitle?: string;
   roastBody?: string;
   roastFixes?: RoastFix[];
+  twitterRoast?: string; // Short 280-char roast for Twitter
+  roastPersona?: string; // Which persona generated the roast
   llmReport?: string; // LLM-ready detailed report for AI assistants
 
   // Metadata
@@ -346,6 +348,8 @@ export interface DbScan {
   roast_title: string | null;
   roast_body: string | null;
   roast_fixes: RoastFix[] | null;
+  twitter_roast: string | null;
+  roast_persona: string | null;
   llm_report: string | null;
   screenshot_url: string | null;
   error_message: string | null;
@@ -391,6 +395,8 @@ export function dbScanToScan(row: DbScan): Scan {
     roastTitle: row.roast_title ?? undefined,
     roastBody: row.roast_body ?? undefined,
     roastFixes: row.roast_fixes ?? undefined,
+    twitterRoast: row.twitter_roast ?? undefined,
+    roastPersona: row.roast_persona ?? undefined,
     llmReport: row.llm_report ?? undefined,
     screenshotUrl: row.screenshot_url ?? undefined,
     errorMessage: row.error_message ?? undefined,

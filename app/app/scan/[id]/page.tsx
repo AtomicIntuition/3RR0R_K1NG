@@ -89,7 +89,7 @@ export default function ScanResultsPage() {
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Shareable Results Section - This entire area gets captured */}
-        <div id="shareable-results" className="relative bg-void rounded-xl p-6 mb-8">
+        <div id="shareable-results" className="relative bg-void rounded-xl p-8 pt-16 mb-8 border border-void-100">
           {/* Screenshot Button - Floating at top right */}
           <div className="absolute top-4 right-4 z-10 screenshot-ignore">
             <ScreenshotButton
@@ -99,17 +99,17 @@ export default function ScanResultsPage() {
             />
           </div>
 
-          {/* Header */}
+          {/* Header - 3RROR_K1NG branding */}
           <header className="text-center mb-8">
-            <Link href="/" className="inline-block mb-4 screenshot-ignore">
-              <span className="text-2xl font-bold text-terminal hover:text-terminal-bright transition-colors">
+            <div className="mb-4">
+              <span className="text-3xl font-bold text-terminal" style={{ textShadow: '0 0 20px rgba(0, 255, 65, 0.5)' }}>
                 3RROR_K1NG
               </span>
-            </Link>
+            </div>
 
             <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
               <span className="text-terminal">TARGET:</span>
-              <span className="text-gray-300 truncate max-w-xs">
+              <span className="text-gray-300 truncate max-w-sm">
                 {scan.url}
               </span>
             </div>

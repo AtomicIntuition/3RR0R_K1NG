@@ -36,7 +36,7 @@ COPY worker/tsconfig.json ./worker/
 RUN npm ci
 
 # Install Playwright browsers (matches whatever version npm installed)
-RUN npx playwright install chromium
+RUN cd worker && npx playwright install chromium
 
 # Copy worker source
 COPY worker/src ./worker/src

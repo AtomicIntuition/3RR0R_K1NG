@@ -60,7 +60,7 @@ export default function RootLayout({
               <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
                 <div className="flex items-center gap-2">
                   <span className="text-terminal font-bold">3RROR_K1NG</span>
-                  <span className="text-gray-600">|</span>
+                  <span className="text-gray-400">|</span>
                   <span>Website Roast Machine</span>
                 </div>
                 <div className="flex items-center gap-4">

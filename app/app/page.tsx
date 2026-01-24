@@ -50,7 +50,7 @@ export default function HomePage() {
             className="p-4 bg-void-50/50 rounded-lg border border-void-100 text-center hover:border-terminal/30 transition-colors"
           >
             <span className="text-2xl mb-2 block">{feature.icon}</span>
-            <h3 className="font-bold text-terminal text-sm">{feature.label}</h3>
+            <p className="font-bold text-terminal text-sm">{feature.label}</p>
             <p className="text-xs text-gray-500 mt-1">{feature.desc}</p>
           </div>
         ))}
@@ -140,13 +140,13 @@ export default function HomePage() {
         <div className="bg-void-50 rounded-lg border border-void-100 p-4 font-mono text-xs text-gray-500">
           <div className="flex items-center gap-2 mb-3 pb-2 border-b border-void-100">
             <span className="text-terminal">guest@3rror_k1ng</span>
-            <span className="text-gray-600">~</span>
+            <span className="text-gray-400">~</span>
           </div>
           <div className="space-y-1">
             <p><span className="text-terminal">$</span> ./scan --target https://your-site.com</p>
-            <p className="text-gray-600">[*] Initializing security audit...</p>
-            <p className="text-gray-600">[*] Running performance checks...</p>
-            <p className="text-gray-600">[*] Analyzing SEO configuration...</p>
+            <p className="text-gray-400">[*] Initializing security audit...</p>
+            <p className="text-gray-400">[*] Running performance checks...</p>
+            <p className="text-gray-400">[*] Analyzing SEO configuration...</p>
             <p className="text-neon-yellow">[!] WARNING: 12 vulnerabilities found</p>
             <p className="text-danger">[X] CRITICAL: Missing security headers</p>
             <p className="text-terminal">[+] Report generated. Prepare for roast.</p>

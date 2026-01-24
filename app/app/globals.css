@@ -216,7 +216,7 @@
   /* Input styles */
   .input {
     @apply w-full px-4 py-3 bg-void-100 border border-void-200 rounded text-gray-100;
-    @apply placeholder:text-gray-600;
+    @apply placeholder:text-gray-500;
     @apply focus:outline-none focus:border-terminal focus:ring-1 focus:ring-terminal/50;
     @apply transition-all duration-200;
   }

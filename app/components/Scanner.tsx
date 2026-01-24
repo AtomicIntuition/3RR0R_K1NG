@@ -104,7 +104,7 @@ export function Scanner({ className }: ScannerProps) {
               placeholder="Enter target URL (e.g., example.com)"
               className={clsx(
                 'flex-1 px-3 py-4 bg-transparent text-gray-100',
-                'placeholder:text-gray-600',
+                'placeholder:text-gray-500',
                 'focus:outline-none',
                 'font-mono text-lg',
                 error && 'text-danger'
@@ -170,7 +170,7 @@ export function Scanner({ className }: ScannerProps) {
 
       {/* Example URLs */}
       <div className="mt-6 text-center">
-        <p className="text-xs text-gray-600 mb-2">Try scanning:</p>
+        <p className="text-xs text-gray-400 mb-2">Try scanning:</p>
         <div className="flex flex-wrap justify-center gap-2">
           {['github.com', 'stripe.com', 'vercel.com'].map((example) => (
             <button

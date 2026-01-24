@@ -1,71 +1,94 @@
+# Website Audit Report - LLM Fix Instructions
+## URL: https://3-rr-0-r-k1-ng-app.vercel.app/
+## Overall Score: 91/100
 
-😬
-NEEDS WORK
-ROAST_ID: FRZWFW
-Dream Blog or Nightmare? Your RSC Payloads Keep 404ing
+### SCORES BREAKDOWN
+- Performance: 97/100
+- Security: 100/100
+- SEO: 100/100
+- Accessibility: 63/100
+- Code Quality: 90/100
 
-Well well, looks like someone's dreaming of being a web dev but coding like they're still asleep. Your performance is absolutely *chef's kiss* - 100/100 across the board, faster than my SSH connections to poorly configured servers. But holy payload failures, Batman! Your Next.js app is throwing more 404s than a script kiddie's first penetration test. Every single category route is failing to fetch its RSC payload and falling back to browser navigation like it's 2005. Meanwhile, your accessibility score of 45 screams 'I design exclusively for hackers with perfect vision' - 22 elements failing contrast ratios? Even my terminal has better color schemes. The security posture is weaker than a default WordPress install - no CSP, missing security headers, and you're basically rolling out the red carpet for XSS attacks. At least Vercel's hosting your speed demon properly, but fix those routing issues before your users think your site got pwned.
+### TECH STACK DETECTED
+- Vercel (hosting, 70% confidence)
+- Next.js (framework, 55% confidence)
+- Angular (framework, 20% confidence)
+- Webflow (cms, 20% confidence)
+- Tailwind CSS (library, 20% confidence)
 
-🛡️
-Security
-5 issues found
-71
-/100
-PASSHTTP Strict Transport Security (HSTS)
-HIGHContent Security Policy (CSP)
-Implement a strict CSP that limits script sources and disables inline scripts.
-PASSX-Content-Type-Options
-PASSX-Frame-Options
-LOWX-XSS-Protection
-Add header: X-XSS-Protection: 1; mode=block (or rely on CSP instead)
-LOWReferrer-Policy
-Add header: Referrer-Policy: strict-origin-when-cross-origin
-LOWPermissions-Policy
-Add header to restrict unnecessary browser features like camera, microphone, geolocation.
-PASSHTTPS Connection
-PASSMixed Content
-INFOServer Information Disclosure
-Remove or obfuscate Server and X-Powered-By headers.
+---
 
-!
-Robots.txt
-robots.txt file not found
-!
-XML Sitemap
-XML sitemap not found at /sitemap.xml
+## CRITICAL FIXES REQUIRED
 
-♿
-Accessibility
-2 violations
-45
-/100
-SERIOUSEnsure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds
-22 elements
-Elements must meet minimum color contrast ratio thresholds
-MODERATEEnsure landmarks are unique
-1 element
-Landmarks should have a unique role or role/label/title (i.e. accessible name) combination
+### SECURITY ISSUES (1 issues)
 
-🧹
-Code Quality
-6 issues detected
-40
-/100
-console error
-x2
-Failed to load resource: the server responded with a status of 404 ()
-console error
-x2
-Failed to fetch RSC payload for https://ai-dream-blog.vercel.app/category/dream-stories. Falling bac
-console error
-x2
-Failed to fetch RSC payload for https://ai-dream-blog.vercel.app/category/sleep-tips. Falling back t
-console error
-x2
-Failed to fetch RSC payload for https://ai-dream-blog.vercel.app/category/symbolism. Falling back to
-console error
-x2
-Failed to fetch RSC payload for https://ai-dream-blog.vercel.app/category/dream-science. Falling bac
-console error
-x2
-Failed to fetch RSC payload for https://ai-dream-blog.vercel.app/. Falling back to browser navigatio
+#### [INFO] Server Information Disclosure
+- **Problem:** Server version information can help attackers find vulnerabilities.
+- **Fix:** Remove or obfuscate Server and X-Powered-By headers.
+
+### ACCESSIBILITY ISSUES (2 violations)
+
+#### [SERIOUS] Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds
+- **Rule:** color-contrast
+- **Fix:** Elements must meet minimum color contrast ratio thresholds
+- **Elements Affected:** 5 elements
+- **CSS Selectors:**
+```css
+.ml-2
+.space-y-1 > p:nth-child(1)
+.space-y-1 > .text-gray-600:nth-child(2)
+.text-gray-600:nth-child(3)
+.text-gray-600:nth-child(4)
+```
+- **Details:** Fix any of the following:
+  Element has insufficient color contrast of 3.56 (foreground color: #6b7280, background color: #1a1a24, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1
+- **Reference:** https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright
+
+#### [MODERATE] Ensure the order of headings is semantically correct
+- **Rule:** heading-order
+- **Fix:** Heading levels should only increase by one
+- **Elements Affected:** 1 elements
+- **CSS Selectors:**
+```css
+.hover\:border-terminal\/30.p-4.bg-void-50\/50:nth-child(1) > h3
+```
+- **Details:** Fix any of the following:
+  Heading order invalid
+- **Reference:** https://dequeuniversity.com/rules/axe/4.11/heading-order?application=playwright
+
+### CODE QUALITY ISSUES (2 issues)
+
+#### [CONSOLE_ERROR] Failed to fetch RSC payload for https://3-rr-0-r-k1-ng-app.vercel.app/pricing. Falling back to brows
+
+- **Count:** 1
+
+#### [CONSOLE_ERROR] Refused to connect to 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&
+
+- **Count:** 1
+
+### PERFORMANCE METRICS
+
+- ✅ **First Contentful Paint:** 0.7 s (score: 97/100)
+- ✅ **Largest Contentful Paint:** 0.7 s (score: 99/100)
+- ✅ **Total Blocking Time:** 0 ms (score: 100/100)
+- ✅ **Cumulative Layout Shift:** 0.093 (score: 91/100)
+- ✅ **Speed Index:** 0.8 s (score: 99/100)
+- ✅ **Time to Interactive:** 0.7 s (score: 100/100)
+
+---
+
+## INSTRUCTIONS FOR AI ASSISTANT
+
+Please analyze this report and provide specific code fixes for each issue. For each fix:
+1. Identify the exact file(s) that need to be modified
+2. Provide the exact code changes needed
+3. Explain why the change fixes the issue
+
+Prioritize fixes in this order:
+1. Critical/High security issues
+2. Serious accessibility violations
+3. Performance issues under 50
+4. SEO issues
+5. Code quality issues
+
+Start with the highest priority items and work through the list.

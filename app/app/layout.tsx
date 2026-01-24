@@ -2,17 +2,24 @@ import type { Metadata } from 'next';
 import { Providers } from '@/components/Providers';
 import './globals.css';
 
+const siteUrl = 'https://3-rr-0-r-k1-ng-app.vercel.app';
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: '3RROR_K1NG | Website Roast Machine',
   description: 'Get your website brutally roasted. Security, performance, SEO, and accessibility audits delivered as savage truths with actionable fixes.',
   keywords: ['website audit', 'security scanner', 'performance testing', 'SEO checker', 'accessibility audit'],
   authors: [{ name: '3RROR_K1NG' }],
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
     title: '3RROR_K1NG | Website Roast Machine',
     description: 'Get your website brutally roasted with actionable fixes',
     type: 'website',
     locale: 'en_US',
     siteName: '3RROR_K1NG',
+    url: siteUrl,
   },
   twitter: {
     card: 'summary_large_image',

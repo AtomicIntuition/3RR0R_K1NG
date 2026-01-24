@@ -1,0 +1,11 @@
+# 3RROR_K1NG robots.txt
+User-agent: *
+Allow: /
+
+# Disallow admin and API routes
+Disallow: /admin
+Disallow: /api/
+Disallow: /auth/
+
+# Sitemap
+Sitemap: https://3-rr-0-r-k1-ng-app.vercel.app/sitemap.xml

@@ -41,6 +41,8 @@ export interface ScanUpdate {
   roast_body?: string;
   roast_fixes?: unknown;
   llm_report?: string;
+  roast_is_fallback?: boolean;
+  roast_fallback_reason?: string | null;
   screenshot_url?: string;
   error_message?: string;
   started_at?: string;

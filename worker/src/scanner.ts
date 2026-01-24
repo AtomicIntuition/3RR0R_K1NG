@@ -201,6 +201,8 @@ export async function runScan(scanId: string, url: string): Promise<ScanResult> 
       roast_body: roast.body,
       roast_fixes: roast.fixes,
       llm_report: roast.llmReport,
+      roast_is_fallback: roast.isFallback || false,
+      roast_fallback_reason: roast.fallbackReason || null,
       completed_at: new Date().toISOString(),
     });
 

@@ -19,6 +19,8 @@ export interface RoastResult {
   body: string;
   fixes: RoastFix[];
   llmReport?: string; // New: LLM-ready detailed report
+  isFallback?: boolean; // Track if AI generation failed
+  fallbackReason?: string; // Why AI failed (for debugging)
 }
 
 interface RoastInput {
@@ -226,84 +228,152 @@ Return ONLY the JSON, no other text.`;
 
 let anthropicClient: Anthropic | null = null;
 
+const CLAUDE_TIMEOUT_MS = 30000; // 30 second timeout
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 1000; // Base delay for exponential backoff
+
 function getAnthropicClient(): Anthropic {
   if (!anthropicClient) {
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
       throw new Error('ANTHROPIC_API_KEY is not configured');
     }
-    anthropicClient = new Anthropic({ apiKey });
+    anthropicClient = new Anthropic({
+      apiKey,
+      timeout: CLAUDE_TIMEOUT_MS,
+    });
   }
   return anthropicClient;
 }
 
-export async function generateRoast(input: RoastInput): Promise<RoastResult> {
-  try {
-    const client = getAnthropicClient();
-    const prompt = buildPrompt(input);
+/**
+ * Extract JSON from Claude's response, handling markdown code fences
+ */
+function extractJSON(text: string): string | null {
+  // First try to extract from markdown code fence
+  const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (codeBlockMatch) {
+    const jsonMatch = codeBlockMatch[1].match(/\{[\s\S]*\}/);
+    if (jsonMatch) return jsonMatch[0];
+  }
 
+  // Fall back to direct JSON extraction
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  return jsonMatch ? jsonMatch[0] : null;
+}
+
+/**
+ * Sleep for exponential backoff
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Call Claude API with retry logic
+ */
+async function callClaudeWithRetry(
+  client: Anthropic,
+  prompt: string,
+  attempt: number = 1
+): Promise<{ text: string; error?: string }> {
+  try {
     const response = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1024,
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
+      messages: [{ role: 'user', content: prompt }],
     });
 
-    // Extract text content
     const textContent = response.content.find(c => c.type === 'text');
     if (!textContent || textContent.type !== 'text') {
       throw new Error('No text response from Claude');
     }
 
-    // Parse JSON response
-    const jsonMatch = textContent.text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('Could not parse JSON from response');
-    }
-
-    const result = JSON.parse(jsonMatch[0]) as RoastResult;
-
-    // Validate and sanitize
-    if (!result.title || !result.body || !Array.isArray(result.fixes)) {
-      throw new Error('Invalid roast format');
-    }
-
-    // Ensure title is not too long
-    result.title = result.title.slice(0, 60);
-
-    // Validate fixes
-    result.fixes = result.fixes.slice(0, 5).map(fix => ({
-      priority: ['critical', 'high', 'medium', 'low'].includes(fix.priority)
-        ? fix.priority
-        : 'medium',
-      category: ['performance', 'security', 'seo', 'accessibility', 'code_quality'].includes(fix.category)
-        ? fix.category
-        : 'security',
-      title: String(fix.title).slice(0, 100),
-      description: String(fix.description).slice(0, 500),
-      effort: ['quick', 'medium', 'significant'].includes(fix.effort)
-        ? fix.effort
-        : 'medium',
-    })) as RoastFix[];
-
-    // Generate LLM-ready report
-    result.llmReport = generateLLMReport(input);
-
-    return result;
+    return { text: textContent.text };
   } catch (error) {
-    console.error('Roast generation failed:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const isRetryable =
+      errorMessage.includes('timeout') ||
+      errorMessage.includes('rate') ||
+      errorMessage.includes('429') ||
+      errorMessage.includes('503') ||
+      errorMessage.includes('overloaded');
 
-    // Return fallback roast
-    return generateFallbackRoast(input);
+    if (isRetryable && attempt < MAX_RETRIES) {
+      const delay = RETRY_DELAY_MS * Math.pow(2, attempt - 1);
+      console.log(`Claude API attempt ${attempt} failed (${errorMessage}), retrying in ${delay}ms...`);
+      await sleep(delay);
+      return callClaudeWithRetry(client, prompt, attempt + 1);
+    }
+
+    return { text: '', error: errorMessage };
   }
 }
 
-function generateFallbackRoast(input: RoastInput): RoastResult {
+export async function generateRoast(input: RoastInput): Promise<RoastResult> {
+  const client = getAnthropicClient();
+  const prompt = buildPrompt(input);
+
+  // Call Claude with retry logic
+  const { text, error } = await callClaudeWithRetry(client, prompt);
+
+  if (error) {
+    console.error(`Roast generation failed after ${MAX_RETRIES} attempts:`, error);
+    return generateFallbackRoast(input, `API error: ${error}`);
+  }
+
+  // Extract JSON (handles markdown code fences)
+  const jsonString = extractJSON(text);
+  if (!jsonString) {
+    console.error('Could not extract JSON from response:', text.slice(0, 200));
+    return generateFallbackRoast(input, 'JSON extraction failed');
+  }
+
+  // Parse JSON
+  let result: RoastResult;
+  try {
+    result = JSON.parse(jsonString) as RoastResult;
+  } catch (parseError) {
+    console.error('JSON parse error:', parseError, 'Raw:', jsonString.slice(0, 200));
+    return generateFallbackRoast(input, 'JSON parse failed');
+  }
+
+  // Validate required fields
+  if (!result.title || !result.body || !Array.isArray(result.fixes)) {
+    console.error('Invalid roast format - missing required fields');
+    return generateFallbackRoast(input, 'Invalid response format');
+  }
+
+  // Ensure title is not too long
+  result.title = result.title.slice(0, 60);
+
+  // Validate fixes
+  result.fixes = result.fixes.slice(0, 5).map(fix => ({
+    priority: ['critical', 'high', 'medium', 'low'].includes(fix.priority)
+      ? fix.priority
+      : 'medium',
+    category: ['performance', 'security', 'seo', 'accessibility', 'code_quality'].includes(fix.category)
+      ? fix.category
+      : 'security',
+    title: String(fix.title).slice(0, 100),
+    description: String(fix.description).slice(0, 500),
+    effort: ['quick', 'medium', 'significant'].includes(fix.effort)
+      ? fix.effort
+      : 'medium',
+  })) as RoastFix[];
+
+  // Generate LLM-ready report
+  result.llmReport = generateLLMReport(input);
+  result.isFallback = false;
+
+  console.log('AI roast generated successfully');
+  return result;
+}
+
+function generateFallbackRoast(input: RoastInput, reason?: string): RoastResult {
   const { scores } = input;
+
+  console.log(`Using fallback roast${reason ? `: ${reason}` : ''}`);
 
   let title: string;
   let body: string;
@@ -371,5 +441,5 @@ function generateFallbackRoast(input: RoastInput): RoastResult {
   // Generate LLM report for fallback too
   const llmReport = generateLLMReport(input);
 
-  return { title, body, fixes, llmReport };
+  return { title, body, fixes, llmReport, isFallback: true, fallbackReason: reason };
 }

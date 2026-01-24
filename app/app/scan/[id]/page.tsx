@@ -127,11 +127,11 @@ export default function ScanResultsPage() {
 
               {/* Letter Grade */}
               <div className="flex flex-col items-center">
-                <div className={`text-8xl md:text-9xl font-black tracking-tight leading-none ${getGradeColor(scan.letterGrade || getGrade(scan.scoreOverall || 0))}`}
+                <div className={`text-8xl md:text-9xl font-black tracking-tight leading-none pb-4 ${getGradeColor(scan.letterGrade || getGrade(scan.scoreOverall || 0))}`}
                      style={{ textShadow: '0 0 30px currentColor, 0 0 60px currentColor' }}>
                   {scan.letterGrade || getGrade(scan.scoreOverall || 0)}
                 </div>
-                <span className="text-lg text-gray-400 font-medium mt-6 pt-2">GRADE</span>
+                <span className="text-lg text-gray-400 font-medium">GRADE</span>
               </div>
             </div>
 

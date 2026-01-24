@@ -109,7 +109,7 @@ export default function ScanResultsPage() {
 
             <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
               <span className="text-terminal">TARGET:</span>
-              <span className="text-gray-300 truncate max-w-sm">
+              <span className="text-gray-300 break-all max-w-md text-center">
                 {scan.url}
               </span>
             </div>
@@ -127,11 +127,11 @@ export default function ScanResultsPage() {
 
               {/* Letter Grade */}
               <div className="flex flex-col items-center">
-                <div className={`text-8xl md:text-9xl font-black tracking-tight ${getGradeColor(scan.letterGrade || getGrade(scan.scoreOverall || 0))}`}
+                <div className={`text-8xl md:text-9xl font-black tracking-tight leading-none ${getGradeColor(scan.letterGrade || getGrade(scan.scoreOverall || 0))}`}
                      style={{ textShadow: '0 0 30px currentColor, 0 0 60px currentColor' }}>
                   {scan.letterGrade || getGrade(scan.scoreOverall || 0)}
                 </div>
-                <span className="text-lg text-gray-400 font-medium mt-2">GRADE</span>
+                <span className="text-lg text-gray-400 font-medium mt-4">GRADE</span>
               </div>
             </div>
 

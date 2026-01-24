@@ -111,12 +111,12 @@ export function ScoreRing({
           {showGrade ? (
             <span className={clsx(text, 'font-bold', colorClass)}>{grade}</span>
           ) : (
-            <span className={clsx(text, 'font-bold tabular-nums', colorClass)}>
-              {displayScore}
-            </span>
-          )}
-          {!showGrade && (
-            <span className={clsx(labelSize, 'text-gray-500')}>/100</span>
+            <>
+              <span className={clsx(text, 'font-bold tabular-nums leading-none', colorClass)}>
+                {displayScore}
+              </span>
+              <span className={clsx(labelSize, 'text-gray-500 mt-1')}>/100</span>
+            </>
           )}
         </div>
       </div>

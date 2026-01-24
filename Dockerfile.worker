@@ -1,0 +1,29 @@
+# Worker Dockerfile for Railway deployment
+# Uses Playwright's official base image with pre-installed browsers
+
+FROM mcr.microsoft.com/playwright:v1.49.1-jammy
+
+WORKDIR /app
+
+# Copy root package files for workspaces
+COPY package*.json ./
+COPY turbo.json ./
+
+# Copy worker package files
+COPY worker/package*.json ./worker/
+COPY worker/tsconfig.json ./worker/
+
+# Install all dependencies (including workspace deps)
+RUN npm ci
+
+# Copy worker source
+COPY worker/src ./worker/src
+
+# Build the worker
+RUN npm run build:worker
+
+# Set environment
+ENV NODE_ENV=production
+
+# Run the worker
+CMD ["node", "worker/dist/index.js"]

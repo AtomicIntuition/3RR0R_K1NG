@@ -89,7 +89,18 @@ export default function ScanResultsPage() {
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Shareable Results Section - This entire area gets captured */}
-        <div id="shareable-results" className="relative bg-void rounded-xl p-8 pt-16 mb-8 border border-void-100">
+        <div id="shareable-results" className="relative bg-void rounded-xl p-8 pt-4 mb-8 border border-void-100">
+          {/* Promo Banner - Visible in screenshots */}
+          <div className="text-center mb-6 py-2 px-4 bg-terminal/10 border border-terminal/30 rounded-lg">
+            <span className="text-terminal font-bold text-sm tracking-wide">
+              GET YOUR FREE ROAST
+            </span>
+            <span className="text-gray-400 text-sm mx-2">→</span>
+            <span className="text-gray-300 text-sm font-medium">
+              link in bio
+            </span>
+          </div>
+
           {/* Screenshot Button - Floating at top right */}
           <div className="absolute top-4 right-4 z-10 screenshot-ignore">
             <ScreenshotButton

@@ -12,7 +12,7 @@ import { runImageAudit, type ImageAuditResult } from './audits/images.js';
 import { runCacheAudit, type CacheAuditResult } from './audits/caching.js';
 import { runRedirectAudit, type RedirectAuditResult } from './audits/redirects.js';
 import { generateRoast, type RoastResult } from './roastGenerator.js';
-import { updateScan, getSupabaseClient } from './lib/supabase.js';
+import { updateScan } from './lib/supabase.js';
 
 export interface ScanResult {
   security: SecurityAuditResult;
@@ -27,7 +27,6 @@ export interface ScanResult {
   images?: ImageAuditResult;
   caching?: CacheAuditResult;
   redirects?: RedirectAuditResult;
-  screenshotUrl?: string;
   roast: RoastResult;
   overallScore: number;
 }
@@ -77,48 +76,6 @@ export async function closeBrowser(): Promise<void> {
   if (browser) {
     await browser.close();
     browser = null;
-  }
-}
-
-/**
- * Capture screenshot and upload to Supabase storage
- */
-async function captureAndUploadScreenshot(
-  page: Page,
-  scanId: string
-): Promise<string | null> {
-  try {
-    // Capture viewport screenshot
-    const screenshot = await page.screenshot({
-      type: 'png',
-      fullPage: false,
-    });
-
-    const supabase = getSupabaseClient();
-
-    // Upload to Supabase storage
-    const fileName = `${scanId}.png`;
-    const { data, error } = await supabase.storage
-      .from('screenshots')
-      .upload(fileName, screenshot, {
-        contentType: 'image/png',
-        upsert: true,
-      });
-
-    if (error) {
-      console.error('Failed to upload screenshot:', error.message);
-      return null;
-    }
-
-    // Get public URL
-    const { data: urlData } = supabase.storage
-      .from('screenshots')
-      .getPublicUrl(fileName);
-
-    return urlData?.publicUrl || null;
-  } catch (err) {
-    console.error('Screenshot capture failed:', err);
-    return null;
   }
 }
 
@@ -220,13 +177,6 @@ export async function runScan(scanId: string, url: string): Promise<ScanResult> 
     console.log(`Resource analysis complete: ${resourceAnalysis.totalResources} resources, ${resourceAnalysis.thirdParty.domains.length} third-party domains`);
 
     // === Phase 1 New Audits ===
-
-    // Capture screenshot
-    const screenshotUrl = await captureAndUploadScreenshot(page, scanId);
-    if (screenshotUrl) {
-      await updateScan(scanId, { screenshot_url: screenshotUrl });
-      console.log(`Screenshot captured: ${screenshotUrl}`);
-    }
 
     // Run new audits in parallel
     const [vulnerabilityResult, protocolResult, imageResult, cacheResult, redirectResult] = await Promise.all([
@@ -338,7 +288,6 @@ export async function runScan(scanId: string, url: string): Promise<ScanResult> 
       images: imageResult,
       caching: cacheResult,
       redirects: redirectResult,
-      screenshotUrl: screenshotUrl || undefined,
       roast,
       overallScore,
     };

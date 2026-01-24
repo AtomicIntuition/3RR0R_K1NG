@@ -391,7 +391,6 @@ export async function runScan(scanId: string, url: string, persona: RoastPersona
       twitter_roast: roast.twitterRoast,
       roast_is_fallback: roast.isFallback || false,
       roast_fallback_reason: roast.fallbackReason || null,
-      skip_roast: skipRoast,
       current_phase: 'complete',
       completed_phases: completedPhases,
       completed_at: new Date().toISOString(),

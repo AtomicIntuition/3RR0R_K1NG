@@ -87,6 +87,102 @@ export interface ScanResults {
   techStack: TechStackItem[];
 }
 
+// Phase 1 Audit Types
+export interface VulnerableLibrary {
+  name: string;
+  detectedVersion: string;
+  vulnerabilities: {
+    severity: string;
+    description: string;
+    cve?: string;
+    fixedIn: string;
+    recommendation: string;
+  }[];
+}
+
+export interface ProtocolInfo {
+  httpVersion: string;
+  http2Supported: boolean;
+  http3Supported: boolean;
+  alpn?: string;
+  recommendations: string[];
+}
+
+export interface ImageIssue {
+  src: string;
+  issues: string[];
+  recommendations: string[];
+  severity: 'high' | 'medium' | 'low';
+  currentSize?: number;
+  potentialSavings?: number;
+}
+
+export interface CacheIssue {
+  url: string;
+  type: string;
+  severity: 'high' | 'medium' | 'low';
+  description: string;
+  recommendation: string;
+}
+
+export interface RedirectHop {
+  url: string;
+  statusCode: number;
+  duration: number;
+  location?: string;
+}
+
+export interface RedirectIssue {
+  severity: 'high' | 'medium' | 'low';
+  description: string;
+  recommendation: string;
+}
+
+// Phase 3 Audit Types
+export interface PWACheck {
+  manifest: { exists: boolean; valid: boolean; issues: string[] };
+  serviceWorker: { registered: boolean; scope?: string };
+  icons: { has192: boolean; has512: boolean; hasMaskable: boolean };
+  themeColor: boolean;
+  viewport: boolean;
+  https: boolean;
+  startUrl: boolean;
+}
+
+export interface PWAIssue {
+  severity: 'high' | 'medium' | 'low';
+  category: string;
+  description: string;
+  recommendation: string;
+}
+
+export interface StructuredDataItem {
+  format: 'json-ld' | 'microdata';
+  type: string;
+  isValid: boolean;
+  issues: string[];
+}
+
+export interface StructuredDataError {
+  type: string;
+  property?: string;
+  message: string;
+  severity: 'error' | 'warning';
+}
+
+export interface BrokenLink {
+  url: string;
+  statusCode: number;
+  anchorText: string;
+  isExternal: boolean;
+  error?: string;
+}
+
+export interface InsecureLink {
+  url: string;
+  anchorText: string;
+}
+
 export interface ScoringBreakdown {
   overall: number;
   letterGrade: string;
@@ -128,6 +224,60 @@ export interface Scan {
   resultsAccessibility?: ScanResults['accessibility'];
   resultsCodeQuality?: ScanResults['codeQuality'];
   resultsTechStack?: ScanResults['techStack'];
+
+  // Phase 1 audit results
+  resultsVulnerabilities?: {
+    score: number;
+    vulnerableLibraries: VulnerableLibrary[];
+  };
+  resultsProtocol?: ProtocolInfo;
+  resultsImages?: {
+    score: number;
+    totalImages: number;
+    totalSize: number;
+    optimizationPotential: number;
+    issues: ImageIssue[];
+  };
+  resultsCaching?: {
+    score: number;
+    summary: { totalResources: number; cached: number; longCache: number; immutable: number };
+    issues: CacheIssue[];
+  };
+  resultsRedirects?: {
+    totalRedirects: number;
+    totalTime: number;
+    redirectChain: RedirectHop[];
+    finalUrl: string;
+    issues: RedirectIssue[];
+  };
+
+  // Phase 3 audit results
+  resultsPwa?: {
+    score: number;
+    installable: boolean;
+    checks: PWACheck;
+    issues: PWAIssue[];
+    recommendations: string[];
+  };
+  resultsStructuredData?: {
+    score: number;
+    found: boolean;
+    jsonLdCount: number;
+    microdataCount: number;
+    types: string[];
+    items: StructuredDataItem[];
+    errors: StructuredDataError[];
+    recommendations: string[];
+  };
+  resultsLinks?: {
+    score: number;
+    totalLinks: number;
+    internalLinks: number;
+    externalLinks: number;
+    checkedLinks: number;
+    brokenLinks: BrokenLink[];
+    insecureLinks: InsecureLink[];
+  };
 
   // Roast content
   roastTitle?: string;
@@ -183,6 +333,16 @@ export interface DbScan {
   results_accessibility: ScanResults['accessibility'] | null;
   results_code_quality: ScanResults['codeQuality'] | null;
   results_tech_stack: ScanResults['techStack'] | null;
+  // Phase 1 results
+  results_vulnerabilities: { score: number; vulnerableLibraries: VulnerableLibrary[] } | null;
+  results_protocol: ProtocolInfo | null;
+  results_images: { score: number; totalImages: number; totalSize: number; optimizationPotential: number; issues: ImageIssue[] } | null;
+  results_caching: { score: number; summary: { totalResources: number; cached: number; longCache: number; immutable: number }; issues: CacheIssue[] } | null;
+  results_redirects: { totalRedirects: number; totalTime: number; redirectChain: RedirectHop[]; finalUrl: string; issues: RedirectIssue[] } | null;
+  // Phase 3 results
+  results_pwa: { score: number; installable: boolean; checks: PWACheck; issues: PWAIssue[]; recommendations: string[] } | null;
+  results_structured_data: { score: number; found: boolean; jsonLdCount: number; microdataCount: number; types: string[]; items: StructuredDataItem[]; errors: StructuredDataError[]; recommendations: string[] } | null;
+  results_links: { score: number; totalLinks: number; internalLinks: number; externalLinks: number; checkedLinks: number; brokenLinks: BrokenLink[]; insecureLinks: InsecureLink[] } | null;
   roast_title: string | null;
   roast_body: string | null;
   roast_fixes: RoastFix[] | null;
@@ -218,6 +378,16 @@ export function dbScanToScan(row: DbScan): Scan {
     resultsAccessibility: row.results_accessibility ?? undefined,
     resultsCodeQuality: row.results_code_quality ?? undefined,
     resultsTechStack: row.results_tech_stack ?? undefined,
+    // Phase 1 results
+    resultsVulnerabilities: row.results_vulnerabilities ?? undefined,
+    resultsProtocol: row.results_protocol ?? undefined,
+    resultsImages: row.results_images ?? undefined,
+    resultsCaching: row.results_caching ?? undefined,
+    resultsRedirects: row.results_redirects ?? undefined,
+    // Phase 3 results
+    resultsPwa: row.results_pwa ?? undefined,
+    resultsStructuredData: row.results_structured_data ?? undefined,
+    resultsLinks: row.results_links ?? undefined,
     roastTitle: row.roast_title ?? undefined,
     roastBody: row.roast_body ?? undefined,
     roastFixes: row.roast_fixes ?? undefined,

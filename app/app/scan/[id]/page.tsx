@@ -10,6 +10,7 @@ import { FixList } from '@/components/FixList';
 import { GlitchText } from '@/components/GlitchText';
 import { ShareCard } from '@/components/ShareCard';
 import { LLMReport } from '@/components/LLMReport';
+import { ExtendedAudits } from '@/components/ExtendedAudits';
 import { useScanRealtime } from '@/lib/useScanRealtime';
 import { getGrade, getGradeColor } from '@/lib/scoring';
 
@@ -203,6 +204,9 @@ export default function ScanResultsPage() {
             )}
           </div>
         </section>
+
+        {/* Extended Audits (Phase 1 & 3) */}
+        <ExtendedAudits scan={scan} />
 
         {/* Tech Stack */}
         {scan.resultsTechStack && scan.resultsTechStack.length > 0 && (

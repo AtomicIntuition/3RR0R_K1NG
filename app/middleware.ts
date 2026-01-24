@@ -13,7 +13,12 @@ export function middleware(request: NextRequest) {
   // Add security headers (production only)
   const headers = response.headers;
 
-  // Content Security Policy
+  // Get the host for dynamic CSP
+  const host = request.headers.get('host') || '3-rr-0-r-k1-ng-app.vercel.app';
+  const protocol = host.includes('localhost') ? 'http' : 'https';
+  const origin = `${protocol}://${host}`;
+
+  // Content Security Policy - includes self-referencing for RSC payloads
   headers.set(
     'Content-Security-Policy',
     [
@@ -22,7 +27,8 @@ export function middleware(request: NextRequest) {
       "style-src 'self' 'unsafe-inline'",
       "font-src 'self'",
       "img-src 'self' data: https: blob:",
-      "connect-src 'self' https://*.supabase.co https://api.stripe.com wss://*.supabase.co https://3-rr-0-r-k1-ng-app.vercel.app https://*.vercel.app",
+      // RSC payloads need to fetch from same origin - explicitly include self and the domain
+      `connect-src 'self' ${origin} https://*.supabase.co https://api.stripe.com wss://*.supabase.co https://3-rr-0-r-k1-ng-app.vercel.app https://*.vercel.app`,
       "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
       "object-src 'none'",
       "base-uri 'self'",

@@ -1,6 +1,7 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import { Providers } from '@/components/Providers';
+import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration';
 import './globals.css';
 
 const jetbrainsMono = JetBrains_Mono({
@@ -17,6 +18,14 @@ const spaceGrotesk = Space_Grotesk({
 
 const siteUrl = 'https://3-rr-0-r-k1-ng-app.vercel.app';
 
+// Viewport configuration with theme color
+export const viewport: Viewport = {
+  themeColor: '#00ff41',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: '3RROR_K1NG | Website Roast Machine',
@@ -25,6 +34,12 @@ export const metadata: Metadata = {
   authors: [{ name: '3RROR_K1NG' }],
   alternates: {
     canonical: '/',
+  },
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: '3RROR_K1NG',
   },
   openGraph: {
     title: '3RROR_K1NG | Website Roast Machine',
@@ -45,6 +60,54 @@ export const metadata: Metadata = {
   },
 };
 
+// Structured data for SEO
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${siteUrl}/#website`,
+      url: siteUrl,
+      name: '3RROR_K1NG',
+      description: 'Website Roast Machine - Security, performance, SEO, and accessibility audits',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: `${siteUrl}/?url={search_term_string}`,
+        },
+        'query-input': 'required name=search_term_string',
+      },
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${siteUrl}/#organization`,
+      name: '3RROR_K1NG',
+      url: siteUrl,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/icons/icon-512x512.svg`,
+        width: 512,
+        height: 512,
+      },
+      sameAs: [],
+    },
+    {
+      '@type': 'SoftwareApplication',
+      '@id': `${siteUrl}/#app`,
+      name: '3RROR_K1NG',
+      applicationCategory: 'DeveloperApplication',
+      operatingSystem: 'Web',
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+      },
+      description: 'Get your website brutally roasted with actionable fixes for security, performance, SEO, and accessibility issues.',
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -54,8 +117,14 @@ export default function RootLayout({
     <html lang="en" className={`${jetbrainsMono.variable} ${spaceGrotesk.variable}`}>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.svg" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </head>
       <body className="min-h-screen font-mono">
+        <ServiceWorkerRegistration />
         <Providers>
           <div className="relative min-h-screen flex flex-col">
             {/* Gradient overlay */}

@@ -227,7 +227,7 @@ SEO ISSUES (${failedSeo.length} failed):
 ${failedSeo.map(f => `- ${f.title}: ${f.description}`).join('\n') || 'None found'}
 
 ACCESSIBILITY VIOLATIONS (${input.accessibilityViolations.length}):
-${input.accessibilityViolations.slice(0, 5).map(v => `- [${v.impact.toUpperCase()}] ${v.description} (${v.nodes} elements)`).join('\n') || 'None found'}
+${input.accessibilityViolations.slice(0, 5).map(v => `- [${v.impact.toUpperCase()}] ${v.description} (${v.nodeCount} elements)`).join('\n') || 'None found'}
 
 CODE QUALITY ISSUES (${input.codeQualityIssues.length}):
 ${input.codeQualityIssues.map(i => `- [${i.type}] ${i.message}`).join('\n') || 'None found'}

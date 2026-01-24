@@ -67,11 +67,11 @@ export const config = {
     /*
      * Match all request paths except for:
      * - api routes that need different CSP (like webhooks)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
+     * - _next (all Next.js internals including RSC payloads)
      * - favicon.ico (favicon file)
-     * - public folder
+     * - public folder assets
+     * - sw.js (service worker)
      */
-    '/((?!api/webhook|_next/static|_next/image|favicon.ico|.*\\.png$|.*\\.jpg$|.*\\.svg$).*)',
+    '/((?!api/webhook|_next|favicon.ico|sw.js|manifest.json|.*\\.png$|.*\\.jpg$|.*\\.svg$|.*\\.ico$).*)',
   ],
 };

@@ -70,6 +70,9 @@ const jsonLd = {
       url: siteUrl,
       name: '3RROR_K1NG',
       description: 'Website Roast Machine - Security, performance, SEO, and accessibility audits',
+      publisher: {
+        '@id': `${siteUrl}/#organization`,
+      },
       potentialAction: {
         '@type': 'SearchAction',
         target: {
@@ -90,6 +93,12 @@ const jsonLd = {
         width: 512,
         height: 512,
       },
+      contactPoint: {
+        '@type': 'ContactPoint',
+        contactType: 'customer support',
+        url: `${siteUrl}`,
+        availableLanguage: 'English',
+      },
       sameAs: [],
     },
     {
@@ -104,6 +113,18 @@ const jsonLd = {
         priceCurrency: 'USD',
       },
       description: 'Get your website brutally roasted with actionable fixes for security, performance, SEO, and accessibility issues.',
+    },
+    {
+      '@type': 'BreadcrumbList',
+      '@id': `${siteUrl}/#breadcrumb`,
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Home',
+          item: siteUrl,
+        },
+      ],
     },
   ],
 };

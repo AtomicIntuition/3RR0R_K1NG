@@ -17,7 +17,7 @@
     "dotenv": "^16.4.7",
     "ioredis": "^5.4.2",
     "lighthouse": "^12.2.1",
-    "playwright": "^1.49.1"
+    "playwright": "1.49.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

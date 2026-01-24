@@ -1,0 +1,26 @@
+{
+  "name": "3rror-k1ng",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "app",
+    "worker"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "dev:app": "npm run dev --workspace=app",
+    "dev:worker": "npm run dev --workspace=worker",
+    "build:app": "npm run build --workspace=app",
+    "build:worker": "npm run build --workspace=worker"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "npm@10.2.0"
+}

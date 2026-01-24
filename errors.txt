@@ -1,0 +1,71 @@
+
+😬
+NEEDS WORK
+ROAST_ID: FRZWFW
+Dream Blog or Nightmare? Your RSC Payloads Keep 404ing
+
+Well well, looks like someone's dreaming of being a web dev but coding like they're still asleep. Your performance is absolutely *chef's kiss* - 100/100 across the board, faster than my SSH connections to poorly configured servers. But holy payload failures, Batman! Your Next.js app is throwing more 404s than a script kiddie's first penetration test. Every single category route is failing to fetch its RSC payload and falling back to browser navigation like it's 2005. Meanwhile, your accessibility score of 45 screams 'I design exclusively for hackers with perfect vision' - 22 elements failing contrast ratios? Even my terminal has better color schemes. The security posture is weaker than a default WordPress install - no CSP, missing security headers, and you're basically rolling out the red carpet for XSS attacks. At least Vercel's hosting your speed demon properly, but fix those routing issues before your users think your site got pwned.
+
+🛡️
+Security
+5 issues found
+71
+/100
+PASSHTTP Strict Transport Security (HSTS)
+HIGHContent Security Policy (CSP)
+Implement a strict CSP that limits script sources and disables inline scripts.
+PASSX-Content-Type-Options
+PASSX-Frame-Options
+LOWX-XSS-Protection
+Add header: X-XSS-Protection: 1; mode=block (or rely on CSP instead)
+LOWReferrer-Policy
+Add header: Referrer-Policy: strict-origin-when-cross-origin
+LOWPermissions-Policy
+Add header to restrict unnecessary browser features like camera, microphone, geolocation.
+PASSHTTPS Connection
+PASSMixed Content
+INFOServer Information Disclosure
+Remove or obfuscate Server and X-Powered-By headers.
+
+!
+Robots.txt
+robots.txt file not found
+!
+XML Sitemap
+XML sitemap not found at /sitemap.xml
+
+♿
+Accessibility
+2 violations
+45
+/100
+SERIOUSEnsure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds
+22 elements
+Elements must meet minimum color contrast ratio thresholds
+MODERATEEnsure landmarks are unique
+1 element
+Landmarks should have a unique role or role/label/title (i.e. accessible name) combination
+
+🧹
+Code Quality
+6 issues detected
+40
+/100
+console error
+x2
+Failed to load resource: the server responded with a status of 404 ()
+console error
+x2
+Failed to fetch RSC payload for https://ai-dream-blog.vercel.app/category/dream-stories. Falling bac
+console error
+x2
+Failed to fetch RSC payload for https://ai-dream-blog.vercel.app/category/sleep-tips. Falling back t
+console error
+x2
+Failed to fetch RSC payload for https://ai-dream-blog.vercel.app/category/symbolism. Falling back to
+console error
+x2
+Failed to fetch RSC payload for https://ai-dream-blog.vercel.app/category/dream-science. Falling bac
+console error
+x2
+Failed to fetch RSC payload for https://ai-dream-blog.vercel.app/. Falling back to browser navigatio

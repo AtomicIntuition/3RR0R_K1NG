@@ -1,6 +1,19 @@
 import type { Metadata } from 'next';
+import { JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import { Providers } from '@/components/Providers';
 import './globals.css';
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+});
 
 const siteUrl = 'https://3-rr-0-r-k1-ng-app.vercel.app';
 
@@ -38,13 +51,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${jetbrainsMono.variable} ${spaceGrotesk.variable}`}>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
-      <body className="min-h-screen">
+      <body className="min-h-screen font-mono">
         <Providers>
           <div className="relative min-h-screen flex flex-col">
             {/* Gradient overlay */}

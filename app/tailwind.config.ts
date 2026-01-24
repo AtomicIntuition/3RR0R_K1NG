@@ -36,8 +36,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        mono: ['JetBrains Mono', 'Fira Code', 'SF Mono', 'Consolas', 'monospace'],
-        display: ['Space Grotesk', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-mono)', 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Consolas', 'monospace'],
+        display: ['var(--font-sans)', 'Space Grotesk', 'system-ui', 'sans-serif'],
       },
       animation: {
         'glitch': 'glitch 1s linear infinite',

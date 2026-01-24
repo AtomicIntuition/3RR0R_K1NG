@@ -1,9 +1,28 @@
 # Worker Dockerfile for Railway deployment
-# Uses Playwright's official base image with pre-installed browsers
-
-FROM mcr.microsoft.com/playwright:v1.49.1-jammy
+FROM node:20-slim
 
 WORKDIR /app
+
+# Install dependencies for Playwright browsers
+RUN apt-get update && apt-get install -y \
+    libnss3 \
+    libnspr4 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libcups2 \
+    libdrm2 \
+    libxkbcommon0 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libxrandr2 \
+    libgbm1 \
+    libasound2 \
+    libpango-1.0-0 \
+    libcairo2 \
+    libatspi2.0-0 \
+    libgtk-3-0 \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy root package files for workspaces
 COPY package*.json ./
@@ -13,8 +32,11 @@ COPY turbo.json ./
 COPY worker/package*.json ./worker/
 COPY worker/tsconfig.json ./worker/
 
-# Install all dependencies (including workspace deps)
+# Install all dependencies
 RUN npm ci
+
+# Install Playwright browsers (matches whatever version npm installed)
+RUN npx playwright install chromium
 
 # Copy worker source
 COPY worker/src ./worker/src

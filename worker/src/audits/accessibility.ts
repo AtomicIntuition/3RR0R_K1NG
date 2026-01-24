@@ -102,11 +102,40 @@ function extractTextContent(html: string): string {
     .slice(0, 100);             // Limit length
 }
 
+// Helper to add timeout to promises
+function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms))
+  ]);
+}
+
 export async function runAccessibilityAudit(page: Page): Promise<AccessibilityAuditResult> {
   try {
-    const axeResults = await new AxeBuilder({ page } as any)
+    // Add 30 second timeout to prevent hanging on heavy pages
+    const axePromise = new AxeBuilder({ page } as any)
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice'])
       .analyze();
+
+    const axeResults = await withTimeout(axePromise, 30000, null);
+
+    // If timed out, return fallback
+    if (!axeResults) {
+      console.warn('Accessibility audit timed out after 30s');
+      return {
+        score: 70,
+        violations: [{
+          id: 'audit-timeout',
+          impact: 'moderate',
+          description: 'Accessibility audit timed out on this page',
+          help: 'Page is too complex for full accessibility analysis',
+          helpUrl: 'https://www.deque.com/axe/',
+          nodeCount: 0,
+          affectedElements: [],
+        }],
+        passes: 0,
+      };
+    }
 
     const violations: AccessibilityViolation[] = axeResults.violations.map(v => {
       // Extract detailed info from each affected node

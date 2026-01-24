@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Disable X-Powered-By header
+  poweredByHeader: false,
   experimental: {
     serverActions: {
       allowedOrigins: [

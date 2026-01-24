@@ -8,7 +8,7 @@ import { getScoreColor, getScoreBgColor, getCategoryIcon, getCategoryDisplayName
 import type {
   SecurityFinding,
   PerformanceMetric,
-  SeoFinding,
+  SEOFinding,
   AccessibilityViolation,
   CodeQualityIssue,
 } from '@/types/scan';
@@ -18,7 +18,7 @@ interface ResultsCardProps {
   score: number;
   findings?: SecurityFinding[];
   metrics?: PerformanceMetric[];
-  seoFindings?: SeoFinding[];
+  seoFindings?: SEOFinding[];
   violations?: AccessibilityViolation[];
   issues?: CodeQualityIssue[];
   className?: string;

@@ -108,8 +108,8 @@ const SCAN_PHASES = [
 
 type ScanPhase = typeof SCAN_PHASES[number];
 
-export async function runScan(scanId: string, url: string, persona: RoastPersona = 'hacker'): Promise<ScanResult> {
-  console.log(`Starting scan for ${url} (${scanId}) with persona: ${persona}`);
+export async function runScan(scanId: string, url: string, persona: RoastPersona = 'hacker', skipRoast: boolean = false): Promise<ScanResult> {
+  console.log(`Starting scan for ${url} (${scanId}) with persona: ${persona}, skipRoast: ${skipRoast}`);
 
   const completedPhases: string[] = [];
 
@@ -325,41 +325,58 @@ export async function runScan(scanId: string, url: string, persona: RoastPersona
     const letterGrade = scoringResult.letterGrade;
     console.log(`Comprehensive score calculated: ${overallScore}/100 (${letterGrade})`);
 
-    // Generate roast with selected persona
-    await updatePhase('roast');
-    const roast = await generateRoast({
-      url,
-      scores: {
-        overall: overallScore,
-        letterGrade,
-        performance: performanceResult.score,
-        security: securityResult.score,
-        seo: seoResult.score,
-        accessibility: accessibilityResult.score,
-        codeQuality: codeQualityResult.score,
-      },
-      scoringBreakdown: scoringResult.breakdown,
-      securityFindings: securityResult.findings,
-      performanceMetrics: performanceResult.metrics,
-      seoFindings: seoResult.findings,
-      accessibilityViolations: accessibilityResult.violations,
-      codeQualityIssues: codeQualityResult.issues,
-      techStack,
-      resourceAnalysis,
-      // Phase 1 new audits
-      vulnerabilities: vulnerabilityResult,
-      protocol: protocolResult,
-      images: imageResult,
-      caching: cacheResult,
-      redirects: redirectResult,
-      // Phase 3 new audits
-      pwa: pwaResult,
-      structuredData: structuredDataResult,
-      links: linksResult,
-      // Persona for roast style
-      persona,
-    });
-    completePhase('roast');
+    // Generate roast with selected persona (unless skipped)
+    let roast: RoastResult;
+
+    if (skipRoast) {
+      // Skip roast generation for faster results
+      console.log(`Skipping roast generation for ${scanId}`);
+      roast = {
+        title: 'Audit Complete',
+        body: 'Roast generation was skipped. Check the detailed metrics below for your website audit results.',
+        fixes: [],
+        llmReport: '',
+        twitterRoast: '',
+        isFallback: true,
+        fallbackReason: 'skipped',
+      };
+      completePhase('roast');
+    } else {
+      await updatePhase('roast');
+      roast = await generateRoast({
+        url,
+        scores: {
+          overall: overallScore,
+          letterGrade,
+          performance: performanceResult.score,
+          security: securityResult.score,
+          seo: seoResult.score,
+          accessibility: accessibilityResult.score,
+          codeQuality: codeQualityResult.score,
+        },
+        scoringBreakdown: scoringResult.breakdown,
+        securityFindings: securityResult.findings,
+        performanceMetrics: performanceResult.metrics,
+        seoFindings: seoResult.findings,
+        accessibilityViolations: accessibilityResult.violations,
+        codeQualityIssues: codeQualityResult.issues,
+        techStack,
+        resourceAnalysis,
+        // Phase 1 new audits
+        vulnerabilities: vulnerabilityResult,
+        protocol: protocolResult,
+        images: imageResult,
+        caching: cacheResult,
+        redirects: redirectResult,
+        // Phase 3 new audits
+        pwa: pwaResult,
+        structuredData: structuredDataResult,
+        links: linksResult,
+        // Persona for roast style
+        persona,
+      });
+      completePhase('roast');
+    }
 
     // Update final results
     await updateScan(scanId, {
@@ -374,6 +391,7 @@ export async function runScan(scanId: string, url: string, persona: RoastPersona
       twitter_roast: roast.twitterRoast,
       roast_is_fallback: roast.isFallback || false,
       roast_fallback_reason: roast.fallbackReason || null,
+      skip_roast: skipRoast,
       current_phase: 'complete',
       completed_phases: completedPhases,
       completed_at: new Date().toISOString(),

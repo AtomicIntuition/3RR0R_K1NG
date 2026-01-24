@@ -37,11 +37,14 @@ const PRIORITY_ANONYMOUS = 10;
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { url, fingerprint, userId, persona = 'hacker' } = body;
+    const { url, fingerprint, userId, persona = 'hacker', skipRoast = false } = body;
 
     // Validate persona
     const validPersonas = ['hacker', 'gordon', 'parent', 'interviewer', 'drill', 'meme', 'therapist'];
     const selectedPersona = validPersonas.includes(persona) ? persona : 'hacker';
+
+    // Validate skipRoast
+    const shouldSkipRoast = Boolean(skipRoast);
 
     // Validate URL
     if (!url || typeof url !== 'string') {
@@ -177,6 +180,7 @@ export async function POST(request: NextRequest) {
           url: parsedUrl.href,
           userTier,
           persona: selectedPersona,
+          skipRoast: shouldSkipRoast,
         },
         {
           jobId: scan.id,

@@ -35,6 +35,7 @@ export function Scanner({ className }: ScannerProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [scanPhase, setScanPhase] = useState('');
   const [persona, setPersona] = useState<RoastPersona>('hacker');
+  const [skipRoast, setSkipRoast] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -60,6 +61,7 @@ export function Scanner({ className }: ScannerProps) {
           url: normalizedUrl,
           userId: user?.id || null,
           persona,
+          skipRoast,
         }),
       });
 
@@ -170,13 +172,40 @@ export function Scanner({ className }: ScannerProps) {
           </div>
         )}
 
-        {/* Persona Selector */}
-        <div className="mt-4">
-          <PersonaSelector
-            selected={persona}
-            onSelect={setPersona}
-            compact={false}
-          />
+        {/* Scan Options */}
+        <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          {/* Persona Selector */}
+          <div className="flex-1">
+            <PersonaSelector
+              selected={persona}
+              onSelect={setPersona}
+              compact={false}
+              disabled={skipRoast}
+            />
+          </div>
+
+          {/* Quick Audit Toggle */}
+          <button
+            type="button"
+            onClick={() => setSkipRoast(!skipRoast)}
+            className={clsx(
+              'flex items-center gap-2 px-4 py-2 rounded-lg border transition-all text-sm font-medium',
+              skipRoast
+                ? 'bg-neon-cyan/20 border-neon-cyan/50 text-neon-cyan'
+                : 'bg-void-50 border-void-200 text-gray-400 hover:border-gray-500'
+            )}
+          >
+            <svg
+              className={clsx('w-4 h-4', skipRoast ? 'text-neon-cyan' : 'text-gray-500')}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <span>Quick Audit</span>
+            {skipRoast && <span className="text-xs opacity-75">(No Roast)</span>}
+          </button>
         </div>
       </form>
 

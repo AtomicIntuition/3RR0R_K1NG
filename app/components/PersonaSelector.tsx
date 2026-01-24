@@ -62,9 +62,10 @@ interface PersonaSelectorProps {
   onSelect: (persona: RoastPersona) => void;
   className?: string;
   compact?: boolean;
+  disabled?: boolean;
 }
 
-export function PersonaSelector({ selected, onSelect, className, compact = false }: PersonaSelectorProps) {
+export function PersonaSelector({ selected, onSelect, className, compact = false, disabled = false }: PersonaSelectorProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const selectedPersona = PERSONAS.find(p => p.id === selected) || PERSONAS[0];
@@ -130,9 +131,10 @@ export function PersonaSelector({ selected, onSelect, className, compact = false
   }
 
   return (
-    <div className={clsx('w-full', className)}>
+    <div className={clsx('w-full', disabled && 'opacity-50 pointer-events-none', className)}>
       <div className="flex items-center gap-2 mb-3">
         <span className="text-sm text-gray-400">Choose Your Roaster:</span>
+        {disabled && <span className="text-xs text-neon-cyan">(Disabled in Quick Audit mode)</span>}
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
         {PERSONAS.map((persona) => (
@@ -140,11 +142,13 @@ export function PersonaSelector({ selected, onSelect, className, compact = false
             key={persona.id}
             type="button"
             onClick={() => onSelect(persona.id)}
+            disabled={disabled}
             className={clsx(
               'flex flex-col items-center p-3 rounded-lg border transition-all',
               selected === persona.id
                 ? 'bg-terminal/10 border-terminal/50 text-terminal'
-                : 'bg-void-50 border-void-100 text-gray-400 hover:border-terminal/30 hover:text-gray-300'
+                : 'bg-void-50 border-void-100 text-gray-400 hover:border-terminal/30 hover:text-gray-300',
+              disabled && 'cursor-not-allowed'
             )}
           >
             <span className="text-2xl mb-1">{persona.emoji}</span>

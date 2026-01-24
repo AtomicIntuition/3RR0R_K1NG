@@ -33,6 +33,8 @@ export interface ScanJobData {
   userTier?: 'anonymous' | 'free' | 'pro';
   // Roast persona selection
   persona?: 'hacker' | 'gordon' | 'parent' | 'interviewer' | 'drill' | 'meme' | 'therapist';
+  // Skip roast generation for faster results
+  skipRoast?: boolean;
   // Phase 2: File upload support
   scanType?: 'url' | 'upload';
   files?: Array<{ path: string; content: string }>;

@@ -86,13 +86,37 @@ export function Scanner({ className }: ScannerProps) {
     <div className={clsx('w-full max-w-2xl mx-auto', className)}>
       <form onSubmit={handleSubmit} className="relative">
         {/* Terminal-style header */}
-        <div className="flex items-center gap-2 px-4 py-2 bg-void-100 rounded-t-lg border border-b-0 border-void-200">
-          <div className="flex gap-1.5">
-            <span className="w-3 h-3 rounded-full bg-danger/80" />
-            <span className="w-3 h-3 rounded-full bg-neon-yellow/80" />
-            <span className="w-3 h-3 rounded-full bg-terminal/80" />
+        <div className="flex items-center justify-between px-4 py-2 bg-void-100 rounded-t-lg border border-b-0 border-void-200">
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1.5">
+              <span className="w-3 h-3 rounded-full bg-danger/80" />
+              <span className="w-3 h-3 rounded-full bg-neon-yellow/80" />
+              <span className="w-3 h-3 rounded-full bg-terminal/80" />
+            </div>
+            <span className="text-xs text-gray-400 ml-2">target_scanner.exe</span>
           </div>
-          <span className="text-xs text-gray-400 ml-2">target_scanner.exe</span>
+
+          {/* Quick Audit Toggle */}
+          <button
+            type="button"
+            onClick={() => setSkipRoast(!skipRoast)}
+            className={clsx(
+              'flex items-center gap-1.5 px-3 py-1 rounded border transition-all text-xs font-medium',
+              skipRoast
+                ? 'bg-neon-cyan/20 border-neon-cyan/50 text-neon-cyan'
+                : 'bg-void-50 border-void-200 text-gray-500 hover:border-gray-400 hover:text-gray-300'
+            )}
+          >
+            <svg
+              className="w-3 h-3"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <span>Quick Mode</span>
+          </button>
         </div>
 
         {/* Input container */}
@@ -172,40 +196,14 @@ export function Scanner({ className }: ScannerProps) {
           </div>
         )}
 
-        {/* Scan Options */}
-        <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          {/* Persona Selector */}
-          <div className="flex-1">
-            <PersonaSelector
-              selected={persona}
-              onSelect={setPersona}
-              compact={false}
-              disabled={skipRoast}
-            />
-          </div>
-
-          {/* Quick Audit Toggle */}
-          <button
-            type="button"
-            onClick={() => setSkipRoast(!skipRoast)}
-            className={clsx(
-              'flex items-center gap-2 px-4 py-2 rounded-lg border transition-all text-sm font-medium',
-              skipRoast
-                ? 'bg-neon-cyan/20 border-neon-cyan/50 text-neon-cyan'
-                : 'bg-void-50 border-void-200 text-gray-400 hover:border-gray-500'
-            )}
-          >
-            <svg
-              className={clsx('w-4 h-4', skipRoast ? 'text-neon-cyan' : 'text-gray-500')}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-            <span>Quick Audit</span>
-            {skipRoast && <span className="text-xs opacity-75">(No Roast)</span>}
-          </button>
+        {/* Persona Selector */}
+        <div className="mt-4">
+          <PersonaSelector
+            selected={persona}
+            onSelect={setPersona}
+            compact={false}
+            disabled={skipRoast}
+          />
         </div>
       </form>
 

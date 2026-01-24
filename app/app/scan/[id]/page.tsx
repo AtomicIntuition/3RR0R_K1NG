@@ -131,7 +131,7 @@ export default function ScanResultsPage() {
                      style={{ textShadow: '0 0 30px currentColor, 0 0 60px currentColor' }}>
                   {scan.letterGrade || getGrade(scan.scoreOverall || 0)}
                 </div>
-                <span className="text-lg text-gray-400 font-medium mt-4">GRADE</span>
+                <span className="text-lg text-gray-400 font-medium mt-6 pt-2">GRADE</span>
               </div>
             </div>
 

@@ -33,22 +33,23 @@ async function getAvailablePort(): Promise<number> {
   });
 }
 
-export async function runPerformanceAudit(url: string): Promise<PerformanceAuditResult> {
-  let browser;
-  const debuggingPort = await getAvailablePort();
+// Run a single Lighthouse attempt
+async function runLighthouseAttempt(url: string, debuggingPort: number): Promise<PerformanceAuditResult | null> {
+  const browser = await chromium.launch({
+    headless: true,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+      `--remote-debugging-port=${debuggingPort}`,
+    ],
+  });
 
   try {
-    // Launch browser with remote debugging port for Lighthouse
-    browser = await chromium.launch({
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        `--remote-debugging-port=${debuggingPort}`,
-      ],
-    });
+    // Small delay to ensure browser is ready
+    await new Promise(resolve => setTimeout(resolve, 500));
 
-    // Run Lighthouse connecting to the debugging port
     const result = await lighthouse(url, {
       port: debuggingPort,
       output: 'json',
@@ -69,15 +70,13 @@ export async function runPerformanceAudit(url: string): Promise<PerformanceAudit
     });
 
     if (!result || !result.lhr) {
-      throw new Error('Lighthouse failed to generate results');
+      return null;
     }
 
     const { lhr } = result;
     const perfScore = Math.round((lhr.categories.performance?.score || 0) * 100);
 
-    // Extract key metrics
     const metrics: PerformanceMetric[] = [];
-
     const auditMappings = [
       { id: 'first-contentful-paint', name: 'First Contentful Paint', unit: 's' },
       { id: 'largest-contentful-paint', name: 'Largest Contentful Paint', unit: 's' },
@@ -101,30 +100,51 @@ export async function runPerformanceAudit(url: string): Promise<PerformanceAudit
       }
     }
 
-    return {
-      score: perfScore,
-      metrics,
-    };
-  } catch (error) {
-    console.error('Lighthouse audit failed:', error);
-
-    // Return default scores if Lighthouse fails
-    return {
-      score: 50, // Default to middle score
-      metrics: [
-        {
-          id: 'error',
-          name: 'Audit Error',
-          value: 0,
-          unit: '',
-          score: 0,
-          displayValue: 'Performance audit failed',
-        },
-      ],
-    };
+    return { score: perfScore, metrics };
   } finally {
-    if (browser) {
-      await browser.close();
+    await browser.close();
+  }
+}
+
+export async function runPerformanceAudit(url: string): Promise<PerformanceAuditResult> {
+  const maxRetries = 2;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const debuggingPort = await getAvailablePort();
+
+      // Add delay between retries to let resources clean up
+      if (attempt > 1) {
+        console.log(`Lighthouse retry attempt ${attempt}/${maxRetries}...`);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+
+      const result = await runLighthouseAttempt(url, debuggingPort);
+      if (result) {
+        return result;
+      }
+    } catch (error) {
+      console.error(`Lighthouse attempt ${attempt} failed:`, error);
+
+      // If this was the last attempt, fall through to return default
+      if (attempt === maxRetries) {
+        console.error('All Lighthouse attempts failed, using fallback score');
+      }
     }
   }
+
+  // Return default scores if all retries fail
+  return {
+    score: 50,
+    metrics: [
+      {
+        id: 'error',
+        name: 'Audit Error',
+        value: 0,
+        unit: '',
+        score: 0,
+        displayValue: 'Performance audit failed after retries',
+      },
+    ],
+  };
 }

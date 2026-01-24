@@ -55,8 +55,9 @@ export async function GET(
     const score = scan.score_overall || 0;
     const grade = scan.letter_grade || 'F';
     const url = scan.url?.replace(/^https?:\/\//, '').replace(/\/$/, '') || 'unknown';
-    const roast = scan.twitter_roast || scan.roast_title || 'Your website got roasted!';
-    const truncatedRoast = roast.length > 150 ? roast.slice(0, 150) + '...' : roast;
+    // Use roast_title for a punchier headline, allow more text
+    const roast = scan.roast_title || scan.twitter_roast || 'Your website got roasted!';
+    const truncatedRoast = roast.length > 280 ? roast.slice(0, 280) + '...' : roast;
     const gradeColor = getGradeColor(grade);
     const scoreColor = getScoreColor(score);
 
@@ -156,13 +157,14 @@ export async function GET(
               <div
                 style={{
                   display: 'flex',
-                  padding: '24px',
+                  padding: '20px 24px',
                   backgroundColor: 'rgba(0,255,65,0.05)',
                   border: '2px solid rgba(0,255,65,0.2)',
                   borderRadius: '12px',
+                  maxHeight: '280px',
                 }}
               >
-                <span style={{ fontSize: '28px', color: '#e5e7eb', lineHeight: '1.4' }}>
+                <span style={{ fontSize: '22px', color: '#e5e7eb', lineHeight: '1.35' }}>
                   "{truncatedRoast}"
                 </span>
               </div>

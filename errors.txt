@@ -1,160 +1,157 @@
-# Website Audit Report - LLM Fix Instructions
-## URL: https://3-rr-0-r-k1-ng-app.vercel.app/
-## Overall Score: 91/100 (Grade: A-)
-
-### COMPREHENSIVE SCORING BREAKDOWN
-- **Security:** 93/100 (30% weight, contributes 28 points)
-- **Performance:** 98/100 (25% weight, contributes 25 points)
-- **User Experience:** 81/100 (20% weight, contributes 16 points)
-- **SEO:** 84/100 (15% weight, contributes 13 points)
-- **Code Quality:** 93/100 (10% weight, contributes 9 points)
-
-### TECH STACK DETECTED
-- Vercel (hosting, 70% confidence)
-- Next.js (framework, 55% confidence)
-- Angular (framework, 20% confidence)
-- Webflow (cms, 20% confidence)
-- Tailwind CSS (library, 20% confidence)
-
----
-
-## CRITICAL FIXES REQUIRED
-
-### SECURITY ISSUES (3 issues)
-
-#### [INFO] Server Information Disclosure
-- **Problem:** Server version information can help attackers find vulnerabilities.
-- **Fix:** Remove or obfuscate Server and X-Powered-By headers.
-
-#### [HIGH] CORS Configuration
-- **Problem:** CORS allows requests from any origin (*), which may expose your API.
-- **Fix:** Replace Access-Control-Allow-Origin: * with specific trusted domains.
-
-#### [LOW] Security.txt File
-- **Problem:** No security.txt file found. This file helps security researchers report vulnerabilities.
-- **Fix:** Create a security.txt file at /.well-known/security.txt with Contact and Expires fields.
-
-### CODE QUALITY ISSUES (2 issues)
-
-#### [CONSOLE_ERROR] Failed to fetch RSC payload for https://3-rr-0-r-k1-ng-app.vercel.app/login. Falling back to browser
-- **Count:** 1
-- **FIX:** This is a Next.js React Server Components issue. Check:
-  1. Server component errors in your app/ pages
-  2. CSP headers blocking RSC fetches (add your domain to connect-src)
-  3. Middleware interfering with RSC routes
-
-#### [CONSOLE_ERROR] Failed to fetch RSC payload for https://3-rr-0-r-k1-ng-app.vercel.app/signup. Falling back to browse
-- **Count:** 1
-- **FIX:** This is a Next.js React Server Components issue. Check:
-  1. Server component errors in your app/ pages
-  2. CSP headers blocking RSC fetches (add your domain to connect-src)
-  3. Middleware interfering with RSC routes
-
-### PERFORMANCE METRICS
-
-- ✅ **First Contentful Paint:** 0.3 s (score: 100/100)
-- ✅ **Largest Contentful Paint:** 0.4 s (score: 100/100)
-- ✅ **Total Blocking Time:** 0 ms (score: 100/100)
-- ✅ **Cumulative Layout Shift:** 0.006 (score: 100/100)
-- ✅ **Speed Index:** 0.3 s (score: 100/100)
-- ✅ **Time to Interactive:** 0.4 s (score: 100/100)
-
-### RESOURCE ANALYSIS
-
-**Overview:**
-- Total Resources: 18
-- Total Page Weight: 241.1KB
-- First-Party: 18 resources (241.1KB)
-- Third-Party: 0 resources (0.0KB)
-
-**Render-Blocking Resources:**
-- CSS: `5685be0aa725fa05.css` (0ms)
 
 
-### PROTOCOL ANALYSIS
+upbeat-connection
 
-- **HTTP Version:** HTTP/2
-- **HTTP/2 Supported:** Yes
-- **HTTP/3 (QUIC):** No
-- **ALPN Protocol:** h2
+production
+Architecture
+Observability
+Logs
+Settings
 
-**Recommendations:**
-- Consider enabling HTTP/3 (QUIC) for improved performance on unreliable networks
-- HTTP/3 reduces latency with 0-RTT connection establishment
-
-
-### PWA ANALYSIS (Score: 35/100)
-
-- **Installable:** No
-- **HTTPS:** Yes
-- **Manifest:** Missing
-- **Service Worker:** Not registered
-- **192x192 Icon:** No
-- **512x512 Icon:** No
-- **Theme Color:** Missing
-- **Viewport:** Set
-
-**Issues:**
-- **[LOW]** Missing theme-color meta tag
-  - Add <meta name="theme-color" content="#your-color"> for browser UI theming
-- **[HIGH]** No web app manifest found
-  - Create a manifest.json file and link it with <link rel="manifest" href="/manifest.json">
-- **[MEDIUM]** No service worker registered
-  - Register a service worker for offline support and better performance. Use Workbox for easy setup.
-- **[MEDIUM]** Missing required icons: 192x192 512x512
-  - Add icons with sizes 192x192 and 512x512 to your manifest
-- **[LOW]** No maskable icon defined
-  - Add a maskable icon with "purpose": "maskable" for better Android adaptive icon support
-
-**Recommendations:**
-- Set up a service worker using Workbox or manual implementation
-- Create a complete web app manifest with all required fields
-- Generate PWA icons using tools like pwa-asset-generator
+30 days or $4.97 left
 
 
-### STRUCTURED DATA (Score: 35/100)
-
-- **Found:** No
-- **JSON-LD Blocks:** 0
-- **Microdata Items:** 0
-
-**Recommendations:**
-- Add structured data to improve search engine understanding and enable rich snippets
-- Start with Organization or WebSite schema for basic site identity
-- Add Organization schema to identify your business/website
-- Add WebSite schema with potentialAction for sitelinks search box
-- Add BreadcrumbList schema for better navigation display in search
 
 
-### LINK AUDIT (Score: 100/100)
 
-- **Total Links:** 7
-- **Internal:** 6
-- **External:** 1
-- **Checked:** 7
+3rror-k1ng-worker
+Deployments
+Variables
+Metrics
+Settings
+Unexposed service
+us-east4-eqdc4a
+1 Replica
+
+HISTORY
+3rror-k1ng-worker
+/
+c03f838b
+Active
+
+Jan 24, 2026 at 12:02 PM EST
+Details
+Build Logs
+Deploy Logs
+Network Flow Logs
+Filter and search logs
+
+Worker is ready and listening for jobs
+Redis worker connected
+Processing job dee68210-2701-4f4a-9772-7ef15f4d1500: https://3-rr-0-r-k1-ng-app.vercel.app/ (persona: meme)
+Starting scan for https://3-rr-0-r-k1-ng-app.vercel.app/ (dee68210-2701-4f4a-9772-7ef15f4d1500) with persona: meme
+Running audits for dee68210-2701-4f4a-9772-7ef15f4d1500...
+Security audit complete: 88
+SEO audit complete: 100
+Accessibility audit complete: 100
+Code quality audit complete: 90
+Tech stack detection complete: 5 technologies found
+Resource analysis complete: 21 resources, 0 third-party domains
+Extended audits complete:
+  - Vulnerabilities: 0 vulnerable libraries
+  - Protocol: HTTP/2, HTTP/2: true
+  - Structured Data: 0 types found
+  - Links: 0 broken, 0 insecure
+  - Images: 0 images, 0 issues
+  - Caching: score 100
+  - Redirects: 0 redirects, 59ms
+  - PWA: score 35, installable: false
+Performance audit complete: 100
+Comprehensive score calculated: 91/100 (A-)
+AI roast generated successfully with meme persona
+Scan complete for dee68210-2701-4f4a-9772-7ef15f4d1500: Overall score 91/100 (A-)
+Job dee68210-2701-4f4a-9772-7ef15f4d1500 completed for scan dee68210-2701-4f4a-9772-7ef15f4d1500
+Security audit complete: 83
+SEO audit complete: 64
+Processing job 1e4b7464-7928-41f8-ad67-b842267a7880: https://github.com/ (persona: gordon)
+Starting scan for https://github.com/ (1e4b7464-7928-41f8-ad67-b842267a7880) with persona: gordon
+Running audits for 1e4b7464-7928-41f8-ad67-b842267a7880...
+Accessibility audit complete: 88
+Code quality audit complete: 92
+Tech stack detection complete: 3 technologies found
+Resource analysis complete: 136 resources, 2 third-party domains
+Extended audits complete:
+  - Vulnerabilities: 0 vulnerable libraries
+  - Protocol: HTTP/1.1, HTTP/2: true
+  - Images: 24 images, 13 issues
+  - Caching: score 100
+  - Redirects: 0 redirects, 31ms
+  - PWA: score 55, installable: false
+  - Structured Data: 0 types found
+  - Links: 1 broken, 0 insecure
+Performance audit complete: 47
+Comprehensive score calculated: 74/100 (C)
+AI roast generated successfully with gordon persona
+Scan complete for 1e4b7464-7928-41f8-ad67-b842267a7880: Overall score 74/100 (C)
+Job 1e4b7464-7928-41f8-ad67-b842267a7880 completed for scan 1e4b7464-7928-41f8-ad67-b842267a7880
+Processing job f463b4fa-3c24-4660-94a9-e0fb8daa3516: https://vercel.com/ (persona: parent)
+Starting scan for https://vercel.com/ (f463b4fa-3c24-4660-94a9-e0fb8daa3516) with persona: parent
+Running audits for f463b4fa-3c24-4660-94a9-e0fb8daa3516...
+Security audit complete: 79
+SEO audit complete: 73
+Accessibility audit complete: 0
+Code quality audit complete: 100
+Tech stack detection complete: 4 technologies found
+Resource analysis complete: 250 resources, 2 third-party domains
+Extended audits complete:
+  - Vulnerabilities: 0 vulnerable libraries
+  - Protocol: HTTP/2, HTTP/2: true
+  - Images: 51 images, 3 issues
+  - Caching: score 100
+  - Redirects: 0 redirects, 44ms
+  - PWA: score 80, installable: false
+  - Structured Data: 1 types found
+  - Links: 0 broken, 0 insecure
+Performance audit complete: 69
+Comprehensive score calculated: 73/100 (C)
+AI roast generated successfully with parent persona
+Scan complete for f463b4fa-3c24-4660-94a9-e0fb8daa3516: Overall score 73/100 (C)
+Job f463b4fa-3c24-4660-94a9-e0fb8daa3516 completed for scan f463b4fa-3c24-4660-94a9-e0fb8daa3516
+Processing job 6b5c5477-21c6-46c7-be08-4abd6a2682ca: https://stripe.com/ (persona: drill)
+Starting scan for https://stripe.com/ (6b5c5477-21c6-46c7-be08-4abd6a2682ca) with persona: drill
+Running audits for 6b5c5477-21c6-46c7-be08-4abd6a2682ca...
+Security audit complete: 74
+SEO audit complete: 64
+Accessibility audit complete: 0
+Processing job 6b5c5477-21c6-46c7-be08-4abd6a2682ca: https://stripe.com/ (persona: drill)
+Starting scan for https://stripe.com/ (6b5c5477-21c6-46c7-be08-4abd6a2682ca) with persona: drill
+Scan failed for 6b5c5477-21c6-46c7-be08-4abd6a2682ca: page.evaluate: Target crashed 
+Job 6b5c5477-21c6-46c7-be08-4abd6a2682ca failed: page.evaluate: Target crashed 
+    at async runScan (/app/worker/dist/scanner.js:145:35)
+Job 6b5c5477-21c6-46c7-be08-4abd6a2682ca failed: page.evaluate: Target crashed 
+    at async Worker.processScanJob (/app/worker/dist/index.js:17:13)
+    at runCodeQualityAudit (/app/worker/dist/audits/codeQuality.js:65:39)
+    at /app/worker/async /app/node_modules/bullmq/dist/cjs/classes/worker.js:565:32 {
+  name: 'Error'
+}
+Running audits for 6b5c5477-21c6-46c7-be08-4abd6a2682ca...
+Security audit complete: 74
+SEO audit complete: 64
+Job 6b5c5477-21c6-46c7-be08-4abd6a2682ca failed: page.evaluate: Target crashed 
+Job 6b5c5477-21c6-46c7-be08-4abd6a2682ca failed: page.evaluate: Target crashed 
+    at runCodeQualityAudit (/app/worker/dist/audits/codeQuality.js:28:34)
+    at runScan (/app/worker/dist/scanner.js:145:41)
+    at async Worker.processScanJob (/app/worker/dist/index.js:17:13)
+    at /app/worker/async /app/node_modules/bullmq/dist/cjs/classes/worker.js:565:32 {
+  name: 'Error'
+}
+Accessibility audit complete: 0
+Scan failed for 6b5c5477-21c6-46c7-be08-4abd6a2682ca: page.evaluate: Target crashed 
+Processing job 6b5c5477-21c6-46c7-be08-4abd6a2682ca: https://stripe.com/ (persona: drill)
+Starting scan for https://stripe.com/ (6b5c5477-21c6-46c7-be08-4abd6a2682ca) with persona: drill
+Running audits for 6b5c5477-21c6-46c7-be08-4abd6a2682ca...
+Security audit complete: 74
+SEO audit complete: 64
+Accessibility audit complete: 0
+Scan failed for 6b5c5477-21c6-46c7-be08-4abd6a2682ca: page.evaluate: Target crashed 
+Job 6b5c5477-21c6-46c7-be08-4abd6a2682ca failed: page.evaluate: Target crashed 
+Job 6b5c5477-21c6-46c7-be08-4abd6a2682ca failed: page.evaluate: Target crashed 
+    at runCodeQualityAudit (/app/worker/dist/audits/codeQuality.js:65:39)
+    at async runScan (/app/worker/dist/scanner.js:145:35)
+    at async Worker.processScanJob (/app/worker/dist/index.js:17:13)
+    at /app/worker/async /app/node_modules/bullmq/dist/cjs/classes/worker.js:565:32 {
+  name: 'Error'
+}
 
 
----
-
-## 📋 COPY-PASTE CODE FIXES
-
-*No critical copy-paste fixes needed - your site is in good shape!*
-
-
----
-
-## INSTRUCTIONS FOR AI ASSISTANT
-
-Please analyze this report and provide specific code fixes for each issue. For each fix:
-1. Identify the exact file(s) that need to be modified
-2. Provide the exact code changes needed
-3. Explain why the change fixes the issue
-
-Prioritize fixes in this order:
-1. Critical/High security issues
-2. Serious accessibility violations
-3. Performance issues under 50
-4. SEO issues
-5. Code quality issues
-
-Start with the highest priority items and work through the list.
+3rror-k1ng-worker | Railway

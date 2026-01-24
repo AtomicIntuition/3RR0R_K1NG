@@ -52,101 +52,104 @@ export async function runCodeQualityAudit(
     });
   }
 
-  // Check for broken links - get links first, then check outside evaluate
-  const linkHrefs = await page.evaluate(() => {
-    const linkEls = document.querySelectorAll('a[href]');
-    const hrefs: string[] = [];
-    const max = Math.min(linkEls.length, 20);
-    for (let i = 0; i < max; i++) {
-      const href = linkEls[i].getAttribute('href');
-      if (href && !href.startsWith('#') && !href.startsWith('javascript:')) {
-        hrefs.push(href);
+  // Check for broken links - wrapped in try-catch to prevent crashes
+  try {
+    const linkHrefs = await page.evaluate(() => {
+      const linkEls = document.querySelectorAll('a[href]');
+      const hrefs: string[] = [];
+      const max = Math.min(linkEls.length, 10); // Reduced from 20 to 10
+      for (let i = 0; i < max; i++) {
+        const href = linkEls[i].getAttribute('href');
+        if (href && !href.startsWith('#') && !href.startsWith('javascript:')) {
+          hrefs.push(href);
+        }
       }
-    }
-    return { hrefs, origin: window.location.origin };
-  });
+      return { hrefs, origin: window.location.origin };
+    }).catch(() => ({ hrefs: [], origin: '' }));
 
-  const brokenLinks: string[] = [];
-  for (const href of linkHrefs.hrefs) {
-    try {
-      const linkUrl = new URL(href, linkHrefs.origin);
-      if (linkUrl.origin !== linkHrefs.origin) continue; // Skip external
-      const resp = await page.request.head(linkUrl.href).catch(() => null);
-      if (!resp || !resp.ok()) {
-        brokenLinks.push(href);
+    const brokenLinks: string[] = [];
+    for (const href of linkHrefs.hrefs) {
+      try {
+        const linkUrl = new URL(href, linkHrefs.origin);
+        if (linkUrl.origin !== linkHrefs.origin) continue; // Skip external
+        const resp = await page.request.head(linkUrl.href, { timeout: 3000 }).catch(() => null);
+        if (!resp || !resp.ok()) {
+          brokenLinks.push(href);
+        }
+      } catch {
+        // Skip
       }
-    } catch {
-      // Skip
     }
+
+    if (brokenLinks.length > 0) {
+      issues.push({
+        id: 'broken-links',
+        type: 'broken_link',
+        message: `Found ${brokenLinks.length} broken internal link(s)`,
+        source: brokenLinks.slice(0, 3).join(', '),
+        count: brokenLinks.length,
+      });
+    }
+  } catch (e) {
+    console.warn('Link check failed, skipping:', e);
   }
 
-  if (brokenLinks.length > 0) {
-    issues.push({
-      id: 'broken-links',
-      type: 'broken_link',
-      message: `Found ${brokenLinks.length} broken internal link(s)`,
-      source: brokenLinks.slice(0, 3).join(', '),
-      count: brokenLinks.length,
-    });
+  // Check for deprecated APIs - wrapped in try-catch
+  try {
+    const deprecatedApis = await page.evaluate(() => {
+      const deprecated: string[] = [];
+
+      // Check for common deprecated patterns
+      if (typeof (document as any).all !== 'undefined') {
+        deprecated.push('document.all');
+      }
+
+      // Check for inline event handlers (considered bad practice)
+      const inlineHandlers = document.querySelectorAll('[onclick], [onmouseover], [onload], [onerror]');
+      if (inlineHandlers.length > 5) {
+        deprecated.push(inlineHandlers.length + ' inline event handlers');
+      }
+
+      return deprecated;
+    }).catch(() => []);
+
+    for (const api of deprecatedApis) {
+      issues.push({
+        id: `deprecated-${issues.length}`,
+        type: 'deprecated_api',
+        message: `Using deprecated: ${api}`,
+        count: 1,
+      });
+    }
+  } catch (e) {
+    console.warn('Deprecated API check failed, skipping:', e);
   }
 
-  // Check for deprecated APIs
-  const deprecatedApis = await page.evaluate(() => {
-    const deprecated: string[] = [];
-
-    // Check for common deprecated patterns
-    if (typeof (document as any).all !== 'undefined') {
-      deprecated.push('document.all');
-    }
-
-    // Check for inline event handlers (considered bad practice)
-    const inlineHandlers = document.querySelectorAll('[onclick], [onmouseover], [onload], [onerror]');
-    if (inlineHandlers.length > 5) {
-      deprecated.push(inlineHandlers.length + ' inline event handlers');
-    }
-
-    // Check for document.write
-    const scriptEls = document.querySelectorAll('script');
-    for (let i = 0; i < scriptEls.length; i++) {
-      const content = scriptEls[i].textContent;
-      if (content && content.includes('document.write')) {
-        deprecated.push('document.write()');
-        break;
+  // Check for mixed content - wrapped in try-catch
+  try {
+    const mixedContent = await page.evaluate(() => {
+      const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
+      const mixed: string[] = [];
+      const max = Math.min(resources.length, 100); // Limit iterations
+      for (let i = 0; i < max; i++) {
+        if (resources[i].name.startsWith('http://')) {
+          mixed.push(resources[i].name);
+        }
       }
+      return mixed;
+    }).catch(() => []);
+
+    if (mixedContent.length > 0) {
+      issues.push({
+        id: 'mixed-content',
+        type: 'mixed_content',
+        message: `${mixedContent.length} resource(s) loaded over insecure HTTP`,
+        source: mixedContent.slice(0, 3).join(', '),
+        count: mixedContent.length,
+      });
     }
-
-    return deprecated;
-  });
-
-  for (const api of deprecatedApis) {
-    issues.push({
-      id: `deprecated-${issues.length}`,
-      type: 'deprecated_api',
-      message: `Using deprecated: ${api}`,
-      count: 1,
-    });
-  }
-
-  // Check for mixed content
-  const mixedContent = await page.evaluate(() => {
-    const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
-    const mixed: string[] = [];
-    for (let i = 0; i < resources.length; i++) {
-      if (resources[i].name.startsWith('http://')) {
-        mixed.push(resources[i].name);
-      }
-    }
-    return mixed;
-  });
-
-  if (mixedContent.length > 0) {
-    issues.push({
-      id: 'mixed-content',
-      type: 'mixed_content',
-      message: `${mixedContent.length} resource(s) loaded over insecure HTTP`,
-      source: mixedContent.slice(0, 3).join(', '),
-      count: mixedContent.length,
-    });
+  } catch (e) {
+    console.warn('Mixed content check failed, skipping:', e);
   }
 
   // Calculate score

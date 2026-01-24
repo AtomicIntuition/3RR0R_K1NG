@@ -180,61 +180,106 @@ export async function runResourceAnalysis(page: Page): Promise<ResourceAnalysis>
   const pageUrl = page.url();
   const pageDomain = new URL(pageUrl).hostname;
 
-  // Collect resource timing data from the browser
-  const resourceData = await page.evaluate(() => {
-    const entries = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
-    const navEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+  // Default fallback values for when page.evaluate crashes
+  const defaultResourceData = {
+    resources: [] as Array<{
+      name: string;
+      initiatorType: string;
+      transferSize: number;
+      encodedBodySize: number;
+      decodedBodySize: number;
+      duration: number;
+      startTime: number;
+      domainLookupStart: number;
+      domainLookupEnd: number;
+      connectStart: number;
+      connectEnd: number;
+      secureConnectionStart: number;
+      requestStart: number;
+      responseStart: number;
+      responseEnd: number;
+    }>,
+    navigation: null as { domContentLoaded: number; load: number } | null,
+  };
 
-    return {
-      resources: entries.map(entry => ({
-        name: entry.name,
-        initiatorType: entry.initiatorType,
-        transferSize: entry.transferSize,
-        encodedBodySize: entry.encodedBodySize,
-        decodedBodySize: entry.decodedBodySize,
-        duration: entry.duration,
-        startTime: entry.startTime,
-        domainLookupStart: entry.domainLookupStart,
-        domainLookupEnd: entry.domainLookupEnd,
-        connectStart: entry.connectStart,
-        connectEnd: entry.connectEnd,
-        secureConnectionStart: entry.secureConnectionStart,
-        requestStart: entry.requestStart,
-        responseStart: entry.responseStart,
-        responseEnd: entry.responseEnd,
-      })),
-      navigation: navEntry ? {
-        domContentLoaded: navEntry.domContentLoadedEventEnd - navEntry.startTime,
-        load: navEntry.loadEventEnd - navEntry.startTime,
-      } : null,
-    };
-  });
+  const defaultRenderBlockingData = {
+    scripts: [] as string[],
+    stylesheets: [] as string[],
+  };
 
-  // Detect render-blocking resources
-  const renderBlockingData = await page.evaluate(() => {
-    const blocking: { scripts: string[]; stylesheets: string[] } = {
-      scripts: [],
-      stylesheets: [],
-    };
+  // Collect resource timing data from the browser - wrapped in try-catch
+  let resourceData = defaultResourceData;
+  try {
+    resourceData = await page.evaluate(() => {
+      const entries = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
+      // Limit to first 200 entries to prevent crashes on heavy pages
+      const limitedEntries = entries.slice(0, 200);
+      const navEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
 
-    // Scripts in head without defer/async are render-blocking
-    document.querySelectorAll('head script[src]').forEach((el) => {
-      const script = el as HTMLScriptElement;
-      if (!script.defer && !script.async) {
-        blocking.scripts.push(script.src);
+      return {
+        resources: limitedEntries.map(entry => ({
+          name: entry.name,
+          initiatorType: entry.initiatorType,
+          transferSize: entry.transferSize,
+          encodedBodySize: entry.encodedBodySize,
+          decodedBodySize: entry.decodedBodySize,
+          duration: entry.duration,
+          startTime: entry.startTime,
+          domainLookupStart: entry.domainLookupStart,
+          domainLookupEnd: entry.domainLookupEnd,
+          connectStart: entry.connectStart,
+          connectEnd: entry.connectEnd,
+          secureConnectionStart: entry.secureConnectionStart,
+          requestStart: entry.requestStart,
+          responseStart: entry.responseStart,
+          responseEnd: entry.responseEnd,
+        })),
+        navigation: navEntry ? {
+          domContentLoaded: navEntry.domContentLoadedEventEnd - navEntry.startTime,
+          load: navEntry.loadEventEnd - navEntry.startTime,
+        } : null,
+      };
+    }).catch(() => defaultResourceData);
+  } catch (e) {
+    console.warn('Resource timing collection failed:', e);
+    resourceData = defaultResourceData;
+  }
+
+  // Detect render-blocking resources - wrapped in try-catch
+  let renderBlockingData = defaultRenderBlockingData;
+  try {
+    renderBlockingData = await page.evaluate(() => {
+      const blocking: { scripts: string[]; stylesheets: string[] } = {
+        scripts: [],
+        stylesheets: [],
+      };
+
+      // Scripts in head without defer/async are render-blocking (limit to 20)
+      const scriptEls = document.querySelectorAll('head script[src]');
+      const maxScripts = Math.min(scriptEls.length, 20);
+      for (let i = 0; i < maxScripts; i++) {
+        const script = scriptEls[i] as HTMLScriptElement;
+        if (!script.defer && !script.async) {
+          blocking.scripts.push(script.src);
+        }
       }
-    });
 
-    // Stylesheets without media="print" are render-blocking
-    document.querySelectorAll('link[rel="stylesheet"]').forEach((el) => {
-      const link = el as HTMLLinkElement;
-      if (link.media !== 'print' && !link.href.includes('fonts.googleapis.com')) {
-        blocking.stylesheets.push(link.href);
+      // Stylesheets without media="print" are render-blocking (limit to 20)
+      const linkEls = document.querySelectorAll('link[rel="stylesheet"]');
+      const maxLinks = Math.min(linkEls.length, 20);
+      for (let i = 0; i < maxLinks; i++) {
+        const link = linkEls[i] as HTMLLinkElement;
+        if (link.media !== 'print' && !link.href.includes('fonts.googleapis.com')) {
+          blocking.stylesheets.push(link.href);
+        }
       }
-    });
 
-    return blocking;
-  });
+      return blocking;
+    }).catch(() => defaultRenderBlockingData);
+  } catch (e) {
+    console.warn('Render-blocking detection failed:', e);
+    renderBlockingData = defaultRenderBlockingData;
+  }
 
   // Process resources
   const resources: ResourceEntry[] = [];

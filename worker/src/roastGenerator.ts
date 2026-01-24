@@ -105,7 +105,7 @@ export const ROAST_PERSONAS: Record<RoastPersona, PersonaConfig> = {
   },
 };
 
-interface RoastInput {
+export interface RoastInput {
   url: string;
   scores: {
     overall: number;
@@ -145,8 +145,9 @@ interface RoastInput {
 
 /**
  * Generate an LLM-ready report that can be pasted directly into Claude/GPT for fixing
+ * Exported for use in Quick Audit mode (no AI needed)
  */
-function generateLLMReport(input: RoastInput): string {
+export function generateLLMReport(input: RoastInput): string {
   const failedSecurity = input.securityFindings.filter(f => !f.passed);
   const failedSeo = input.seoFindings.filter(f => !f.passed);
 
@@ -1054,6 +1055,90 @@ export async function generateRoast(input: RoastInput): Promise<RoastResult> {
 
   console.log(`AI roast generated successfully with ${result.persona} persona`);
   return result;
+}
+
+/**
+ * Generate deterministic fixes from audit data (no AI needed)
+ * Used for Quick Audit mode
+ */
+export function generateQuickAuditFixes(input: RoastInput): RoastFix[] {
+  const fixes: RoastFix[] = [];
+
+  // Security fixes
+  const failedSecurity = input.securityFindings.filter(f => !f.passed);
+  for (const finding of failedSecurity.slice(0, 2)) {
+    fixes.push({
+      priority: finding.severity === 'critical' ? 'critical' : finding.severity === 'high' ? 'high' : 'medium',
+      category: 'security',
+      title: finding.title,
+      description: finding.recommendation,
+      effort: 'quick',
+    });
+  }
+
+  // Performance fixes
+  if (input.scores.performance < 70) {
+    const slowMetric = input.performanceMetrics.find(m => m.score < 50);
+    if (slowMetric) {
+      fixes.push({
+        priority: 'high',
+        category: 'performance',
+        title: `Improve ${slowMetric.name}`,
+        description: `Current: ${slowMetric.displayValue}. Optimize to improve Core Web Vitals.`,
+        effort: 'medium',
+      });
+    }
+  }
+
+  // SEO fixes
+  const failedSeo = input.seoFindings.filter(f => !f.passed);
+  if (failedSeo.length > 0) {
+    fixes.push({
+      priority: 'medium',
+      category: 'seo',
+      title: failedSeo[0].title,
+      description: failedSeo[0].description,
+      effort: 'quick',
+    });
+  }
+
+  // Accessibility fixes
+  if (input.accessibilityViolations.length > 0) {
+    const worst = input.accessibilityViolations[0];
+    fixes.push({
+      priority: worst.impact === 'critical' ? 'critical' : worst.impact === 'serious' ? 'high' : 'medium',
+      category: 'accessibility',
+      title: 'Fix accessibility violations',
+      description: worst.help,
+      effort: 'medium',
+    });
+  }
+
+  // Vulnerability fixes
+  if (input.vulnerabilities && input.vulnerabilities.vulnerableLibraries.length > 0) {
+    const lib = input.vulnerabilities.vulnerableLibraries[0];
+    fixes.push({
+      priority: 'critical',
+      category: 'security',
+      title: `Update ${lib.name}`,
+      description: `Version ${lib.detectedVersion} has known vulnerabilities. Update to latest secure version.`,
+      effort: 'quick',
+    });
+  }
+
+  // PWA fixes
+  if (input.pwa && !input.pwa.installable && input.pwa.issues.length > 0) {
+    const issue = input.pwa.issues[0];
+    fixes.push({
+      priority: 'low',
+      category: 'performance',
+      title: 'Improve PWA readiness',
+      description: issue.recommendation,
+      effort: 'medium',
+    });
+  }
+
+  return fixes.slice(0, 5);
 }
 
 function generateFallbackRoast(input: RoastInput, reason?: string): RoastResult {

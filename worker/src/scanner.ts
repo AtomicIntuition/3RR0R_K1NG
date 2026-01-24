@@ -19,7 +19,7 @@ import { scanCodePatterns, type CodePatternsAuditResult } from './audits/codePat
 import { runPWAAudit, type PWAAuditResult } from './audits/pwa.js';
 import { runStructuredDataAudit, type StructuredDataAuditResult } from './audits/structuredData.js';
 import { runLinkAudit, type LinkAuditResult } from './audits/links.js';
-import { generateRoast, generateUploadRoast, type RoastResult, type RoastPersona } from './roastGenerator.js';
+import { generateRoast, generateUploadRoast, generateLLMReport, generateQuickAuditFixes, type RoastResult, type RoastPersona, type RoastInput } from './roastGenerator.js';
 import { updateScan } from './lib/supabase.js';
 import {
   calculateComprehensiveScore,
@@ -329,16 +329,51 @@ export async function runScan(scanId: string, url: string, persona: RoastPersona
     let roast: RoastResult;
 
     if (skipRoast) {
-      // Skip roast generation for faster results
-      console.log(`Skipping roast generation for ${scanId}`);
+      // Skip AI roast but still generate useful report and fixes
+      console.log(`Quick Audit mode - generating report without AI roast for ${scanId}`);
+
+      // Build input for report generation (same structure as roast input)
+      const reportInput: RoastInput = {
+        url,
+        scores: {
+          overall: overallScore,
+          letterGrade,
+          performance: performanceResult.score,
+          security: securityResult.score,
+          seo: seoResult.score,
+          accessibility: accessibilityResult.score,
+          codeQuality: codeQualityResult.score,
+        },
+        scoringBreakdown: scoringResult.breakdown,
+        securityFindings: securityResult.findings,
+        performanceMetrics: performanceResult.metrics,
+        seoFindings: seoResult.findings,
+        accessibilityViolations: accessibilityResult.violations,
+        codeQualityIssues: codeQualityResult.issues,
+        techStack,
+        resourceAnalysis,
+        vulnerabilities: vulnerabilityResult,
+        protocol: protocolResult,
+        images: imageResult,
+        caching: cacheResult,
+        redirects: redirectResult,
+        pwa: pwaResult,
+        structuredData: structuredDataResult,
+        links: linksResult,
+      };
+
+      // Generate LLM report and fixes without calling AI
+      const llmReport = generateLLMReport(reportInput);
+      const fixes = generateQuickAuditFixes(reportInput);
+
       roast = {
-        title: 'Audit Complete',
-        body: 'Roast generation was skipped. Check the detailed metrics below for your website audit results.',
-        fixes: [],
-        llmReport: '',
-        twitterRoast: '',
+        title: 'Quick Audit Complete',
+        body: `Your site scored ${overallScore}/100 (${letterGrade}). Review the detailed metrics and actionable fixes below.`,
+        fixes,
+        llmReport,
+        twitterRoast: `${url.replace(/^https?:\/\//, '')} scored ${overallScore}/100 (${letterGrade}). Quick audit complete - see full report for fixes.`.slice(0, 280),
         isFallback: true,
-        fallbackReason: 'skipped',
+        fallbackReason: 'quick_audit',
       };
       completePhase('roast');
     } else {

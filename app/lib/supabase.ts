@@ -43,9 +43,28 @@ export type Database = {
           results_accessibility: unknown | null;
           results_code_quality: unknown | null;
           results_tech_stack: unknown | null;
+          // Phase 1 audit results
+          results_vulnerabilities: unknown | null;
+          results_protocol: unknown | null;
+          results_images: unknown | null;
+          results_caching: unknown | null;
+          results_redirects: unknown | null;
+          // Phase 2 audit results
+          scan_type: 'url' | 'upload';
+          uploaded_files: unknown | null;
+          results_dependencies: unknown | null;
+          results_secrets: unknown | null;
+          results_code_patterns: unknown | null;
+          // Phase 3 audit results
+          results_pwa: unknown | null;
+          results_structured_data: unknown | null;
+          results_links: unknown | null;
           roast_title: string | null;
           roast_body: string | null;
           roast_fixes: unknown | null;
+          llm_report: string | null;
+          roast_is_fallback: boolean | null;
+          roast_fallback_reason: string | null;
           screenshot_url: string | null;
           error_message: string | null;
           ip_address: string | null;
@@ -60,6 +79,8 @@ export type Database = {
           user_id?: string | null;
           url: string;
           status?: 'pending' | 'processing' | 'completed' | 'failed';
+          scan_type?: 'url' | 'upload';
+          uploaded_files?: unknown | null;
           ip_address?: string | null;
           fingerprint?: string | null;
         };
@@ -77,9 +98,28 @@ export type Database = {
           results_accessibility?: unknown | null;
           results_code_quality?: unknown | null;
           results_tech_stack?: unknown | null;
+          // Phase 1 audit results
+          results_vulnerabilities?: unknown | null;
+          results_protocol?: unknown | null;
+          results_images?: unknown | null;
+          results_caching?: unknown | null;
+          results_redirects?: unknown | null;
+          // Phase 2 audit results
+          scan_type?: 'url' | 'upload';
+          uploaded_files?: unknown | null;
+          results_dependencies?: unknown | null;
+          results_secrets?: unknown | null;
+          results_code_patterns?: unknown | null;
+          // Phase 3 audit results
+          results_pwa?: unknown | null;
+          results_structured_data?: unknown | null;
+          results_links?: unknown | null;
           roast_title?: string | null;
           roast_body?: string | null;
           roast_fixes?: unknown | null;
+          llm_report?: string | null;
+          roast_is_fallback?: boolean | null;
+          roast_fallback_reason?: string | null;
           screenshot_url?: string | null;
           error_message?: string | null;
           started_at?: string | null;

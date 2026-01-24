@@ -1,19 +1,27 @@
 import 'dotenv/config';
 import { Job } from 'bullmq';
 import { createScanWorker, closeConnections, type ScanJobData } from './lib/queue.js';
-import { runScan, closeBrowser } from './scanner.js';
+import { runScan, runUploadScan, closeBrowser } from './scanner.js';
 import { updateScan } from './lib/supabase.js';
 
 console.log('Starting 3RROR_K1NG Worker...');
 
 // Process scan jobs
 async function processScanJob(job: Job<ScanJobData>): Promise<void> {
-  const { scanId, url } = job.data;
+  const { scanId, url, scanType, files } = job.data;
 
-  console.log(`Processing job ${job.id}: ${url}`);
+  console.log(`Processing job ${job.id}: ${scanType === 'upload' ? 'File Upload' : url}`);
 
   try {
-    await runScan(scanId, url);
+    if (scanType === 'upload' && files) {
+      // Process file upload scan
+      await runUploadScan(scanId, files);
+    } else if (url) {
+      // Process URL scan
+      await runScan(scanId, url);
+    } else {
+      throw new Error('Invalid job data: missing url or files');
+    }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error(`Job ${job.id} failed:`, errorMessage);

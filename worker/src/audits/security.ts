@@ -382,6 +382,43 @@ const SECURITY_HEADERS = [
     recommendation: 'Add header to restrict unnecessary browser features like camera, microphone, geolocation.',
     check: (value: string | null) => !!value,
   },
+  // Phase 3: Advanced Cross-Origin Headers
+  {
+    name: 'Cross-Origin-Embedder-Policy',
+    id: 'coep',
+    severity: 'low' as const,
+    title: 'Cross-Origin-Embedder-Policy (COEP)',
+    description: 'Controls embedding of cross-origin resources, required for SharedArrayBuffer.',
+    recommendation: 'Add header: Cross-Origin-Embedder-Policy: require-corp (if using SharedArrayBuffer)',
+    check: (value: string | null) => {
+      if (!value) return true; // Optional header, not having it is fine for most sites
+      return value === 'require-corp' || value === 'credentialless';
+    },
+  },
+  {
+    name: 'Cross-Origin-Opener-Policy',
+    id: 'coop',
+    severity: 'low' as const,
+    title: 'Cross-Origin-Opener-Policy (COOP)',
+    description: 'Isolates browsing context from cross-origin documents, protects against Spectre attacks.',
+    recommendation: 'Add header: Cross-Origin-Opener-Policy: same-origin for enhanced isolation',
+    check: (value: string | null) => {
+      if (!value) return true; // Optional header
+      return ['same-origin', 'same-origin-allow-popups', 'unsafe-none'].includes(value);
+    },
+  },
+  {
+    name: 'Cross-Origin-Resource-Policy',
+    id: 'corp',
+    severity: 'low' as const,
+    title: 'Cross-Origin-Resource-Policy (CORP)',
+    description: 'Controls which origins can load this resource.',
+    recommendation: 'Add header: Cross-Origin-Resource-Policy: same-origin (or cross-origin if needed)',
+    check: (value: string | null) => {
+      if (!value) return true; // Optional header
+      return ['same-origin', 'same-site', 'cross-origin'].includes(value);
+    },
+  },
 ];
 
 // Severity weights for scoring

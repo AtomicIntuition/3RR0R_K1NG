@@ -44,6 +44,16 @@ export interface ScanUpdate {
   results_images?: unknown;
   results_caching?: unknown;
   results_redirects?: unknown;
+  // Phase 2 new audit results (file upload)
+  scan_type?: 'url' | 'upload';
+  uploaded_files?: unknown;
+  results_dependencies?: unknown;
+  results_secrets?: unknown;
+  results_code_patterns?: unknown;
+  // Phase 3 new audit results
+  results_pwa?: unknown;
+  results_structured_data?: unknown;
+  results_links?: unknown;
   roast_title?: string;
   roast_body?: string;
   roast_fixes?: unknown;

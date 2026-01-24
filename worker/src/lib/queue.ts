@@ -29,8 +29,11 @@ const connections: Redis[] = [];
 
 export interface ScanJobData {
   scanId: string;
-  url: string;
+  url?: string;
   userTier?: 'anonymous' | 'free' | 'pro';
+  // Phase 2: File upload support
+  scanType?: 'url' | 'upload';
+  files?: Array<{ path: string; content: string }>;
 }
 
 export function createScanWorker(

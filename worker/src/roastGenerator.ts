@@ -11,6 +11,14 @@ import type { ProtocolInfo } from './audits/protocol.js';
 import type { ImageAuditResult } from './audits/images.js';
 import type { CacheAuditResult } from './audits/caching.js';
 import type { RedirectAuditResult } from './audits/redirects.js';
+// Phase 3 audit types
+import type { PWAAuditResult } from './audits/pwa.js';
+import type { StructuredDataAuditResult } from './audits/structuredData.js';
+import type { LinkAuditResult } from './audits/links.js';
+// Phase 2 audit types
+import type { DependencyAuditResult } from './audits/dependencies.js';
+import type { SecretsAuditResult } from './audits/secrets.js';
+import type { CodePatternsAuditResult } from './audits/codePatterns.js';
 
 export interface RoastFix {
   priority: 'critical' | 'high' | 'medium' | 'low';
@@ -52,6 +60,10 @@ interface RoastInput {
   images?: ImageAuditResult;
   caching?: CacheAuditResult;
   redirects?: RedirectAuditResult;
+  // Phase 3 new audits
+  pwa?: PWAAuditResult;
+  structuredData?: StructuredDataAuditResult;
+  links?: LinkAuditResult;
 }
 
 /**
@@ -330,6 +342,118 @@ ${finding.value ? `- **Current Value:** \`${finding.value}\`` : ''}
       report += `\n**Recommended:** Update links to use final URL directly: \`${input.redirects.finalUrl}\`\n`;
     }
     report += `\n`;
+  }
+
+  // === Phase 3 New Audits ===
+
+  // PWA Analysis
+  if (input.pwa) {
+    report += `\n### PWA ANALYSIS (Score: ${input.pwa.score}/100)\n\n`;
+    report += `- **Installable:** ${input.pwa.installable ? 'Yes' : 'No'}\n`;
+    report += `- **HTTPS:** ${input.pwa.checks.https ? 'Yes' : 'No'}\n`;
+    report += `- **Manifest:** ${input.pwa.checks.manifest.exists ? (input.pwa.checks.manifest.valid ? 'Valid' : 'Invalid') : 'Missing'}\n`;
+    report += `- **Service Worker:** ${input.pwa.checks.serviceWorker.registered ? 'Registered' : 'Not registered'}\n`;
+    report += `- **192x192 Icon:** ${input.pwa.checks.icons.has192 ? 'Yes' : 'No'}\n`;
+    report += `- **512x512 Icon:** ${input.pwa.checks.icons.has512 ? 'Yes' : 'No'}\n`;
+    report += `- **Theme Color:** ${input.pwa.checks.themeColor ? 'Set' : 'Missing'}\n`;
+    report += `- **Viewport:** ${input.pwa.checks.viewport ? 'Set' : 'Missing'}\n\n`;
+
+    if (input.pwa.issues.length > 0) {
+      report += `**Issues:**\n`;
+      for (const issue of input.pwa.issues) {
+        report += `- **[${issue.severity.toUpperCase()}]** ${issue.description}\n`;
+        report += `  - ${issue.recommendation}\n`;
+      }
+      report += `\n`;
+    }
+
+    if (input.pwa.recommendations.length > 0) {
+      report += `**Recommendations:**\n`;
+      for (const rec of input.pwa.recommendations) {
+        report += `- ${rec}\n`;
+      }
+      report += `\n`;
+    }
+  }
+
+  // Structured Data Analysis
+  if (input.structuredData) {
+    report += `\n### STRUCTURED DATA (Score: ${input.structuredData.score}/100)\n\n`;
+    report += `- **Found:** ${input.structuredData.found ? 'Yes' : 'No'}\n`;
+    report += `- **JSON-LD Blocks:** ${input.structuredData.jsonLdCount}\n`;
+    report += `- **Microdata Items:** ${input.structuredData.microdataCount}\n`;
+    if (input.structuredData.types.length > 0) {
+      report += `- **Schema Types:** ${input.structuredData.types.join(', ')}\n`;
+    }
+    report += `\n`;
+
+    if (input.structuredData.errors.length > 0) {
+      const errors = input.structuredData.errors.filter(e => e.severity === 'error');
+      const warnings = input.structuredData.errors.filter(e => e.severity === 'warning');
+
+      if (errors.length > 0) {
+        report += `**Errors (${errors.length}):**\n`;
+        for (const error of errors.slice(0, 5)) {
+          report += `- ${error.type}: ${error.message}\n`;
+        }
+        report += `\n`;
+      }
+
+      if (warnings.length > 0) {
+        report += `**Warnings (${warnings.length}):**\n`;
+        for (const warning of warnings.slice(0, 5)) {
+          report += `- ${warning.type}: ${warning.message}\n`;
+        }
+        report += `\n`;
+      }
+    }
+
+    if (input.structuredData.recommendations.length > 0) {
+      report += `**Recommendations:**\n`;
+      for (const rec of input.structuredData.recommendations) {
+        report += `- ${rec}\n`;
+      }
+      report += `\n`;
+    }
+  }
+
+  // Link Audit
+  if (input.links) {
+    report += `\n### LINK AUDIT (Score: ${input.links.score}/100)\n\n`;
+    report += `- **Total Links:** ${input.links.totalLinks}\n`;
+    report += `- **Internal:** ${input.links.internalLinks}\n`;
+    report += `- **External:** ${input.links.externalLinks}\n`;
+    report += `- **Checked:** ${input.links.checkedLinks}\n\n`;
+
+    if (input.links.brokenLinks.length > 0) {
+      report += `**Broken Links (${input.links.brokenLinks.length}):**\n`;
+      for (const link of input.links.brokenLinks.slice(0, 5)) {
+        report += `- ${link.url} (${link.statusCode || 'connection error'})\n`;
+        if (link.error) {
+          report += `  - Error: ${link.error}\n`;
+        }
+      }
+      report += `\n`;
+    }
+
+    if (input.links.insecureLinks.length > 0) {
+      report += `**Insecure HTTP Links (${input.links.insecureLinks.length}):**\n`;
+      for (const link of input.links.insecureLinks.slice(0, 5)) {
+        report += `- ${link.url}\n`;
+      }
+      report += `**Fix:** Update all HTTP links to HTTPS or use protocol-relative URLs.\n\n`;
+    }
+
+    if (input.links.redirectedLinks.length > 0) {
+      const permanentRedirects = input.links.redirectedLinks.filter(l => l.statusCode === 301);
+      if (permanentRedirects.length > 0) {
+        report += `**Permanent Redirects (${permanentRedirects.length}):**\n`;
+        for (const link of permanentRedirects.slice(0, 3)) {
+          report += `- ${link.url} → ${link.redirectTo || 'unknown'}\n`;
+        }
+        report += `**Fix:** Update links to point directly to final URLs.\n\n`;
+      }
+    }
   }
 
   // Copy-paste ready code fixes
@@ -645,6 +769,22 @@ ${input.images?.issues.slice(0, 3).map(i => `- ${i.issues.join(', ')}`).join('\n
 
 REDIRECT CHAIN: ${input.redirects?.totalRedirects || 0} redirects (${input.redirects?.totalTime || 0}ms)
 
+PWA STATUS:
+- Installable: ${input.pwa?.installable ? 'Yes' : 'No'}
+- Service Worker: ${input.pwa?.checks.serviceWorker.registered ? 'Yes' : 'No'}
+- Manifest: ${input.pwa?.checks.manifest.exists ? (input.pwa?.checks.manifest.valid ? 'Valid' : 'Invalid') : 'Missing'}
+- Issues: ${input.pwa?.issues.length || 0}
+
+STRUCTURED DATA:
+- Found: ${input.structuredData?.found ? 'Yes' : 'No'}
+- Types: ${input.structuredData?.types.join(', ') || 'None'}
+- Errors: ${input.structuredData?.errors.filter(e => e.severity === 'error').length || 0}
+
+LINKS:
+- Total: ${input.links?.totalLinks || 0}
+- Broken: ${input.links?.brokenLinks.length || 0}
+- Insecure HTTP: ${input.links?.insecureLinks.length || 0}
+
 ROAST INTENSITY: ${getRoastIntensity(input.scores.overall)}
 
 Generate a roast in the following JSON format. The roast should be memorable, technically accurate, and include specific references to the actual issues found. Use hacker/tech terminology and metaphors. Be creative with the title - it should be punchy and shareable.
@@ -891,6 +1031,340 @@ function generateFallbackRoast(input: RoastInput, reason?: string): RoastResult 
 
   // Generate LLM report for fallback too
   const llmReport = generateLLMReport(input);
+
+  return { title, body, fixes, llmReport, isFallback: true, fallbackReason: reason };
+}
+
+// ============================================
+// Phase 2: File Upload Roast Generation
+// ============================================
+
+interface UploadRoastInput {
+  filesCount: number;
+  dependencies: DependencyAuditResult;
+  secrets: SecretsAuditResult;
+  codePatterns: CodePatternsAuditResult;
+  overallScore: number;
+}
+
+/**
+ * Generate an LLM-ready report for file upload scans
+ */
+function generateUploadLLMReport(input: UploadRoastInput): string {
+  let report = `# Code Audit Report - LLM Fix Instructions
+## Files Analyzed: ${input.filesCount}
+## Overall Score: ${input.overallScore}/100
+
+### SCORES BREAKDOWN
+- Dependencies: ${input.dependencies.score}/100 (${input.dependencies.totalDependencies} packages)
+- Secrets: ${input.secrets.score}/100 (${input.secrets.totalFilesScanned} files scanned)
+- Code Patterns: ${input.codePatterns.score}/100 (${input.codePatterns.totalFilesScanned} files scanned)
+
+---
+
+## CRITICAL FIXES REQUIRED
+
+`;
+
+  // Secrets (most critical)
+  if (input.secrets.findings.length > 0) {
+    report += `### EXPOSED SECRETS (${input.secrets.findings.length} found)\n\n`;
+    report += `**Summary:** ${input.secrets.summary.critical} critical, ${input.secrets.summary.high} high, ${input.secrets.summary.medium} medium\n\n`;
+
+    for (const finding of input.secrets.findings.slice(0, 10)) {
+      report += `#### [${finding.severity.toUpperCase()}] ${finding.type}
+- **File:** \`${finding.file}\`
+- **Line:** ${finding.line}
+- **Found:** \`${finding.match}\`
+- **Action:** ${finding.recommendation}
+
+`;
+    }
+  }
+
+  // Dependency Vulnerabilities
+  if (input.dependencies.details.length > 0) {
+    report += `### DEPENDENCY VULNERABILITIES (${input.dependencies.details.length} found)\n\n`;
+    report += `**Summary:** ${input.dependencies.vulnerabilities.critical} critical, ${input.dependencies.vulnerabilities.high} high, ${input.dependencies.vulnerabilities.moderate} moderate, ${input.dependencies.vulnerabilities.low} low\n\n`;
+
+    for (const vuln of input.dependencies.details.slice(0, 10)) {
+      report += `#### [${vuln.severity.toUpperCase()}] ${vuln.package}@${vuln.installedVersion}
+- **Issue:** ${vuln.vulnerability}
+${vuln.cve ? `- **CVE:** ${vuln.cve}` : ''}
+- **Fixed in:** ${vuln.patchedVersions}
+- **Action:** ${vuln.recommendation}
+
+`;
+    }
+  }
+
+  // Code Pattern Issues
+  if (input.codePatterns.issues.length > 0) {
+    report += `### CODE PATTERN ISSUES (${input.codePatterns.issues.length} found)\n\n`;
+    report += `**Summary:** ${input.codePatterns.summary.critical} critical, ${input.codePatterns.summary.high} high, ${input.codePatterns.summary.medium} medium, ${input.codePatterns.summary.low} low\n\n`;
+
+    for (const issue of input.codePatterns.issues.slice(0, 15)) {
+      report += `#### [${issue.severity.toUpperCase()}] ${issue.type}
+- **File:** \`${issue.file}:${issue.line}\`
+- **Code:** \`${issue.code}\`
+- **Problem:** ${issue.description}
+- **Fix:** ${issue.fix}
+
+`;
+    }
+  }
+
+  // Copy-paste fixes
+  report += `\n---\n\n## COPY-PASTE CODE FIXES\n\n`;
+
+  // npm update commands
+  if (input.dependencies.details.length > 0) {
+    const packages = [...new Set(input.dependencies.details.map(d => d.package))];
+    report += `### Update Vulnerable Dependencies\n\n`;
+    report += '```bash\n';
+    report += `# Update all vulnerable packages\n`;
+    report += `npm update ${packages.slice(0, 10).join(' ')}\n\n`;
+    report += `# Or run npm audit fix\n`;
+    report += `npm audit fix\n`;
+    report += '```\n\n';
+  }
+
+  // Environment variable fixes for secrets
+  if (input.secrets.findings.length > 0) {
+    report += `### Fix Exposed Secrets\n\n`;
+    report += '```typescript\n';
+    report += `// BEFORE (insecure)\n`;
+    report += `const apiKey = 'sk_live_xxxxx';\n\n`;
+    report += `// AFTER (secure)\n`;
+    report += `const apiKey = process.env.API_KEY;\n`;
+    report += '```\n\n';
+    report += `Add to .gitignore:\n`;
+    report += '```\n';
+    report += `.env\n`;
+    report += `.env.local\n`;
+    report += `.env.production\n`;
+    report += '```\n\n';
+  }
+
+  report += `
+---
+
+## INSTRUCTIONS FOR AI ASSISTANT
+
+Please analyze this code audit report and provide specific fixes for each issue:
+
+1. **Secrets:** Identify all hardcoded secrets and provide safe alternatives using environment variables
+2. **Dependencies:** Suggest specific npm commands to update vulnerable packages
+3. **Code Patterns:** Provide corrected code snippets for each pattern issue
+
+Prioritize fixes in this order:
+1. Critical secrets (API keys, passwords, private keys)
+2. Critical dependency vulnerabilities
+3. High severity issues
+4. Medium/Low issues
+
+Start with the highest priority items and provide actionable code fixes.`;
+
+  return report;
+}
+
+/**
+ * Build prompt for upload scan roast
+ */
+function buildUploadPrompt(input: UploadRoastInput): string {
+  return `You are 3RROR_K1NG, a legendary hacker who reviews code with brutal honesty. You speak with a mix of technical expertise and devastating wit. Your reviews are memorable, shareable, and actually helpful.
+
+CODE SCAN RESULTS:
+- Files Analyzed: ${input.filesCount}
+- Overall Score: ${input.overallScore}/100
+
+DEPENDENCY VULNERABILITIES (${input.dependencies.details.length}):
+- Critical: ${input.dependencies.vulnerabilities.critical}
+- High: ${input.dependencies.vulnerabilities.high}
+- Moderate: ${input.dependencies.vulnerabilities.moderate}
+- Low: ${input.dependencies.vulnerabilities.low}
+${input.dependencies.details.slice(0, 5).map(d => `  - ${d.package}@${d.installedVersion}: ${d.vulnerability}`).join('\n')}
+
+EXPOSED SECRETS (${input.secrets.findings.length}):
+- Critical: ${input.secrets.summary.critical}
+- High: ${input.secrets.summary.high}
+- Medium: ${input.secrets.summary.medium}
+${input.secrets.findings.slice(0, 5).map(s => `  - [${s.severity.toUpperCase()}] ${s.type} in ${s.file}:${s.line}`).join('\n')}
+
+CODE PATTERN ISSUES (${input.codePatterns.issues.length}):
+- Critical: ${input.codePatterns.summary.critical}
+- High: ${input.codePatterns.summary.high}
+- Medium: ${input.codePatterns.summary.medium}
+${input.codePatterns.issues.slice(0, 5).map(i => `  - [${i.severity.toUpperCase()}] ${i.type} in ${i.file}:${i.line}`).join('\n')}
+
+ROAST INTENSITY: ${input.overallScore >= 80 ? 'mild teasing' : input.overallScore >= 50 ? 'firm roasting' : 'scorched earth devastation'}
+
+Generate a roast in the following JSON format. The roast should be memorable, technically accurate, and include specific references to the actual issues found.
+
+{
+  "title": "A devastating one-liner roast title (max 60 chars)",
+  "body": "2-3 paragraph roast that references specific findings. Be savage but helpful. Focus on the most critical issues found.",
+  "fixes": [
+    {
+      "priority": "critical|high|medium|low",
+      "category": "security|code_quality",
+      "title": "Short actionable fix title",
+      "description": "Specific technical explanation of what to do",
+      "effort": "quick|medium|significant"
+    }
+  ]
+}
+
+RULES:
+- Title must be under 60 characters
+- Include 3-5 of the most impactful fixes
+- Fixes should be ordered by priority (critical first)
+- Be specific - reference actual package names, file paths, or secret types found
+- If secrets were found, that's ALWAYS the #1 priority issue
+- The body should be 100-200 words
+- Do NOT use markdown formatting in the body text
+
+Return ONLY the JSON, no other text.`;
+}
+
+/**
+ * Generate roast for file upload scans
+ */
+export async function generateUploadRoast(input: UploadRoastInput): Promise<RoastResult> {
+  const client = getAnthropicClient();
+  const prompt = buildUploadPrompt(input);
+
+  // Call Claude with retry logic
+  const { text, error } = await callClaudeWithRetry(client, prompt);
+
+  if (error) {
+    console.error(`Upload roast generation failed after ${MAX_RETRIES} attempts:`, error);
+    return generateUploadFallbackRoast(input, `API error: ${error}`);
+  }
+
+  // Extract JSON (handles markdown code fences)
+  const jsonString = extractJSON(text);
+  if (!jsonString) {
+    console.error('Could not extract JSON from response:', text.slice(0, 200));
+    return generateUploadFallbackRoast(input, 'JSON extraction failed');
+  }
+
+  // Parse JSON
+  let result: RoastResult;
+  try {
+    result = JSON.parse(jsonString) as RoastResult;
+  } catch (parseError) {
+    console.error('JSON parse error:', parseError, 'Raw:', jsonString.slice(0, 200));
+    return generateUploadFallbackRoast(input, 'JSON parse failed');
+  }
+
+  // Validate required fields
+  if (!result.title || !result.body || !Array.isArray(result.fixes)) {
+    console.error('Invalid roast format - missing required fields');
+    return generateUploadFallbackRoast(input, 'Invalid response format');
+  }
+
+  // Ensure title is not too long
+  result.title = result.title.slice(0, 60);
+
+  // Validate fixes
+  result.fixes = result.fixes.slice(0, 5).map(fix => ({
+    priority: ['critical', 'high', 'medium', 'low'].includes(fix.priority)
+      ? fix.priority
+      : 'medium',
+    category: ['security', 'code_quality'].includes(fix.category)
+      ? fix.category
+      : 'security',
+    title: String(fix.title).slice(0, 100),
+    description: String(fix.description).slice(0, 500),
+    effort: ['quick', 'medium', 'significant'].includes(fix.effort)
+      ? fix.effort
+      : 'medium',
+  })) as RoastFix[];
+
+  // Generate LLM-ready report
+  result.llmReport = generateUploadLLMReport(input);
+  result.isFallback = false;
+
+  console.log('AI upload roast generated successfully');
+  return result;
+}
+
+/**
+ * Generate fallback roast for upload scans when AI fails
+ */
+function generateUploadFallbackRoast(input: UploadRoastInput, reason?: string): RoastResult {
+  console.log(`Using fallback upload roast${reason ? `: ${reason}` : ''}`);
+
+  let title: string;
+  let body: string;
+
+  const hasSecrets = input.secrets.findings.length > 0;
+  const hasCriticalDeps = input.dependencies.vulnerabilities.critical > 0;
+  const score = input.overallScore;
+
+  if (hasSecrets) {
+    title = 'YOUR SECRETS ARE SHOWING';
+    body = `I found ${input.secrets.findings.length} exposed secrets in your code. ${
+      input.secrets.summary.critical > 0
+        ? `${input.secrets.summary.critical} of them are CRITICAL - we're talking API keys, credentials, the works.`
+        : 'Some of these could give attackers access to your systems.'
+    } This isn't a joke - you need to rotate these credentials IMMEDIATELY and add them to your .gitignore. I've seen production databases get wiped because of exactly this kind of carelessness.`;
+  } else if (hasCriticalDeps) {
+    title = 'Your Dependencies Are A Liability';
+    body = `You've got ${input.dependencies.vulnerabilities.critical} critical vulnerabilities in your dependencies. These aren't just warnings - they're actively exploitable security holes. Run \`npm audit fix\` like your production server depends on it, because it does. Score: ${score}/100.`;
+  } else if (score >= 80) {
+    title = 'Not Bad, Code Review Champion';
+    body = `Your code scored ${score}/100. That's actually respectable. I found ${input.codePatterns.issues.length} code pattern issues and ${input.dependencies.details.length} dependency concerns, but nothing that screams "I learned to code yesterday." Keep the clean coding practices up.`;
+  } else if (score >= 50) {
+    title = 'Room For Improvement';
+    body = `A ${score}/100 means you're not completely lost, but you're definitely wandering in the woods. Found ${input.codePatterns.issues.length} code pattern issues that need attention. Time to level up your security game and clean up those patterns.`;
+  } else {
+    title = 'THIS CODE NEEDS AN INTERVENTION';
+    body = `A ${score}/100? This codebase is a liability waiting to happen. Between the ${input.codePatterns.issues.length} code pattern issues and ${input.dependencies.details.length} dependency vulnerabilities, I'm genuinely concerned. Time for a serious code review session.`;
+  }
+
+  const fixes: RoastFix[] = [];
+
+  // Add secret fixes first
+  if (input.secrets.findings.length > 0) {
+    const finding = input.secrets.findings[0];
+    fixes.push({
+      priority: finding.severity === 'critical' ? 'critical' : 'high',
+      category: 'security',
+      title: `Remove exposed ${finding.type}`,
+      description: finding.recommendation,
+      effort: 'quick',
+    });
+  }
+
+  // Add dependency fixes
+  if (input.dependencies.details.length > 0) {
+    const critical = input.dependencies.details.find(d => d.severity === 'critical');
+    if (critical) {
+      fixes.push({
+        priority: 'critical',
+        category: 'security',
+        title: `Update ${critical.package}`,
+        description: critical.recommendation,
+        effort: 'quick',
+      });
+    }
+  }
+
+  // Add code pattern fixes
+  if (input.codePatterns.issues.length > 0) {
+    const issue = input.codePatterns.issues[0];
+    fixes.push({
+      priority: issue.severity === 'critical' ? 'critical' : 'medium',
+      category: 'code_quality',
+      title: issue.type,
+      description: issue.fix,
+      effort: 'medium',
+    });
+  }
+
+  const llmReport = generateUploadLLMReport(input);
 
   return { title, body, fixes, llmReport, isFallback: true, fallbackReason: reason };
 }

@@ -11,7 +11,15 @@ import { runProtocolAudit, type ProtocolInfo } from './audits/protocol.js';
 import { runImageAudit, type ImageAuditResult } from './audits/images.js';
 import { runCacheAudit, type CacheAuditResult } from './audits/caching.js';
 import { runRedirectAudit, type RedirectAuditResult } from './audits/redirects.js';
-import { generateRoast, type RoastResult } from './roastGenerator.js';
+// Phase 2 audits
+import { auditDependencies, type DependencyAuditResult } from './audits/dependencies.js';
+import { scanForSecrets, type SecretsAuditResult } from './audits/secrets.js';
+import { scanCodePatterns, type CodePatternsAuditResult } from './audits/codePatterns.js';
+// Phase 3 audits
+import { runPWAAudit, type PWAAuditResult } from './audits/pwa.js';
+import { runStructuredDataAudit, type StructuredDataAuditResult } from './audits/structuredData.js';
+import { runLinkAudit, type LinkAuditResult } from './audits/links.js';
+import { generateRoast, generateUploadRoast, type RoastResult } from './roastGenerator.js';
 import { updateScan } from './lib/supabase.js';
 
 export interface ScanResult {
@@ -22,13 +30,32 @@ export interface ScanResult {
   codeQuality: CodeQualityAuditResult;
   techStack: TechStackItem[];
   resources: ResourceAnalysis;
+  // Phase 1 audits
   vulnerabilities?: VulnerabilityAuditResult;
   protocol?: ProtocolInfo;
   images?: ImageAuditResult;
   caching?: CacheAuditResult;
   redirects?: RedirectAuditResult;
+  // Phase 3 audits
+  pwa?: PWAAuditResult;
+  structuredData?: StructuredDataAuditResult;
+  links?: LinkAuditResult;
   roast: RoastResult;
   overallScore: number;
+}
+
+// Phase 2: Upload scan result
+export interface UploadScanResult {
+  dependencies: DependencyAuditResult;
+  secrets: SecretsAuditResult;
+  codePatterns: CodePatternsAuditResult;
+  roast: RoastResult;
+  overallScore: number;
+}
+
+export interface UploadedFile {
+  path: string;
+  content: string;
 }
 
 // Score weights
@@ -217,6 +244,33 @@ export async function runScan(scanId: string, url: string): Promise<ScanResult> 
     });
     console.log(`Redirect audit complete: ${redirectResult.totalRedirects} redirects, ${redirectResult.totalTime}ms`);
 
+    // === Phase 3 New Audits ===
+
+    // Run Phase 3 audits in parallel
+    const [pwaResult, structuredDataResult, linksResult] = await Promise.all([
+      runPWAAudit(page, url),
+      runStructuredDataAudit(page),
+      runLinkAudit(page, url),
+    ]);
+
+    // Save PWA audit results
+    await updateScan(scanId, {
+      results_pwa: pwaResult,
+    });
+    console.log(`PWA audit complete: score ${pwaResult.score}, installable: ${pwaResult.installable}`);
+
+    // Save structured data audit results
+    await updateScan(scanId, {
+      results_structured_data: structuredDataResult,
+    });
+    console.log(`Structured data audit complete: ${structuredDataResult.types.length} types found`);
+
+    // Save links audit results
+    await updateScan(scanId, {
+      results_links: linksResult,
+    });
+    console.log(`Links audit complete: ${linksResult.brokenLinks.length} broken, ${linksResult.insecureLinks.length} insecure`);
+
     // Performance audit (Lighthouse - runs separately)
     const performanceResult = await runPerformanceAudit(url);
     await updateScan(scanId, {
@@ -258,6 +312,10 @@ export async function runScan(scanId: string, url: string): Promise<ScanResult> 
       images: imageResult,
       caching: cacheResult,
       redirects: redirectResult,
+      // Phase 3 new audits
+      pwa: pwaResult,
+      structuredData: structuredDataResult,
+      links: linksResult,
     });
 
     // Update final results
@@ -288,6 +346,9 @@ export async function runScan(scanId: string, url: string): Promise<ScanResult> 
       images: imageResult,
       caching: cacheResult,
       redirects: redirectResult,
+      pwa: pwaResult,
+      structuredData: structuredDataResult,
+      links: linksResult,
       roast,
       overallScore,
     };
@@ -304,5 +365,106 @@ export async function runScan(scanId: string, url: string): Promise<ScanResult> 
     throw error;
   } finally {
     await context.close();
+  }
+}
+
+/**
+ * Run a code upload scan (Phase 2)
+ * Analyzes uploaded files for dependencies, secrets, and code patterns
+ */
+export async function runUploadScan(
+  scanId: string,
+  files: UploadedFile[]
+): Promise<UploadScanResult> {
+  console.log(`Starting upload scan for ${scanId} with ${files.length} files`);
+
+  // Update status to processing
+  await updateScan(scanId, {
+    status: 'processing',
+    started_at: new Date().toISOString(),
+  });
+
+  try {
+    // Run all audits in parallel
+    console.log(`Running code audits for ${scanId}...`);
+
+    const [dependenciesResult, secretsResult, codePatternsResult] = await Promise.all([
+      auditDependencies(files),
+      scanForSecrets(files),
+      scanCodePatterns(files),
+    ]);
+
+    // Save dependency audit results
+    await updateScan(scanId, {
+      results_dependencies: dependenciesResult,
+    });
+    console.log(
+      `Dependency audit complete: ${dependenciesResult.details.length} vulnerabilities found`
+    );
+
+    // Save secrets audit results
+    await updateScan(scanId, {
+      results_secrets: secretsResult,
+    });
+    console.log(`Secrets audit complete: ${secretsResult.findings.length} secrets found`);
+
+    // Save code patterns audit results
+    await updateScan(scanId, {
+      results_code_patterns: codePatternsResult,
+    });
+    console.log(`Code patterns audit complete: ${codePatternsResult.issues.length} issues found`);
+
+    // Calculate overall score (weighted average)
+    // Dependencies: 40%, Secrets: 40%, Code Patterns: 20%
+    const overallScore = Math.round(
+      dependenciesResult.score * 0.4 +
+        secretsResult.score * 0.4 +
+        codePatternsResult.score * 0.2
+    );
+
+    // Generate roast for upload scan
+    const roast = await generateUploadRoast({
+      filesCount: files.length,
+      dependencies: dependenciesResult,
+      secrets: secretsResult,
+      codePatterns: codePatternsResult,
+      overallScore,
+    });
+
+    // Update final results
+    await updateScan(scanId, {
+      status: 'completed',
+      score_overall: overallScore,
+      score_security: secretsResult.score,
+      score_code_quality: codePatternsResult.score,
+      roast_title: roast.title,
+      roast_body: roast.body,
+      roast_fixes: roast.fixes,
+      llm_report: roast.llmReport,
+      roast_is_fallback: roast.isFallback || false,
+      roast_fallback_reason: roast.fallbackReason || null,
+      completed_at: new Date().toISOString(),
+    });
+
+    console.log(`Upload scan complete for ${scanId}: Overall score ${overallScore}`);
+
+    return {
+      dependencies: dependenciesResult,
+      secrets: secretsResult,
+      codePatterns: codePatternsResult,
+      roast,
+      overallScore,
+    };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`Upload scan failed for ${scanId}:`, errorMessage);
+
+    await updateScan(scanId, {
+      status: 'failed',
+      error_message: errorMessage,
+      completed_at: new Date().toISOString(),
+    });
+
+    throw error;
   }
 }

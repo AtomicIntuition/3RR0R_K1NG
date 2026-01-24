@@ -130,8 +130,17 @@ export function useScanRealtime(scanId: string) {
       )
       .subscribe();
 
+    // Fallback polling in case Realtime isn't enabled
+    const pollInterval = setInterval(async () => {
+      const result = await fetchScan();
+      if (result && (result.status === 'completed' || result.status === 'failed')) {
+        clearInterval(pollInterval);
+      }
+    }, 3000);
+
     return () => {
       supabase.removeChannel(channel);
+      clearInterval(pollInterval);
     };
   }, [scanId, fetchScan]);
 

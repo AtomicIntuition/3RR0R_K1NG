@@ -80,22 +80,42 @@ ${input.techStack.map(t => `- ${t.name} (${t.category}, ${t.confidence}% confide
     }
   }
 
-  // Accessibility issues with CSS selectors
+  // Accessibility issues with actionable details
   if (input.accessibilityViolations.length > 0) {
     report += `### ACCESSIBILITY ISSUES (${input.accessibilityViolations.length} violations)\n\n`;
     for (const violation of input.accessibilityViolations) {
+      const v = violation as any;
       report += `#### [${violation.impact.toUpperCase()}] ${violation.description}
 - **Rule:** ${violation.id}
 - **Fix:** ${violation.help}
-- **Elements Affected:** ${violation.nodes} elements
-${(violation as any).selectors?.length ? `- **CSS Selectors:**
-\`\`\`css
-${(violation as any).selectors.slice(0, 5).join('\n')}
-\`\`\`` : ''}
-${(violation as any).failureSummary ? `- **Details:** ${(violation as any).failureSummary}` : ''}
+- **Elements Affected:** ${v.nodeCount || v.nodes || 0} elements
 - **Reference:** ${violation.helpUrl}
 
 `;
+      // Add detailed actionable info for each element
+      if (v.affectedElements?.length > 0) {
+        report += `**ACTIONABLE FIXES:**\n\n`;
+        for (const elem of v.affectedElements.slice(0, 5)) {
+          report += `**Element:** \`${elem.textContent || 'No text'}\`\n`;
+          report += `- **Search for:** \`"${elem.textContent}"\` in your codebase\n`;
+          report += `- **HTML:** \`${elem.html.slice(0, 200)}\`\n`;
+
+          // Color contrast specific actionable fix
+          if (elem.colorData) {
+            report += `- **Current Color:** \`${elem.colorData.fgColor}\` on \`${elem.colorData.bgColor}\`\n`;
+            report += `- **Current Ratio:** ${elem.colorData.contrastRatio.toFixed(2)} (needs ${elem.colorData.expectedRatio})\n`;
+            report += `- **FIX: Change color to** \`${elem.colorData.suggestedFgColor}\`\n`;
+
+            // Tailwind-specific suggestion
+            if (elem.colorData.fgColor === '#6b7280') {
+              report += `- **Tailwind Fix:** Change \`text-gray-500\` to \`text-gray-400\` or \`text-gray-300\`\n`;
+            } else if (elem.colorData.fgColor === '#9ca3af') {
+              report += `- **Tailwind Fix:** Change \`text-gray-400\` to \`text-gray-300\`\n`;
+            }
+          }
+          report += `\n`;
+        }
+      }
     }
   }
 
@@ -111,15 +131,33 @@ ${finding.value ? `- **Current Value:** \`${finding.value}\`` : ''}
     }
   }
 
-  // Code quality issues
+  // Code quality issues with actionable context
   if (input.codeQualityIssues.length > 0) {
     report += `### CODE QUALITY ISSUES (${input.codeQualityIssues.length} issues)\n\n`;
     for (const issue of input.codeQualityIssues) {
-      report += `#### [${issue.type.toUpperCase()}] ${issue.message}
-${(issue as any).source ? `- **Source:** \`${(issue as any).source}\`` : ''}
-- **Count:** ${issue.count}
+      report += `#### [${issue.type.toUpperCase()}] ${issue.message}\n`;
+      report += `- **Count:** ${issue.count}\n`;
+      if (issue.source) {
+        report += `- **Source/Location:** \`${issue.source}\`\n`;
+      }
 
-`;
+      // Add actionable fix suggestions based on issue type
+      if (issue.type === 'console_error') {
+        if (issue.message.includes('RSC payload') || issue.message.includes('Falling back to browser')) {
+          report += `- **FIX:** This is a Next.js React Server Components issue. Check:\n`;
+          report += `  1. Server component errors in your app/ pages\n`;
+          report += `  2. CSP headers blocking RSC fetches (add your domain to connect-src)\n`;
+          report += `  3. Middleware interfering with RSC routes\n`;
+        } else if (issue.message.includes('404') || issue.message.includes('not found')) {
+          report += `- **FIX:** A resource is missing. Check the URL in the error and ensure the file exists.\n`;
+        } else if (issue.message.includes('fonts.googleapis.com') || issue.message.includes('Refused to connect')) {
+          report += `- **FIX:** CSP is blocking this connection. Add the domain to your Content-Security-Policy connect-src directive.\n`;
+        }
+      } else if (issue.type === 'broken_link') {
+        report += `- **FIX:** Create the missing pages or update the links to valid URLs.\n`;
+        report += `- **Broken URLs:** ${issue.source}\n`;
+      }
+      report += `\n`;
     }
   }
 

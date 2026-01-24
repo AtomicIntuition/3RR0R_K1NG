@@ -163,7 +163,7 @@ async function detectLibraries(page: Page): Promise<DetectedLibrary[]> {
     // Bootstrap
     if (win.bootstrap?.Alert?.VERSION) {
       libs.push({ name: 'bootstrap', version: win.bootstrap.Alert.VERSION, source: 'global' });
-    } else if (win.$.fn?.tooltip?.Constructor?.VERSION) {
+    } else if (win.$?.fn?.tooltip?.Constructor?.VERSION) {
       libs.push({ name: 'bootstrap', version: win.$.fn.tooltip.Constructor.VERSION, source: 'global' });
     }
 

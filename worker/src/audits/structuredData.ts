@@ -69,17 +69,26 @@ export async function runStructuredDataAudit(page: Page): Promise<StructuredData
   const recommendations: string[] = [];
   const items: StructuredDataItem[] = [];
 
-  // Extract JSON-LD
-  const jsonLdData = await page.evaluate(() => {
-    const scripts = document.querySelectorAll('script[type="application/ld+json"]');
-    return Array.from(scripts).map(script => {
-      try {
-        return JSON.parse(script.textContent || '');
-      } catch {
-        return { _parseError: true, _raw: script.textContent?.slice(0, 200) };
+  // Extract JSON-LD - wrapped in try-catch
+  let jsonLdData: Array<any> = [];
+  try {
+    jsonLdData = await page.evaluate(() => {
+      const scripts = document.querySelectorAll('script[type="application/ld+json"]');
+      const results: any[] = [];
+      const max = Math.min(scripts.length, 20); // Limit scripts
+      for (let i = 0; i < max; i++) {
+        try {
+          results.push(JSON.parse(scripts[i].textContent || ''));
+        } catch {
+          results.push({ _parseError: true, _raw: scripts[i].textContent?.slice(0, 200) });
+        }
       }
-    });
-  });
+      return results;
+    }).catch(() => []);
+  } catch (e) {
+    console.warn('JSON-LD extraction failed:', e);
+    jsonLdData = [];
+  }
 
   // Process JSON-LD items
   for (const data of jsonLdData) {
@@ -146,36 +155,49 @@ export async function runStructuredDataAudit(page: Page): Promise<StructuredData
     }
   }
 
-  // Extract Microdata
-  const microdataItems = await page.evaluate(() => {
-    const scopes = document.querySelectorAll('[itemscope]');
-    return Array.from(scopes).map(scope => {
-      const itemType = scope.getAttribute('itemtype');
-      const properties: Record<string, string> = {};
+  // Extract Microdata - wrapped in try-catch
+  let microdataItems: Array<{ itemType: string | null; properties: Record<string, string> }> = [];
+  try {
+    microdataItems = await page.evaluate(() => {
+      const scopes = document.querySelectorAll('[itemscope]');
+      const results: Array<{ itemType: string | null; properties: Record<string, string> }> = [];
+      const max = Math.min(scopes.length, 20); // Limit scopes
+      for (let i = 0; i < max; i++) {
+        const scope = scopes[i];
+        const itemType = scope.getAttribute('itemtype');
+        const properties: Record<string, string> = {};
 
-      scope.querySelectorAll('[itemprop]').forEach(prop => {
-        const propName = prop.getAttribute('itemprop');
-        if (propName) {
-          // Get value based on element type
-          let value = '';
-          if (prop instanceof HTMLMetaElement) {
-            value = prop.content;
-          } else if (prop instanceof HTMLAnchorElement || prop instanceof HTMLLinkElement) {
-            value = prop.href;
-          } else if (prop instanceof HTMLImageElement) {
-            value = prop.src;
-          } else if (prop instanceof HTMLTimeElement) {
-            value = prop.dateTime || prop.textContent || '';
-          } else {
-            value = prop.textContent || '';
+        const props = scope.querySelectorAll('[itemprop]');
+        const maxProps = Math.min(props.length, 30);
+        for (let j = 0; j < maxProps; j++) {
+          const prop = props[j];
+          const propName = prop.getAttribute('itemprop');
+          if (propName) {
+            // Get value based on element type
+            let value = '';
+            if (prop instanceof HTMLMetaElement) {
+              value = prop.content;
+            } else if (prop instanceof HTMLAnchorElement || prop instanceof HTMLLinkElement) {
+              value = prop.href;
+            } else if (prop instanceof HTMLImageElement) {
+              value = prop.src;
+            } else if (prop instanceof HTMLTimeElement) {
+              value = prop.dateTime || prop.textContent || '';
+            } else {
+              value = prop.textContent || '';
+            }
+            properties[propName] = value.trim();
           }
-          properties[propName] = value.trim();
         }
-      });
 
-      return { itemType, properties };
-    });
-  });
+        results.push({ itemType, properties });
+      }
+      return results;
+    }).catch(() => []);
+  } catch (e) {
+    console.warn('Microdata extraction failed:', e);
+    microdataItems = [];
+  }
 
   // Process Microdata items
   for (const item of microdataItems) {

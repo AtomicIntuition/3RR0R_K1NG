@@ -464,16 +464,23 @@ export async function runSecurityAudit(
     passed: isHttps,
   });
 
-  // Check for mixed content
-  const mixedContent = await page.evaluate(() => {
-    const resources = performance.getEntriesByType('resource');
-    for (let i = 0; i < resources.length; i++) {
-      if (resources[i].name.startsWith('http://')) {
-        return true;
+  // Check for mixed content - wrapped in try-catch
+  let mixedContent = false;
+  try {
+    mixedContent = await page.evaluate(() => {
+      const resources = performance.getEntriesByType('resource');
+      const max = Math.min(resources.length, 200);
+      for (let i = 0; i < max; i++) {
+        if (resources[i].name.startsWith('http://')) {
+          return true;
+        }
       }
-    }
-    return false;
-  });
+      return false;
+    }).catch(() => false);
+  } catch (e) {
+    console.warn('Mixed content check failed:', e);
+    mixedContent = false;
+  }
 
   findings.push({
     id: 'mixed-content',
@@ -635,49 +642,59 @@ export async function runSecurityAudit(
     }
   }
 
-  // === ENTERPRISE: Subresource Integrity (SRI) ===
-  const sriViolations = await page.evaluate(() => {
-    const violations: Array<{
-      tagName: string;
-      src: string;
-      outerHtml: string;
-      isExternal: boolean;
-    }> = [];
+  // === ENTERPRISE: Subresource Integrity (SRI) === wrapped in try-catch
+  let sriViolations: SRIViolation[] = [];
+  try {
+    sriViolations = await page.evaluate(() => {
+      const violations: Array<{
+        tagName: string;
+        src: string;
+        outerHtml: string;
+        isExternal: boolean;
+      }> = [];
 
-    // Check scripts
-    document.querySelectorAll('script[src]').forEach((el) => {
-      const script = el as HTMLScriptElement;
-      const src = script.src;
-      const isExternal = src && !src.startsWith(window.location.origin);
+      // Check scripts (limit to 30)
+      const scripts = document.querySelectorAll('script[src]');
+      const maxScripts = Math.min(scripts.length, 30);
+      for (let i = 0; i < maxScripts; i++) {
+        const script = scripts[i] as HTMLScriptElement;
+        const src = script.src;
+        const isExternal = src && !src.startsWith(window.location.origin);
 
-      if (isExternal && !script.integrity) {
-        violations.push({
-          tagName: 'script',
-          src: src,
-          outerHtml: script.outerHTML.slice(0, 200),
-          isExternal: true,
-        });
+        if (isExternal && !script.integrity) {
+          violations.push({
+            tagName: 'script',
+            src: src,
+            outerHtml: script.outerHTML.slice(0, 200),
+            isExternal: true,
+          });
+        }
       }
-    });
 
-    // Check stylesheets
-    document.querySelectorAll('link[rel="stylesheet"][href]').forEach((el) => {
-      const link = el as HTMLLinkElement;
-      const href = link.href;
-      const isExternal = href && !href.startsWith(window.location.origin);
+      // Check stylesheets (limit to 30)
+      const links = document.querySelectorAll('link[rel="stylesheet"][href]');
+      const maxLinks = Math.min(links.length, 30);
+      for (let i = 0; i < maxLinks; i++) {
+        const link = links[i] as HTMLLinkElement;
+        const href = link.href;
+        const isExternal = href && !href.startsWith(window.location.origin);
 
-      if (isExternal && !link.integrity) {
-        violations.push({
-          tagName: 'link',
-          src: href,
-          outerHtml: link.outerHTML.slice(0, 200),
-          isExternal: true,
-        });
+        if (isExternal && !link.integrity) {
+          violations.push({
+            tagName: 'link',
+            src: href,
+            outerHtml: link.outerHTML.slice(0, 200),
+            isExternal: true,
+          });
+        }
       }
-    });
 
-    return violations;
-  });
+      return violations;
+    }).catch(() => []);
+  } catch (e) {
+    console.warn('SRI check failed:', e);
+    sriViolations = [];
+  }
 
   if (sriViolations.length > 0) {
     findings.push({
@@ -703,28 +720,39 @@ export async function runSecurityAudit(
     });
   }
 
-  // === ENTERPRISE: Form Security Checks ===
-  const formIssues = await page.evaluate(() => {
-    const issues: string[] = [];
+  // === ENTERPRISE: Form Security Checks === wrapped in try-catch
+  let formIssues: string[] = [];
+  try {
+    formIssues = await page.evaluate(() => {
+      const issues: string[] = [];
+      const forms = document.querySelectorAll('form');
+      const maxForms = Math.min(forms.length, 20);
 
-    document.querySelectorAll('form').forEach((form, i) => {
-      const action = form.action;
-      // Check for HTTP form actions on HTTPS page
-      if (window.location.protocol === 'https:' && action.startsWith('http://')) {
-        issues.push(`Form #${i + 1} submits to insecure HTTP: ${action}`);
+      for (let i = 0; i < maxForms; i++) {
+        const form = forms[i];
+        const action = form.action;
+        // Check for HTTP form actions on HTTPS page
+        if (window.location.protocol === 'https:' && action.startsWith('http://')) {
+          issues.push(`Form #${i + 1} submits to insecure HTTP: ${action}`);
+        }
+
+        // Check for password fields without autocomplete="off" or "new-password"
+        const pwFields = form.querySelectorAll('input[type="password"]');
+        const maxPw = Math.min(pwFields.length, 10);
+        for (let j = 0; j < maxPw; j++) {
+          const autocomplete = (pwFields[j] as HTMLInputElement).autocomplete;
+          if (!autocomplete || autocomplete === 'on') {
+            issues.push(`Password field missing autocomplete="new-password"`);
+          }
+        }
       }
 
-      // Check for password fields without autocomplete="off" or "new-password"
-      form.querySelectorAll('input[type="password"]').forEach((input) => {
-        const autocomplete = (input as HTMLInputElement).autocomplete;
-        if (!autocomplete || autocomplete === 'on') {
-          issues.push(`Password field missing autocomplete="new-password"`);
-        }
-      });
-    });
-
-    return issues;
-  });
+      return issues;
+    }).catch(() => []);
+  } catch (e) {
+    console.warn('Form security check failed:', e);
+    formIssues = [];
+  }
 
   if (formIssues.length > 0) {
     findings.push({
@@ -740,18 +768,25 @@ export async function runSecurityAudit(
     });
   }
 
-  // === ENTERPRISE: Dangerous JavaScript APIs ===
-  const dangerousAPIs = await page.evaluate(() => {
-    const found: string[] = [];
-    const html = document.documentElement.outerHTML;
+  // === ENTERPRISE: Dangerous JavaScript APIs === wrapped in try-catch
+  let dangerousAPIs: string[] = [];
+  try {
+    dangerousAPIs = await page.evaluate(() => {
+      const found: string[] = [];
+      // Limit HTML size to check to prevent crashes
+      const html = document.documentElement.outerHTML.slice(0, 500000);
 
-    // Check for eval usage in inline scripts
-    if (html.includes('eval(')) found.push('eval() detected');
-    if (html.includes('document.write(')) found.push('document.write() detected');
-    if (html.includes('innerHTML')) found.push('innerHTML usage detected');
+      // Check for eval usage in inline scripts
+      if (html.includes('eval(')) found.push('eval() detected');
+      if (html.includes('document.write(')) found.push('document.write() detected');
+      if (html.includes('innerHTML')) found.push('innerHTML usage detected');
 
-    return found;
-  });
+      return found;
+    }).catch(() => []);
+  } catch (e) {
+    console.warn('Dangerous APIs check failed:', e);
+    dangerousAPIs = [];
+  }
 
   if (dangerousAPIs.length > 0) {
     findings.push({

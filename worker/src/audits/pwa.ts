@@ -88,11 +88,17 @@ export async function runPWAAudit(page: Page, url: string): Promise<PWAAuditResu
     });
   }
 
-  // Check viewport meta tag
-  const hasViewport = await page.evaluate(() => {
-    const viewport = document.querySelector('meta[name="viewport"]');
-    return viewport !== null;
-  });
+  // Check viewport meta tag - wrapped in try-catch
+  let hasViewport = false;
+  try {
+    hasViewport = await page.evaluate(() => {
+      const viewport = document.querySelector('meta[name="viewport"]');
+      return viewport !== null;
+    }).catch(() => false);
+  } catch (e) {
+    console.warn('Viewport check failed:', e);
+    hasViewport = false;
+  }
 
   if (!hasViewport) {
     issues.push({
@@ -104,11 +110,17 @@ export async function runPWAAudit(page: Page, url: string): Promise<PWAAuditResu
     });
   }
 
-  // Check theme color meta tag
-  const hasThemeColor = await page.evaluate(() => {
-    const themeColor = document.querySelector('meta[name="theme-color"]');
-    return themeColor !== null;
-  });
+  // Check theme color meta tag - wrapped in try-catch
+  let hasThemeColor = false;
+  try {
+    hasThemeColor = await page.evaluate(() => {
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      return themeColor !== null;
+    }).catch(() => false);
+  } catch (e) {
+    console.warn('Theme color check failed:', e);
+    hasThemeColor = false;
+  }
 
   if (!hasThemeColor) {
     issues.push({
@@ -236,11 +248,17 @@ export async function runPWAAudit(page: Page, url: string): Promise<PWAAuditResu
  * Check web app manifest
  */
 async function checkManifest(page: Page, baseUrl: string): Promise<ManifestCheck> {
-  const manifestInfo = await page.evaluate(() => {
-    const link = document.querySelector('link[rel="manifest"]');
-    if (!link) return null;
-    return (link as HTMLLinkElement).href;
-  });
+  let manifestInfo: string | null = null;
+  try {
+    manifestInfo = await page.evaluate(() => {
+      const link = document.querySelector('link[rel="manifest"]');
+      if (!link) return null;
+      return (link as HTMLLinkElement).href;
+    }).catch(() => null);
+  } catch (e) {
+    console.warn('Manifest link check failed:', e);
+    manifestInfo = null;
+  }
 
   if (!manifestInfo) {
     return {
@@ -312,36 +330,41 @@ async function checkManifest(page: Page, baseUrl: string): Promise<ManifestCheck
  * Check service worker registration
  */
 async function checkServiceWorker(page: Page): Promise<ServiceWorkerCheck> {
-  const swInfo = await page.evaluate(async () => {
-    if (!('serviceWorker' in navigator)) {
-      return { registered: false };
-    }
-
-    try {
-      const registration = await navigator.serviceWorker.getRegistration();
-      if (registration?.active) {
-        return {
-          registered: true,
-          scope: registration.scope,
-          scriptUrl: registration.active.scriptURL,
-        };
+  try {
+    const swInfo = await page.evaluate(async () => {
+      if (!('serviceWorker' in navigator)) {
+        return { registered: false };
       }
 
-      // Also check for controlling worker
-      if (navigator.serviceWorker.controller) {
-        return {
-          registered: true,
-          scriptUrl: navigator.serviceWorker.controller.scriptURL,
-        };
+      try {
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (registration?.active) {
+          return {
+            registered: true,
+            scope: registration.scope,
+            scriptUrl: registration.active.scriptURL,
+          };
+        }
+
+        // Also check for controlling worker
+        if (navigator.serviceWorker.controller) {
+          return {
+            registered: true,
+            scriptUrl: navigator.serviceWorker.controller.scriptURL,
+          };
+        }
+
+        return { registered: false };
+      } catch {
+        return { registered: false };
       }
+    }).catch(() => ({ registered: false }));
 
-      return { registered: false };
-    } catch {
-      return { registered: false };
-    }
-  });
-
-  return swInfo;
+    return swInfo;
+  } catch (e) {
+    console.warn('Service worker check failed:', e);
+    return { registered: false };
+  }
 }
 
 /**

@@ -109,76 +109,80 @@ function estimateSavings(format: string, fileSize: number): number {
  * Collect image data from page
  */
 async function collectImageData(page: Page): Promise<ImageData[]> {
-  return await page.evaluate(() => {
-    const images: ImageData[] = [];
+  try {
+    return await page.evaluate(() => {
+      const images: ImageData[] = [];
+      const imgEls = document.querySelectorAll('img');
+      const max = Math.min(imgEls.length, 100); // Limit images
 
-    document.querySelectorAll('img').forEach(img => {
-      const rect = img.getBoundingClientRect();
-      const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
+      for (let i = 0; i < max; i++) {
+        const img = imgEls[i];
+        const rect = img.getBoundingClientRect();
+        const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
 
-      // Get format from src
-      const src = img.src || img.currentSrc || '';
-      let format = 'unknown';
-      const urlLower = src.toLowerCase();
-      if (urlLower.includes('.webp') || urlLower.includes('format=webp')) format = 'webp';
-      else if (urlLower.includes('.avif') || urlLower.includes('format=avif')) format = 'avif';
-      else if (urlLower.includes('.png')) format = 'png';
-      else if (urlLower.includes('.jpg') || urlLower.includes('.jpeg')) format = 'jpg';
-      else if (urlLower.includes('.gif')) format = 'gif';
-      else if (urlLower.includes('.svg')) format = 'svg';
-      else if (urlLower.includes('.ico')) format = 'ico';
+        // Get format from src
+        const src = img.src || img.currentSrc || '';
+        let format = 'unknown';
+        const urlLower = src.toLowerCase();
+        if (urlLower.includes('.webp') || urlLower.includes('format=webp')) format = 'webp';
+        else if (urlLower.includes('.avif') || urlLower.includes('format=avif')) format = 'avif';
+        else if (urlLower.includes('.png')) format = 'png';
+        else if (urlLower.includes('.jpg') || urlLower.includes('.jpeg')) format = 'jpg';
+        else if (urlLower.includes('.gif')) format = 'gif';
+        else if (urlLower.includes('.svg')) format = 'svg';
+        else if (urlLower.includes('.ico')) format = 'ico';
 
-      images.push({
-        src,
-        loading: img.loading || null,
-        srcset: img.srcset || null,
-        sizes: img.sizes || null,
-        width: rect.width,
-        height: rect.height,
-        naturalWidth: img.naturalWidth,
-        naturalHeight: img.naturalHeight,
-        hasWidthHeight: img.hasAttribute('width') && img.hasAttribute('height'),
-        isInViewport,
-        format,
-        alt: img.alt,
-        hasAlt: img.hasAttribute('alt'),
-        fileSize: 0, // Will be populated from resource timing
-      });
-    });
-
-    // Also check picture elements with source
-    document.querySelectorAll('picture source').forEach(source => {
-      const srcset = (source as HTMLSourceElement).srcset;
-      if (srcset) {
-        const type = (source as HTMLSourceElement).type;
-        if (type?.includes('webp') || type?.includes('avif')) {
-          // Picture element is using modern formats, this is good
-        }
+        images.push({
+          src,
+          loading: img.loading || null,
+          srcset: img.srcset || null,
+          sizes: img.sizes || null,
+          width: rect.width,
+          height: rect.height,
+          naturalWidth: img.naturalWidth,
+          naturalHeight: img.naturalHeight,
+          hasWidthHeight: img.hasAttribute('width') && img.hasAttribute('height'),
+          isInViewport,
+          format,
+          alt: img.alt,
+          hasAlt: img.hasAttribute('alt'),
+          fileSize: 0, // Will be populated from resource timing
+        });
       }
-    });
 
-    return images;
-  });
+      return images;
+    }).catch(() => []);
+  } catch (e) {
+    console.warn('Image data collection failed:', e);
+    return [];
+  }
 }
 
 /**
  * Get image file sizes from resource timing
  */
 async function getImageSizes(page: Page): Promise<Map<string, number>> {
-  const sizes = await page.evaluate(() => {
-    const entries = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
-    const imageSizes: [string, number][] = [];
+  try {
+    const sizes = await page.evaluate(() => {
+      const entries = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
+      const imageSizes: [string, number][] = [];
+      const max = Math.min(entries.length, 200); // Limit entries
 
-    entries.forEach(entry => {
-      if (entry.initiatorType === 'img' || entry.name.match(/\.(jpg|jpeg|png|gif|webp|avif|svg)/i)) {
-        imageSizes.push([entry.name, entry.transferSize || entry.encodedBodySize || 0]);
+      for (let i = 0; i < max; i++) {
+        const entry = entries[i];
+        if (entry.initiatorType === 'img' || entry.name.match(/\.(jpg|jpeg|png|gif|webp|avif|svg)/i)) {
+          imageSizes.push([entry.name, entry.transferSize || entry.encodedBodySize || 0]);
+        }
       }
-    });
 
-    return imageSizes;
-  });
+      return imageSizes;
+    }).catch(() => [] as [string, number][]);
 
-  return new Map(sizes);
+    return new Map(sizes);
+  } catch (e) {
+    console.warn('Image sizes collection failed:', e);
+    return new Map();
+  }
 }
 
 /**

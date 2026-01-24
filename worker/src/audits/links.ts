@@ -67,26 +67,33 @@ export async function runLinkAudit(page: Page, baseUrl: string): Promise<LinkAud
   const redirectedLinks: RedirectedLink[] = [];
   const insecureLinks: InsecureLink[] = [];
 
-  // Extract all links from page
-  const allLinks = await page.evaluate(() => {
-    const anchors = document.querySelectorAll('a[href]');
-    return Array.from(anchors)
-      .map(a => {
-        const anchor = a as HTMLAnchorElement;
-        return {
-          href: anchor.href,
-          text: (a.textContent || '').trim().slice(0, 50),
-          isExternal: anchor.host !== window.location.host,
-        };
-      })
-      .filter(link => {
+  // Extract all links from page - wrapped in try-catch
+  let allLinks: LinkInfo[] = [];
+  try {
+    allLinks = await page.evaluate(() => {
+      const anchors = document.querySelectorAll('a[href]');
+      const links: Array<{ href: string; text: string; isExternal: boolean }> = [];
+      const max = Math.min(anchors.length, 200); // Limit links
+
+      for (let i = 0; i < max; i++) {
+        const anchor = anchors[i] as HTMLAnchorElement;
+        const href = anchor.href;
         // Filter out non-HTTP links
-        return (
-          link.href.startsWith('http://') ||
-          link.href.startsWith('https://')
-        );
-      });
-  });
+        if (href.startsWith('http://') || href.startsWith('https://')) {
+          links.push({
+            href,
+            text: (anchor.textContent || '').trim().slice(0, 50),
+            isExternal: anchor.host !== window.location.host,
+          });
+        }
+      }
+
+      return links;
+    }).catch(() => []);
+  } catch (e) {
+    console.warn('Link extraction failed:', e);
+    allLinks = [];
+  }
 
   // Remove duplicates
   const uniqueLinks = allLinks.filter(

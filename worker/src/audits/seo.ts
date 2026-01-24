@@ -16,48 +16,79 @@ export interface SeoAuditResult {
 export async function runSeoAudit(page: Page, url: string): Promise<SeoAuditResult> {
   const findings: SeoFinding[] = [];
 
-  // Extract meta information from the page - fully inlined to avoid tsx __name issue
-  const seoData = await page.evaluate(() => {
-    const canonicalEl = document.querySelector('link[rel="canonical"]');
-    const h1El = document.querySelector('h1');
+  // Default SEO data for fallback
+  const defaultSeoData = {
+    title: '',
+    metaDescription: null as string | null,
+    metaKeywords: null as string | null,
+    canonical: null as string | null,
+    ogTitle: null as string | null,
+    ogDescription: null as string | null,
+    ogImage: null as string | null,
+    ogUrl: null as string | null,
+    twitterCard: null as string | null,
+    twitterTitle: null as string | null,
+    twitterDescription: null as string | null,
+    twitterImage: null as string | null,
+    viewport: null as string | null,
+    robots: null as string | null,
+    h1Count: 0,
+    h1Text: null as string | null,
+    imgWithoutAlt: 0,
+    totalImages: 0,
+    linksWithoutText: 0,
+    hasLang: false,
+    lang: null as string | null,
+  };
 
-    const descEl = document.querySelector('meta[name="description"], meta[property="description"]');
-    const keywordsEl = document.querySelector('meta[name="keywords"]');
-    const ogTitleEl = document.querySelector('meta[property="og:title"]');
-    const ogDescEl = document.querySelector('meta[property="og:description"]');
-    const ogImageEl = document.querySelector('meta[property="og:image"]');
-    const ogUrlEl = document.querySelector('meta[property="og:url"]');
-    const twitterCardEl = document.querySelector('meta[name="twitter:card"]');
-    const twitterTitleEl = document.querySelector('meta[name="twitter:title"]');
-    const twitterDescEl = document.querySelector('meta[name="twitter:description"]');
-    const twitterImageEl = document.querySelector('meta[name="twitter:image"]');
-    const viewportEl = document.querySelector('meta[name="viewport"]');
-    const robotsEl = document.querySelector('meta[name="robots"]');
+  // Extract meta information from the page - wrapped in try-catch
+  let seoData = defaultSeoData;
+  try {
+    seoData = await page.evaluate(() => {
+      const canonicalEl = document.querySelector('link[rel="canonical"]');
+      const h1El = document.querySelector('h1');
 
-    return {
-      title: document.title,
-      metaDescription: descEl ? descEl.getAttribute('content') : null,
-      metaKeywords: keywordsEl ? keywordsEl.getAttribute('content') : null,
-      canonical: canonicalEl ? canonicalEl.getAttribute('href') : null,
-      ogTitle: ogTitleEl ? ogTitleEl.getAttribute('content') : null,
-      ogDescription: ogDescEl ? ogDescEl.getAttribute('content') : null,
-      ogImage: ogImageEl ? ogImageEl.getAttribute('content') : null,
-      ogUrl: ogUrlEl ? ogUrlEl.getAttribute('content') : null,
-      twitterCard: twitterCardEl ? twitterCardEl.getAttribute('content') : null,
-      twitterTitle: twitterTitleEl ? twitterTitleEl.getAttribute('content') : null,
-      twitterDescription: twitterDescEl ? twitterDescEl.getAttribute('content') : null,
-      twitterImage: twitterImageEl ? twitterImageEl.getAttribute('content') : null,
-      viewport: viewportEl ? viewportEl.getAttribute('content') : null,
-      robots: robotsEl ? robotsEl.getAttribute('content') : null,
-      h1Count: document.querySelectorAll('h1').length,
-      h1Text: h1El ? h1El.textContent : null,
-      imgWithoutAlt: document.querySelectorAll('img:not([alt])').length,
-      totalImages: document.querySelectorAll('img').length,
-      linksWithoutText: document.querySelectorAll('a:not([aria-label])').length,
-      hasLang: document.documentElement.hasAttribute('lang'),
-      lang: document.documentElement.getAttribute('lang'),
-    };
-  });
+      const descEl = document.querySelector('meta[name="description"], meta[property="description"]');
+      const keywordsEl = document.querySelector('meta[name="keywords"]');
+      const ogTitleEl = document.querySelector('meta[property="og:title"]');
+      const ogDescEl = document.querySelector('meta[property="og:description"]');
+      const ogImageEl = document.querySelector('meta[property="og:image"]');
+      const ogUrlEl = document.querySelector('meta[property="og:url"]');
+      const twitterCardEl = document.querySelector('meta[name="twitter:card"]');
+      const twitterTitleEl = document.querySelector('meta[name="twitter:title"]');
+      const twitterDescEl = document.querySelector('meta[name="twitter:description"]');
+      const twitterImageEl = document.querySelector('meta[name="twitter:image"]');
+      const viewportEl = document.querySelector('meta[name="viewport"]');
+      const robotsEl = document.querySelector('meta[name="robots"]');
+
+      return {
+        title: document.title,
+        metaDescription: descEl ? descEl.getAttribute('content') : null,
+        metaKeywords: keywordsEl ? keywordsEl.getAttribute('content') : null,
+        canonical: canonicalEl ? canonicalEl.getAttribute('href') : null,
+        ogTitle: ogTitleEl ? ogTitleEl.getAttribute('content') : null,
+        ogDescription: ogDescEl ? ogDescEl.getAttribute('content') : null,
+        ogImage: ogImageEl ? ogImageEl.getAttribute('content') : null,
+        ogUrl: ogUrlEl ? ogUrlEl.getAttribute('content') : null,
+        twitterCard: twitterCardEl ? twitterCardEl.getAttribute('content') : null,
+        twitterTitle: twitterTitleEl ? twitterTitleEl.getAttribute('content') : null,
+        twitterDescription: twitterDescEl ? twitterDescEl.getAttribute('content') : null,
+        twitterImage: twitterImageEl ? twitterImageEl.getAttribute('content') : null,
+        viewport: viewportEl ? viewportEl.getAttribute('content') : null,
+        robots: robotsEl ? robotsEl.getAttribute('content') : null,
+        h1Count: document.querySelectorAll('h1').length,
+        h1Text: h1El ? h1El.textContent : null,
+        imgWithoutAlt: document.querySelectorAll('img:not([alt])').length,
+        totalImages: document.querySelectorAll('img').length,
+        linksWithoutText: document.querySelectorAll('a:not([aria-label])').length,
+        hasLang: document.documentElement.hasAttribute('lang'),
+        lang: document.documentElement.getAttribute('lang'),
+      };
+    }).catch(() => defaultSeoData);
+  } catch (e) {
+    console.warn('SEO data extraction failed:', e);
+    seoData = defaultSeoData;
+  }
 
   // Title tag check
   const hasTitle = !!seoData.title && seoData.title.length > 0;

@@ -118,102 +118,108 @@ function isVersionBelow(version: string, target: string): boolean {
  * Detect libraries from window globals and script URLs
  */
 async function detectLibraries(page: Page): Promise<DetectedLibrary[]> {
-  const libraries = await page.evaluate(() => {
-    const libs: Array<{ name: string; version: string; source: 'global' | 'script-url' | 'meta' }> = [];
-    const win = window as any;
+  try {
+    const libraries = await page.evaluate(() => {
+      const libs: Array<{ name: string; version: string; source: 'global' | 'script-url' | 'meta' }> = [];
+      const win = window as any;
 
-    // jQuery
-    if (win.jQuery?.fn?.jquery) {
-      libs.push({ name: 'jquery', version: win.jQuery.fn.jquery, source: 'global' });
-    } else if (win.$?.fn?.jquery) {
-      libs.push({ name: 'jquery', version: win.$.fn.jquery, source: 'global' });
-    }
+      // jQuery
+      if (win.jQuery?.fn?.jquery) {
+        libs.push({ name: 'jquery', version: win.jQuery.fn.jquery, source: 'global' });
+      } else if (win.$?.fn?.jquery) {
+        libs.push({ name: 'jquery', version: win.$.fn.jquery, source: 'global' });
+      }
 
-    // React
-    if (win.React?.version) {
-      libs.push({ name: 'react', version: win.React.version, source: 'global' });
-    }
+      // React
+      if (win.React?.version) {
+        libs.push({ name: 'react', version: win.React.version, source: 'global' });
+      }
 
-    // Vue
-    if (win.Vue?.version) {
-      libs.push({ name: 'vue', version: win.Vue.version, source: 'global' });
-    }
+      // Vue
+      if (win.Vue?.version) {
+        libs.push({ name: 'vue', version: win.Vue.version, source: 'global' });
+      }
 
-    // Angular (AngularJS)
-    if (win.angular?.version?.full) {
-      libs.push({ name: 'angular', version: win.angular.version.full, source: 'global' });
-    }
+      // Angular (AngularJS)
+      if (win.angular?.version?.full) {
+        libs.push({ name: 'angular', version: win.angular.version.full, source: 'global' });
+      }
 
-    // Lodash
-    if (win._?.VERSION) {
-      libs.push({ name: 'lodash', version: win._.VERSION, source: 'global' });
-    }
+      // Lodash
+      if (win._?.VERSION) {
+        libs.push({ name: 'lodash', version: win._.VERSION, source: 'global' });
+      }
 
-    // Underscore
-    if (win._?.VERSION && !win._.chain) {
-      // Underscore doesn't have chain by default, lodash does
-      libs.push({ name: 'underscore', version: win._.VERSION, source: 'global' });
-    }
+      // Underscore
+      if (win._?.VERSION && !win._.chain) {
+        // Underscore doesn't have chain by default, lodash does
+        libs.push({ name: 'underscore', version: win._.VERSION, source: 'global' });
+      }
 
-    // Moment.js
-    if (win.moment?.version) {
-      libs.push({ name: 'moment', version: win.moment.version, source: 'global' });
-    }
+      // Moment.js
+      if (win.moment?.version) {
+        libs.push({ name: 'moment', version: win.moment.version, source: 'global' });
+      }
 
-    // Bootstrap
-    if (win.bootstrap?.Alert?.VERSION) {
-      libs.push({ name: 'bootstrap', version: win.bootstrap.Alert.VERSION, source: 'global' });
-    } else if (win.$?.fn?.tooltip?.Constructor?.VERSION) {
-      libs.push({ name: 'bootstrap', version: win.$.fn.tooltip.Constructor.VERSION, source: 'global' });
-    }
+      // Bootstrap
+      if (win.bootstrap?.Alert?.VERSION) {
+        libs.push({ name: 'bootstrap', version: win.bootstrap.Alert.VERSION, source: 'global' });
+      } else if (win.$?.fn?.tooltip?.Constructor?.VERSION) {
+        libs.push({ name: 'bootstrap', version: win.$.fn.tooltip.Constructor.VERSION, source: 'global' });
+      }
 
-    // Handlebars
-    if (win.Handlebars?.VERSION) {
-      libs.push({ name: 'handlebars', version: win.Handlebars.VERSION, source: 'global' });
-    }
+      // Handlebars
+      if (win.Handlebars?.VERSION) {
+        libs.push({ name: 'handlebars', version: win.Handlebars.VERSION, source: 'global' });
+      }
 
-    // Axios
-    if (win.axios?.VERSION) {
-      libs.push({ name: 'axios', version: win.axios.VERSION, source: 'global' });
-    }
+      // Axios
+      if (win.axios?.VERSION) {
+        libs.push({ name: 'axios', version: win.axios.VERSION, source: 'global' });
+      }
 
-    // DOMPurify
-    if (win.DOMPurify?.version) {
-      libs.push({ name: 'dompurify', version: win.DOMPurify.version, source: 'global' });
-    }
+      // DOMPurify
+      if (win.DOMPurify?.version) {
+        libs.push({ name: 'dompurify', version: win.DOMPurify.version, source: 'global' });
+      }
 
-    // Parse script URLs for versions
-    const scripts = document.querySelectorAll('script[src]');
-    scripts.forEach(script => {
-      const src = (script as HTMLScriptElement).src;
+      // Parse script URLs for versions (limit to 30 scripts)
+      const scripts = document.querySelectorAll('script[src]');
+      const maxScripts = Math.min(scripts.length, 30);
+      for (let i = 0; i < maxScripts; i++) {
+        const src = (scripts[i] as HTMLScriptElement).src;
 
-      // Common CDN patterns: library-1.2.3.min.js, library@1.2.3, library/1.2.3/
-      const patterns = [
-        { regex: /jquery[.-](\d+\.\d+\.\d+)/i, name: 'jquery' },
-        { regex: /lodash[.-](\d+\.\d+\.\d+)/i, name: 'lodash' },
-        { regex: /underscore[.-](\d+\.\d+\.\d+)/i, name: 'underscore' },
-        { regex: /angular[.-](\d+\.\d+\.\d+)/i, name: 'angular' },
-        { regex: /vue[@.-](\d+\.\d+\.\d+)/i, name: 'vue' },
-        { regex: /react[@.-](\d+\.\d+\.\d+)/i, name: 'react' },
-        { regex: /bootstrap[.-](\d+\.\d+\.\d+)/i, name: 'bootstrap' },
-        { regex: /moment[.-](\d+\.\d+\.\d+)/i, name: 'moment' },
-        { regex: /handlebars[.-](\d+\.\d+\.\d+)/i, name: 'handlebars' },
-        { regex: /axios[.-](\d+\.\d+\.\d+)/i, name: 'axios' },
-        { regex: /dompurify[.-](\d+\.\d+\.\d+)/i, name: 'dompurify' },
-      ];
+        // Common CDN patterns: library-1.2.3.min.js, library@1.2.3, library/1.2.3/
+        const patterns = [
+          { regex: /jquery[.-](\d+\.\d+\.\d+)/i, name: 'jquery' },
+          { regex: /lodash[.-](\d+\.\d+\.\d+)/i, name: 'lodash' },
+          { regex: /underscore[.-](\d+\.\d+\.\d+)/i, name: 'underscore' },
+          { regex: /angular[.-](\d+\.\d+\.\d+)/i, name: 'angular' },
+          { regex: /vue[@.-](\d+\.\d+\.\d+)/i, name: 'vue' },
+          { regex: /react[@.-](\d+\.\d+\.\d+)/i, name: 'react' },
+          { regex: /bootstrap[.-](\d+\.\d+\.\d+)/i, name: 'bootstrap' },
+          { regex: /moment[.-](\d+\.\d+\.\d+)/i, name: 'moment' },
+          { regex: /handlebars[.-](\d+\.\d+\.\d+)/i, name: 'handlebars' },
+          { regex: /axios[.-](\d+\.\d+\.\d+)/i, name: 'axios' },
+          { regex: /dompurify[.-](\d+\.\d+\.\d+)/i, name: 'dompurify' },
+        ];
 
-      for (const { regex, name } of patterns) {
-        const match = src.match(regex);
-        if (match && !libs.some(l => l.name === name)) {
-          libs.push({ name, version: match[1], source: 'script-url' });
+        for (const { regex, name } of patterns) {
+          const match = src.match(regex);
+          if (match && !libs.some(l => l.name === name)) {
+            libs.push({ name, version: match[1], source: 'script-url' });
+          }
         }
       }
-    });
 
-    return libs;
-  });
+      return libs;
+    }).catch(() => [] as Array<{ name: string; version: string; source: 'global' | 'script-url' | 'meta' }>);
 
-  return libraries;
+    return libraries;
+  } catch (e) {
+    console.warn('Library detection failed:', e);
+    return [];
+  }
 }
 
 /**

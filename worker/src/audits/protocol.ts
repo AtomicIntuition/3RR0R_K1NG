@@ -99,14 +99,24 @@ async function checkHttp3Support(url: string): Promise<{ supported: boolean; alt
  * Get protocol information from resource timing
  */
 async function getResourceProtocols(page: Page): Promise<ResourceProtocol[]> {
-  return await page.evaluate(() => {
-    const entries = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
-    return entries.map(entry => ({
-      url: entry.name,
-      protocol: entry.nextHopProtocol || 'unknown',
-      type: entry.initiatorType || 'other',
-    }));
-  });
+  try {
+    return await page.evaluate(() => {
+      const entries = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
+      const max = Math.min(entries.length, 200); // Limit entries
+      const result: Array<{ url: string; protocol: string; type: string }> = [];
+      for (let i = 0; i < max; i++) {
+        result.push({
+          url: entries[i].name,
+          protocol: entries[i].nextHopProtocol || 'unknown',
+          type: entries[i].initiatorType || 'other',
+        });
+      }
+      return result;
+    }).catch(() => []);
+  } catch (e) {
+    console.warn('Resource protocols check failed:', e);
+    return [];
+  }
 }
 
 /**

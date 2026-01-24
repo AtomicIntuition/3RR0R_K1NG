@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import clsx from 'clsx';
 import { getGrade } from '@/lib/scoring';
+import { ScreenshotButton } from './ScreenshotButton';
 
 interface ShareCardProps {
   scanId: string;
@@ -14,14 +15,9 @@ interface ShareCardProps {
 
 export function ShareCard({ scanId, url, score, twitterRoast, className }: ShareCardProps) {
   const [copied, setCopied] = useState(false);
-  const [downloading, setDownloading] = useState(false);
 
   const shareUrl = typeof window !== 'undefined'
     ? `${window.location.origin}/scan/${scanId}`
-    : '';
-
-  const ogImageUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/api/og/${scanId}`
     : '';
 
   const grade = getGrade(score);
@@ -60,26 +56,6 @@ export function ShareCard({ scanId, url, score, twitterRoast, className }: Share
     window.open(linkedInUrl, '_blank', 'width=550,height=420');
   };
 
-  const handleDownloadImage = async () => {
-    setDownloading(true);
-    try {
-      const response = await fetch(ogImageUrl);
-      const blob = await response.blob();
-      const downloadUrl = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = `3rror-k1ng-roast-${scanId.slice(0, 8)}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(downloadUrl);
-    } catch (error) {
-      console.error('Failed to download image:', error);
-    } finally {
-      setDownloading(false);
-    }
-  };
-
   return (
     <div className={clsx('card p-6', className)}>
       <h3 className="text-lg font-bold text-gray-100 mb-4">
@@ -87,7 +63,7 @@ export function ShareCard({ scanId, url, score, twitterRoast, className }: Share
       </h3>
 
       <p className="text-sm text-gray-400 mb-6">
-        Brave enough to share your results? Let the world see your score.
+        Brave enough to share your results? Screenshot the roast above and share it!
       </p>
 
       {/* Share URL input */}
@@ -112,7 +88,7 @@ export function ShareCard({ scanId, url, score, twitterRoast, className }: Share
       </div>
 
       {/* Social share buttons */}
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 mb-6">
         <button
           onClick={handleTwitterShare}
           className="flex items-center gap-2 px-4 py-2 bg-[#1DA1F2]/10 border border-[#1DA1F2]/30 text-[#1DA1F2] rounded hover:bg-[#1DA1F2]/20 transition-colors"
@@ -133,56 +109,17 @@ export function ShareCard({ scanId, url, score, twitterRoast, className }: Share
           <span>Share on LinkedIn</span>
         </button>
 
-        <button
-          onClick={handleDownloadImage}
-          disabled={downloading}
-          className="flex items-center gap-2 px-4 py-2 bg-terminal/10 border border-terminal/30 text-terminal rounded hover:bg-terminal/20 transition-colors disabled:opacity-50"
-        >
-          {downloading ? (
-            <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-            </svg>
-          ) : (
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-          )}
-          <span>{downloading ? 'Generating...' : 'Download Image'}</span>
-        </button>
-      </div>
-
-      {/* Twitter Image Preview */}
-      <div className="mt-6">
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-sm text-gray-400">Twitter/X Card Preview:</p>
-          <a
-            href={ogImageUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-terminal hover:underline"
-          >
-            Open full size
-          </a>
-        </div>
-        <div className="relative aspect-[1200/675] rounded-lg overflow-hidden border border-void-200 bg-void-100">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={ogImageUrl}
-            alt="Twitter card preview"
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
-        </div>
-        <p className="text-xs text-gray-500 mt-2">
-          This image will appear when you share on Twitter/X. Download it to post manually for maximum impact.
-        </p>
+        {/* Screenshot button - captures the roast section */}
+        <ScreenshotButton
+          targetId="roast-container"
+          filename={`3rror-k1ng-roast-${scanId.slice(0, 8)}`}
+        />
       </div>
 
       {/* Twitter roast text */}
       {twitterRoast && (
-        <div className="mt-4 p-3 bg-void-100 rounded-lg border border-void-200">
-          <p className="text-xs text-gray-500 mb-2">Twitter-ready roast:</p>
+        <div className="p-3 bg-void-100 rounded-lg border border-void-200">
+          <p className="text-xs text-gray-500 mb-2">Twitter-ready roast (copy & paste):</p>
           <p className="text-sm text-gray-300 font-mono">{twitterRoast}</p>
           <button
             onClick={async () => {

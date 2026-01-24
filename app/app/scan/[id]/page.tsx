@@ -148,7 +148,7 @@ export default function ScanResultsPage() {
 
         {/* Roast Section */}
         {scan.roastTitle && scan.roastBody && (
-          <section className="mb-12">
+          <section id="roast-container" className="mb-12">
             <RoastText
               title={scan.roastTitle}
               body={scan.roastBody}

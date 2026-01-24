@@ -11,6 +11,7 @@ import { GlitchText } from '@/components/GlitchText';
 import { ShareCard } from '@/components/ShareCard';
 import { LLMReport } from '@/components/LLMReport';
 import { useScanRealtime } from '@/lib/useScanRealtime';
+import { getGrade, getGradeColor } from '@/lib/scoring';
 
 export default function ScanResultsPage() {
   const params = useParams();
@@ -105,13 +106,42 @@ export default function ScanResultsPage() {
           </div>
         </header>
 
-        {/* Overall Score */}
+        {/* Overall Score with Letter Grade */}
         <section className="text-center mb-12">
-          <ScoreRing
-            score={scan.scoreOverall || 0}
-            size="xl"
-            label="OVERALL SCORE"
-          />
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8">
+            {/* Numeric Score */}
+            <ScoreRing
+              score={scan.scoreOverall || 0}
+              size="xl"
+              label="OVERALL SCORE"
+            />
+
+            {/* Letter Grade */}
+            <div className="flex flex-col items-center">
+              <div className={`text-8xl md:text-9xl font-black tracking-tight ${getGradeColor(scan.letterGrade || getGrade(scan.scoreOverall || 0))}`}
+                   style={{ textShadow: '0 0 30px currentColor, 0 0 60px currentColor' }}>
+                {scan.letterGrade || getGrade(scan.scoreOverall || 0)}
+              </div>
+              <span className="text-lg text-gray-400 font-medium mt-2">GRADE</span>
+            </div>
+          </div>
+
+          {/* Scoring Breakdown (if available) */}
+          {scan.scoringBreakdown?.breakdown && (
+            <div className="mt-8 max-w-2xl mx-auto">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                {scan.scoringBreakdown.breakdown.map((cat) => (
+                  <div key={cat.category} className="bg-void-50 border border-void-100 rounded-lg p-3 text-center">
+                    <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">{cat.category}</div>
+                    <div className={`text-xl font-bold ${cat.score >= 90 ? 'text-terminal' : cat.score >= 70 ? 'text-neon-yellow' : cat.score >= 50 ? 'text-neon-orange' : 'text-danger'}`}>
+                      {cat.score}
+                    </div>
+                    <div className="text-xs text-gray-600">{cat.weight}% weight</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
 
         {/* Roast Section */}

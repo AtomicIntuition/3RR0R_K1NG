@@ -87,6 +87,24 @@ export interface ScanResults {
   techStack: TechStackItem[];
 }
 
+export interface ScoringBreakdown {
+  overall: number;
+  letterGrade: string;
+  categoryScores: {
+    security: { score: number; weight: number; components: Record<string, number> };
+    performance: { score: number; weight: number; components: Record<string, number> };
+    seo: { score: number; weight: number; components: Record<string, number> };
+    userExperience: { score: number; weight: number; components: Record<string, number> };
+    codeQuality: { score: number; weight: number; components: Record<string, number> };
+  };
+  breakdown: {
+    category: string;
+    score: number;
+    weight: number;
+    contribution: number;
+  }[];
+}
+
 export interface Scan {
   id: string;
   url: string;
@@ -95,6 +113,8 @@ export interface Scan {
 
   // Scores
   scoreOverall?: number;
+  letterGrade?: string;
+  scoringBreakdown?: ScoringBreakdown;
   scorePerformance?: number;
   scoreSecurity?: number;
   scoreSeo?: number;
@@ -150,6 +170,8 @@ export interface DbScan {
   url: string;
   status: ScanStatus;
   score_overall: number | null;
+  letter_grade: string | null;
+  scoring_breakdown: ScoringBreakdown | null;
   score_performance: number | null;
   score_security: number | null;
   score_seo: number | null;
@@ -183,6 +205,8 @@ export function dbScanToScan(row: DbScan): Scan {
     status: row.status,
     userId: row.user_id ?? undefined,
     scoreOverall: row.score_overall ?? undefined,
+    letterGrade: row.letter_grade ?? undefined,
+    scoringBreakdown: row.scoring_breakdown ?? undefined,
     scorePerformance: row.score_performance ?? undefined,
     scoreSecurity: row.score_security ?? undefined,
     scoreSeo: row.score_seo ?? undefined,

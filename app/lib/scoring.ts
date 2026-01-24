@@ -35,14 +35,43 @@ export function calculateOverallScore(scores: Partial<CategoryScores>): number {
 }
 
 /**
- * Get grade letter from score
+ * Get grade letter from score (with +/- modifiers)
  */
 export function getGrade(score: number): string {
-  if (score >= 90) return 'A';
-  if (score >= 80) return 'B';
-  if (score >= 70) return 'C';
-  if (score >= 60) return 'D';
+  const rounded = Math.round(score);
+  if (rounded >= 97) return 'A+';
+  if (rounded >= 93) return 'A';
+  if (rounded >= 90) return 'A-';
+  if (rounded >= 87) return 'B+';
+  if (rounded >= 83) return 'B';
+  if (rounded >= 80) return 'B-';
+  if (rounded >= 77) return 'C+';
+  if (rounded >= 73) return 'C';
+  if (rounded >= 70) return 'C-';
+  if (rounded >= 67) return 'D+';
+  if (rounded >= 63) return 'D';
+  if (rounded >= 60) return 'D-';
   return 'F';
+}
+
+/**
+ * Get grade color class
+ */
+export function getGradeColor(grade: string): string {
+  if (grade.startsWith('A')) return 'text-terminal';
+  if (grade.startsWith('B')) return 'text-neon-yellow';
+  if (grade.startsWith('C')) return 'text-neon-orange';
+  return 'text-danger';
+}
+
+/**
+ * Get grade background color class
+ */
+export function getGradeBgColor(grade: string): string {
+  if (grade.startsWith('A')) return 'bg-terminal/20 border-terminal/50';
+  if (grade.startsWith('B')) return 'bg-neon-yellow/20 border-neon-yellow/50';
+  if (grade.startsWith('C')) return 'bg-neon-orange/20 border-neon-orange/50';
+  return 'bg-danger/20 border-danger/50';
 }
 
 /**

@@ -47,6 +47,24 @@ export interface SRIViolation {
   isExternal: boolean;
 }
 
+export interface SecurityTxtInfo {
+  exists: boolean;
+  valid: boolean;
+  url?: string;
+  content?: string;
+  issues: string[];
+  fields: {
+    contact?: string;
+    expires?: string;
+    encryption?: string;
+    acknowledgments?: string;
+    preferredLanguages?: string;
+    canonical?: string;
+    policy?: string;
+    hiring?: string;
+  };
+}
+
 export interface SecurityAuditResult {
   score: number;
   findings: SecurityFinding[];
@@ -54,6 +72,7 @@ export interface SecurityAuditResult {
   sslInfo?: SSLInfo;
   corsInfo?: CORSInfo;
   sriViolations?: SRIViolation[];
+  securityTxt?: SecurityTxtInfo;
 }
 
 /**
@@ -152,6 +171,135 @@ function analyzeCORS(headers: Record<string, string>): CORSInfo {
     maxAge,
     isPermissive,
   };
+}
+
+/**
+ * Check for security.txt file and validate its contents
+ * RFC 9116: https://www.rfc-editor.org/rfc/rfc9116
+ */
+async function checkSecurityTxt(baseUrl: string): Promise<SecurityTxtInfo> {
+  const result: SecurityTxtInfo = {
+    exists: false,
+    valid: false,
+    issues: [],
+    fields: {},
+  };
+
+  // Try standard locations
+  const urls = [
+    `${baseUrl}/.well-known/security.txt`,
+    `${baseUrl}/security.txt`,
+  ];
+
+  for (const url of urls) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; 3RROR_K1NG/1.0)',
+        },
+        signal: controller.signal,
+        redirect: 'follow',
+      });
+
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const contentType = response.headers.get('content-type') || '';
+        const content = await response.text();
+
+        result.exists = true;
+        result.url = url;
+        result.content = content.slice(0, 2000); // Limit content size
+
+        // Parse fields
+        const lines = content.split('\n');
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (trimmed.startsWith('#') || !trimmed) continue;
+
+          const colonIndex = trimmed.indexOf(':');
+          if (colonIndex > 0) {
+            const field = trimmed.slice(0, colonIndex).toLowerCase();
+            const value = trimmed.slice(colonIndex + 1).trim();
+
+            switch (field) {
+              case 'contact':
+                result.fields.contact = value;
+                break;
+              case 'expires':
+                result.fields.expires = value;
+                break;
+              case 'encryption':
+                result.fields.encryption = value;
+                break;
+              case 'acknowledgments':
+              case 'acknowledgements':
+                result.fields.acknowledgments = value;
+                break;
+              case 'preferred-languages':
+                result.fields.preferredLanguages = value;
+                break;
+              case 'canonical':
+                result.fields.canonical = value;
+                break;
+              case 'policy':
+                result.fields.policy = value;
+                break;
+              case 'hiring':
+                result.fields.hiring = value;
+                break;
+            }
+          }
+        }
+
+        // Validate required fields (RFC 9116)
+        if (!result.fields.contact) {
+          result.issues.push('Missing required Contact field');
+        }
+
+        if (!result.fields.expires) {
+          result.issues.push('Missing required Expires field');
+        } else {
+          // Check if expired
+          try {
+            const expiryDate = new Date(result.fields.expires);
+            if (expiryDate < new Date()) {
+              result.issues.push(`security.txt has expired (${result.fields.expires})`);
+            }
+          } catch {
+            result.issues.push('Invalid Expires date format');
+          }
+        }
+
+        // Check content type
+        if (!contentType.includes('text/plain')) {
+          result.issues.push(`Should be served as text/plain (got: ${contentType})`);
+        }
+
+        // Check HTTPS
+        if (!url.startsWith('https://')) {
+          result.issues.push('Should be served over HTTPS');
+        }
+
+        // Determine validity
+        result.valid = result.issues.length === 0 && !!result.fields.contact;
+
+        break; // Found file, stop checking other locations
+      }
+    } catch {
+      // Continue to next URL
+    }
+  }
+
+  if (!result.exists) {
+    result.issues.push('No security.txt file found');
+  }
+
+  return result;
 }
 
 // Security header checks with severity weights
@@ -582,6 +730,37 @@ export async function runSecurityAudit(
     });
   }
 
+  // === ENTERPRISE: Security.txt Check ===
+  let securityTxt: SecurityTxtInfo | undefined;
+  try {
+    const urlObj = new URL(url);
+    const baseUrl = `${urlObj.protocol}//${urlObj.host}`;
+    securityTxt = await checkSecurityTxt(baseUrl);
+
+    findings.push({
+      id: 'security-txt',
+      severity: 'low',
+      title: 'Security.txt File',
+      description: securityTxt.exists
+        ? securityTxt.valid
+          ? 'security.txt is properly configured for responsible disclosure.'
+          : `security.txt exists but has issues: ${securityTxt.issues.join(', ')}`
+        : 'No security.txt file found. This file helps security researchers report vulnerabilities.',
+      recommendation: securityTxt.exists
+        ? securityTxt.valid
+          ? 'security.txt is properly configured.'
+          : 'Fix the issues in your security.txt file.'
+        : 'Create a security.txt file at /.well-known/security.txt with Contact and Expires fields.',
+      passed: securityTxt.exists && securityTxt.valid,
+      details: securityTxt.exists ? {
+        currentValue: securityTxt.url,
+        affectedElements: securityTxt.issues.length > 0 ? securityTxt.issues : undefined,
+      } : undefined,
+    });
+  } catch (err) {
+    console.error('Security.txt check failed:', err);
+  }
+
   // Calculate score
   let totalPenalty = 0;
   let maxPenalty = 0;
@@ -604,5 +783,6 @@ export async function runSecurityAudit(
     sslInfo,
     corsInfo,
     sriViolations: sriViolations.length > 0 ? sriViolations : undefined,
+    securityTxt,
   };
 }

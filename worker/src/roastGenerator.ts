@@ -6,6 +6,11 @@ import type { AccessibilityViolation } from './audits/accessibility.js';
 import type { CodeQualityIssue } from './audits/codeQuality.js';
 import type { TechStackItem } from './audits/techStack.js';
 import type { ResourceAnalysis, ResourceIssue } from './audits/resources.js';
+import type { VulnerabilityAuditResult } from './audits/vulnerabilities.js';
+import type { ProtocolInfo } from './audits/protocol.js';
+import type { ImageAuditResult } from './audits/images.js';
+import type { CacheAuditResult } from './audits/caching.js';
+import type { RedirectAuditResult } from './audits/redirects.js';
 
 export interface RoastFix {
   priority: 'critical' | 'high' | 'medium' | 'low';
@@ -41,6 +46,12 @@ interface RoastInput {
   codeQualityIssues: CodeQualityIssue[];
   techStack: TechStackItem[];
   resourceAnalysis?: ResourceAnalysis;
+  // Phase 1 new audits
+  vulnerabilities?: VulnerabilityAuditResult;
+  protocol?: ProtocolInfo;
+  images?: ImageAuditResult;
+  caching?: CacheAuditResult;
+  redirects?: RedirectAuditResult;
 }
 
 /**
@@ -213,6 +224,112 @@ ${finding.value ? `- **Current Value:** \`${finding.value}\`` : ''}
         report += `\n`;
       }
     }
+  }
+
+  // === Phase 1 New Audits ===
+
+  // Vulnerable Libraries
+  if (input.vulnerabilities && input.vulnerabilities.vulnerableLibraries.length > 0) {
+    report += `\n### VULNERABLE LIBRARIES (${input.vulnerabilities.vulnerableLibraries.length} found)\n\n`;
+    for (const lib of input.vulnerabilities.vulnerableLibraries) {
+      report += `#### ${lib.name} v${lib.detectedVersion}\n`;
+      for (const vuln of lib.vulnerabilities) {
+        report += `- **[${vuln.severity.toUpperCase()}]** ${vuln.description}\n`;
+        if (vuln.cve) {
+          report += `  - CVE: ${vuln.cve}\n`;
+        }
+        report += `  - Fixed in: ${vuln.fixedIn}\n`;
+        report += `  - **Action:** ${vuln.recommendation}\n`;
+      }
+      report += `\n`;
+    }
+  }
+
+  // Protocol Analysis
+  if (input.protocol) {
+    report += `\n### PROTOCOL ANALYSIS\n\n`;
+    report += `- **HTTP Version:** ${input.protocol.httpVersion}\n`;
+    report += `- **HTTP/2 Supported:** ${input.protocol.http2Supported ? 'Yes' : 'No'}\n`;
+    report += `- **HTTP/3 (QUIC):** ${input.protocol.http3Supported ? 'Yes' : 'No'}\n`;
+    if (input.protocol.alpn) {
+      report += `- **ALPN Protocol:** ${input.protocol.alpn}\n`;
+    }
+    if (input.protocol.recommendations.length > 0 && !input.protocol.recommendations[0].includes('optimal')) {
+      report += `\n**Recommendations:**\n`;
+      for (const rec of input.protocol.recommendations) {
+        report += `- ${rec}\n`;
+      }
+    }
+    report += `\n`;
+  }
+
+  // Image Optimization
+  if (input.images && input.images.issues.length > 0) {
+    report += `\n### IMAGE OPTIMIZATION (${input.images.issues.length} issues)\n\n`;
+    report += `- **Total Images:** ${input.images.totalImages}\n`;
+    report += `- **Total Size:** ${(input.images.totalSize / 1024).toFixed(1)}KB\n`;
+    report += `- **Potential Savings:** ${(input.images.optimizationPotential / 1024).toFixed(1)}KB\n\n`;
+
+    const highPriority = input.images.issues.filter(i => i.severity === 'high');
+    const mediumPriority = input.images.issues.filter(i => i.severity === 'medium');
+
+    if (highPriority.length > 0) {
+      report += `**High Priority:**\n`;
+      for (const issue of highPriority.slice(0, 3)) {
+        report += `- ${issue.src.split('/').pop()}: ${issue.issues.join(', ')}\n`;
+        for (const rec of issue.recommendations.slice(0, 2)) {
+          report += `  - ${rec}\n`;
+        }
+      }
+    }
+
+    if (mediumPriority.length > 0) {
+      report += `\n**Medium Priority:**\n`;
+      for (const issue of mediumPriority.slice(0, 3)) {
+        report += `- ${issue.src.split('/').pop()}: ${issue.issues.join(', ')}\n`;
+      }
+    }
+    report += `\n`;
+  }
+
+  // Cache Analysis
+  if (input.caching && input.caching.issues.length > 0) {
+    report += `\n### CACHE HEADERS (${input.caching.issues.length} issues)\n\n`;
+    report += `- **Cached Resources:** ${input.caching.summary.cached}/${input.caching.summary.totalResources}\n`;
+    report += `- **Long Cache (>1 week):** ${input.caching.summary.longCache}\n`;
+    report += `- **With Immutable:** ${input.caching.summary.immutable}\n\n`;
+
+    for (const issue of input.caching.issues.slice(0, 5)) {
+      report += `#### [${issue.severity.toUpperCase()}] ${issue.type} - ${issue.url.split('/').pop()}\n`;
+      report += `- ${issue.description}\n`;
+      report += `- **Fix:** ${issue.recommendation}\n\n`;
+    }
+  }
+
+  // Redirect Chain
+  if (input.redirects && input.redirects.totalRedirects > 0) {
+    report += `\n### REDIRECT CHAIN (${input.redirects.totalRedirects} redirects, ${input.redirects.totalTime}ms)\n\n`;
+    report += `\`\`\`\n`;
+    for (const hop of input.redirects.redirectChain) {
+      const status = hop.statusCode >= 300 && hop.statusCode < 400 ? `(${hop.statusCode})` : `(${hop.statusCode})`;
+      report += `${hop.url} ${status} - ${hop.duration}ms\n`;
+      if (hop.location) {
+        report += `  → ${hop.location}\n`;
+      }
+    }
+    report += `\`\`\`\n\n`;
+
+    if (input.redirects.issues.length > 0) {
+      for (const issue of input.redirects.issues) {
+        report += `- **[${issue.severity.toUpperCase()}]** ${issue.description}\n`;
+        report += `  - ${issue.recommendation}\n`;
+      }
+    }
+
+    if (input.redirects.finalUrl !== input.url) {
+      report += `\n**Recommended:** Update links to use final URL directly: \`${input.redirects.finalUrl}\`\n`;
+    }
+    report += `\n`;
   }
 
   // Copy-paste ready code fixes
@@ -514,6 +631,19 @@ ${input.accessibilityViolations.slice(0, 5).map(v => `- [${v.impact.toUpperCase(
 
 CODE QUALITY ISSUES (${input.codeQualityIssues.length}):
 ${input.codeQualityIssues.map(i => `- [${i.type}] ${i.message}`).join('\n') || 'None found'}
+
+VULNERABLE LIBRARIES (${input.vulnerabilities?.vulnerableLibraries.length || 0}):
+${input.vulnerabilities?.vulnerableLibraries.map(lib => `- ${lib.name} v${lib.detectedVersion}: ${lib.vulnerabilities.map(v => `[${v.severity.toUpperCase()}] ${v.cve || v.description}`).join(', ')}`).join('\n') || 'None detected'}
+
+PROTOCOL:
+- HTTP Version: ${input.protocol?.httpVersion || 'Unknown'}
+- HTTP/2: ${input.protocol?.http2Supported ? 'Yes' : 'No'}
+- HTTP/3: ${input.protocol?.http3Supported ? 'Yes' : 'No'}
+
+IMAGE ISSUES (${input.images?.issues.length || 0}):
+${input.images?.issues.slice(0, 3).map(i => `- ${i.issues.join(', ')}`).join('\n') || 'None found'}
+
+REDIRECT CHAIN: ${input.redirects?.totalRedirects || 0} redirects (${input.redirects?.totalTime || 0}ms)
 
 ROAST INTENSITY: ${getRoastIntensity(input.scores.overall)}
 

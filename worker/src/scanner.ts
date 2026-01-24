@@ -6,8 +6,13 @@ import { runAccessibilityAudit, type AccessibilityAuditResult } from './audits/a
 import { runCodeQualityAudit, type CodeQualityAuditResult } from './audits/codeQuality.js';
 import { detectTechStack, type TechStackItem } from './audits/techStack.js';
 import { runResourceAnalysis, type ResourceAnalysis } from './audits/resources.js';
+import { runVulnerabilityAudit, type VulnerabilityAuditResult } from './audits/vulnerabilities.js';
+import { runProtocolAudit, type ProtocolInfo } from './audits/protocol.js';
+import { runImageAudit, type ImageAuditResult } from './audits/images.js';
+import { runCacheAudit, type CacheAuditResult } from './audits/caching.js';
+import { runRedirectAudit, type RedirectAuditResult } from './audits/redirects.js';
 import { generateRoast, type RoastResult } from './roastGenerator.js';
-import { updateScan } from './lib/supabase.js';
+import { updateScan, getSupabaseClient } from './lib/supabase.js';
 
 export interface ScanResult {
   security: SecurityAuditResult;
@@ -17,6 +22,12 @@ export interface ScanResult {
   codeQuality: CodeQualityAuditResult;
   techStack: TechStackItem[];
   resources: ResourceAnalysis;
+  vulnerabilities?: VulnerabilityAuditResult;
+  protocol?: ProtocolInfo;
+  images?: ImageAuditResult;
+  caching?: CacheAuditResult;
+  redirects?: RedirectAuditResult;
+  screenshotUrl?: string;
   roast: RoastResult;
   overallScore: number;
 }
@@ -66,6 +77,48 @@ export async function closeBrowser(): Promise<void> {
   if (browser) {
     await browser.close();
     browser = null;
+  }
+}
+
+/**
+ * Capture screenshot and upload to Supabase storage
+ */
+async function captureAndUploadScreenshot(
+  page: Page,
+  scanId: string
+): Promise<string | null> {
+  try {
+    // Capture viewport screenshot
+    const screenshot = await page.screenshot({
+      type: 'png',
+      fullPage: false,
+    });
+
+    const supabase = getSupabaseClient();
+
+    // Upload to Supabase storage
+    const fileName = `${scanId}.png`;
+    const { data, error } = await supabase.storage
+      .from('screenshots')
+      .upload(fileName, screenshot, {
+        contentType: 'image/png',
+        upsert: true,
+      });
+
+    if (error) {
+      console.error('Failed to upload screenshot:', error.message);
+      return null;
+    }
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from('screenshots')
+      .getPublicUrl(fileName);
+
+    return urlData?.publicUrl || null;
+  } catch (err) {
+    console.error('Screenshot capture failed:', err);
+    return null;
   }
 }
 
@@ -166,6 +219,54 @@ export async function runScan(scanId: string, url: string): Promise<ScanResult> 
     });
     console.log(`Resource analysis complete: ${resourceAnalysis.totalResources} resources, ${resourceAnalysis.thirdParty.domains.length} third-party domains`);
 
+    // === Phase 1 New Audits ===
+
+    // Capture screenshot
+    const screenshotUrl = await captureAndUploadScreenshot(page, scanId);
+    if (screenshotUrl) {
+      await updateScan(scanId, { screenshot_url: screenshotUrl });
+      console.log(`Screenshot captured: ${screenshotUrl}`);
+    }
+
+    // Run new audits in parallel
+    const [vulnerabilityResult, protocolResult, imageResult, cacheResult, redirectResult] = await Promise.all([
+      runVulnerabilityAudit(page),
+      runProtocolAudit(page, url),
+      runImageAudit(page),
+      runCacheAudit(page),
+      runRedirectAudit(url),
+    ]);
+
+    // Save vulnerability audit results
+    await updateScan(scanId, {
+      results_vulnerabilities: vulnerabilityResult,
+    });
+    console.log(`Vulnerability audit complete: ${vulnerabilityResult.vulnerableLibraries.length} vulnerable libraries found`);
+
+    // Save protocol audit results
+    await updateScan(scanId, {
+      results_protocol: protocolResult,
+    });
+    console.log(`Protocol audit complete: ${protocolResult.httpVersion}, HTTP/2: ${protocolResult.http2Supported}`);
+
+    // Save image audit results
+    await updateScan(scanId, {
+      results_images: imageResult,
+    });
+    console.log(`Image audit complete: ${imageResult.totalImages} images, ${imageResult.issues.length} issues`);
+
+    // Save cache audit results
+    await updateScan(scanId, {
+      results_caching: cacheResult,
+    });
+    console.log(`Cache audit complete: score ${cacheResult.score}`);
+
+    // Save redirect audit results
+    await updateScan(scanId, {
+      results_redirects: redirectResult,
+    });
+    console.log(`Redirect audit complete: ${redirectResult.totalRedirects} redirects, ${redirectResult.totalTime}ms`);
+
     // Performance audit (Lighthouse - runs separately)
     const performanceResult = await runPerformanceAudit(url);
     await updateScan(scanId, {
@@ -201,6 +302,12 @@ export async function runScan(scanId: string, url: string): Promise<ScanResult> 
       codeQualityIssues: codeQualityResult.issues,
       techStack,
       resourceAnalysis,
+      // Phase 1 new audits
+      vulnerabilities: vulnerabilityResult,
+      protocol: protocolResult,
+      images: imageResult,
+      caching: cacheResult,
+      redirects: redirectResult,
     });
 
     // Update final results
@@ -226,6 +333,12 @@ export async function runScan(scanId: string, url: string): Promise<ScanResult> 
       codeQuality: codeQualityResult,
       techStack,
       resources: resourceAnalysis,
+      vulnerabilities: vulnerabilityResult,
+      protocol: protocolResult,
+      images: imageResult,
+      caching: cacheResult,
+      redirects: redirectResult,
+      screenshotUrl: screenshotUrl || undefined,
       roast,
       overallScore,
     };

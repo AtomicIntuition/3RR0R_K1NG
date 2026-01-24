@@ -38,6 +38,12 @@ export interface ScanUpdate {
   results_code_quality?: unknown;
   results_tech_stack?: unknown;
   results_resources?: unknown;
+  // Phase 1 new audit results
+  results_vulnerabilities?: unknown;
+  results_protocol?: unknown;
+  results_images?: unknown;
+  results_caching?: unknown;
+  results_redirects?: unknown;
   roast_title?: string;
   roast_body?: string;
   roast_fixes?: unknown;

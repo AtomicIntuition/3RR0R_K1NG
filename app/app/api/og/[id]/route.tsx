@@ -2,27 +2,15 @@ import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-export const runtime = 'edge';
-
-// Create Supabase client for edge runtime
-function getSupabaseClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
-}
+// Use Node.js runtime instead of edge for better env var access
+export const runtime = 'nodejs';
 
 // Helper to get grade color
 function getGradeColor(grade: string): string {
-  if (grade.startsWith('A')) return '#00ff41'; // terminal green
-  if (grade.startsWith('B')) return '#fffc00'; // neon yellow
-  if (grade.startsWith('C')) return '#ff6b00'; // neon orange
-  return '#ff0040'; // danger red
+  if (grade.startsWith('A')) return '#00ff41';
+  if (grade.startsWith('B')) return '#fffc00';
+  if (grade.startsWith('C')) return '#ff6b00';
+  return '#ff0040';
 }
 
 // Helper to get score color
@@ -38,112 +26,80 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Await params in Next.js 14+
     const { id: scanId } = await params;
 
-    // Fetch scan data
-    const supabase = getSupabaseClient();
+    // Create Supabase client
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('Missing Supabase env vars');
+      return new Response('Server configuration error', { status: 500 });
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+
     const { data: scan, error } = await supabase
       .from('scans')
-      .select('url, score_overall, letter_grade, roast_title, twitter_roast, roast_persona')
+      .select('url, score_overall, letter_grade, roast_title, twitter_roast')
       .eq('id', scanId)
       .single();
 
     if (error || !scan) {
+      console.error('Scan fetch error:', error);
       return new Response('Scan not found', { status: 404 });
     }
 
     const score = scan.score_overall || 0;
     const grade = scan.letter_grade || 'F';
     const url = scan.url?.replace(/^https?:\/\//, '').replace(/\/$/, '') || 'unknown';
-    const roast = scan.twitter_roast || scan.roast_title || 'No roast generated';
+    const roast = scan.twitter_roast || scan.roast_title || 'Your website got roasted!';
+    const truncatedRoast = roast.length > 150 ? roast.slice(0, 150) + '...' : roast;
     const gradeColor = getGradeColor(grade);
     const scoreColor = getScoreColor(score);
 
-    // Generate the image
     return new ImageResponse(
       (
         <div
           style={{
-            width: '100%',
-            height: '100%',
+            width: '1200px',
+            height: '675px',
             display: 'flex',
             flexDirection: 'column',
             backgroundColor: '#0a0a0f',
-            fontFamily: 'monospace',
-            position: 'relative',
-            overflow: 'hidden',
+            padding: '40px',
           }}
         >
-          {/* Grid background pattern */}
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              backgroundImage: 'linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px)',
-              backgroundSize: '50px 50px',
-            }}
-          />
-
-          {/* Scanlines effect */}
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 65, 0.03) 2px, rgba(0, 255, 65, 0.03) 4px)',
-            }}
-          />
-
           {/* Header */}
           <div
             style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              padding: '30px 40px',
-              borderBottom: '1px solid #1a1a24',
+              marginBottom: '30px',
             }}
           >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                color: '#00ff41',
-                fontSize: '32px',
-                fontWeight: 'bold',
-              }}
-            >
-              <span>3RROR_K1NG</span>
+            <div style={{ color: '#00ff41', fontSize: '36px', fontWeight: 'bold' }}>
+              3RROR_K1NG
             </div>
-            <div
-              style={{
-                color: '#6b7280',
-                fontSize: '20px',
-              }}
-            >
+            <div style={{ color: '#6b7280', fontSize: '24px' }}>
               WEBSITE ROAST
             </div>
           </div>
 
           {/* Main content */}
-          <div
-            style={{
-              display: 'flex',
-              flex: 1,
-              padding: '40px',
-              gap: '40px',
-            }}
-          >
-            {/* Left side - Score and Grade */}
+          <div style={{ display: 'flex', flexGrow: 1 }}>
+            {/* Left side - Score */}
             <div
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '20px',
-                minWidth: '280px',
+                width: '350px',
+                marginRight: '40px',
               }}
             >
               {/* Score circle */}
@@ -154,90 +110,61 @@ export async function GET(
                   justifyContent: 'center',
                   width: '180px',
                   height: '180px',
-                  borderRadius: '100%',
+                  borderRadius: '90px',
                   border: `8px solid ${scoreColor}`,
-                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                  backgroundColor: 'rgba(0,0,0,0.5)',
+                  marginBottom: '20px',
                 }}
               >
-                <span
-                  style={{
-                    fontSize: '64px',
-                    fontWeight: 'bold',
-                    color: scoreColor,
-                  }}
-                >
+                <span style={{ fontSize: '72px', fontWeight: 'bold', color: scoreColor }}>
                   {score}
                 </span>
               </div>
-
               {/* Letter grade */}
               <div
                 style={{
-                  fontSize: '100px',
+                  fontSize: '120px',
                   fontWeight: '900',
                   color: gradeColor,
-                  textShadow: `0 0 30px ${gradeColor}, 0 0 60px ${gradeColor}`,
-                  lineHeight: 1,
+                  lineHeight: '1',
                 }}
               >
                 {grade}
               </div>
             </div>
 
-            {/* Right side - URL and Roast */}
+            {/* Right side - Details */}
             <div
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                flex: 1,
                 justifyContent: 'center',
-                gap: '24px',
+                flexGrow: 1,
               }}
             >
               {/* URL */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                }}
-              >
-                <span style={{ color: '#00ff41', fontSize: '24px' }}>TARGET:</span>
-                <span
-                  style={{
-                    color: '#e5e7eb',
-                    fontSize: '28px',
-                    fontWeight: 'bold',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    maxWidth: '500px',
-                  }}
-                >
-                  {url}
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '24px' }}>
+                <span style={{ color: '#00ff41', fontSize: '28px', marginRight: '12px' }}>
+                  TARGET:
+                </span>
+                <span style={{ color: '#e5e7eb', fontSize: '32px', fontWeight: 'bold' }}>
+                  {url.length > 35 ? url.slice(0, 35) + '...' : url}
                 </span>
               </div>
 
-              {/* Roast text */}
+              {/* Roast box */}
               <div
                 style={{
+                  display: 'flex',
                   padding: '24px',
-                  backgroundColor: 'rgba(0, 255, 65, 0.05)',
-                  border: `2px solid ${scoreColor}33`,
+                  backgroundColor: 'rgba(0,255,65,0.05)',
+                  border: '2px solid rgba(0,255,65,0.2)',
                   borderRadius: '12px',
-                  maxHeight: '180px',
-                  overflow: 'hidden',
                 }}
               >
-                <div
-                  style={{
-                    fontSize: '26px',
-                    color: '#e5e7eb',
-                    lineHeight: 1.4,
-                  }}
-                >
-                  "{roast.length > 200 ? roast.slice(0, 200) + '...' : roast}"
-                </div>
+                <span style={{ fontSize: '28px', color: '#e5e7eb', lineHeight: '1.4' }}>
+                  "{truncatedRoast}"
+                </span>
               </div>
             </div>
           </div>
@@ -248,24 +175,24 @@ export async function GET(
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              padding: '20px 40px',
+              marginTop: '30px',
+              paddingTop: '20px',
               borderTop: '1px solid #1a1a24',
-              color: '#6b7280',
-              fontSize: '18px',
             }}
           >
-            <span>Get roasted at 3rror.app</span>
-            <span>SCAN_ID: {scanId.slice(0, 8).toUpperCase()}</span>
+            <span style={{ color: '#6b7280', fontSize: '20px' }}>
+              Get roasted at 3rror.app
+            </span>
+            <span style={{ color: '#6b7280', fontSize: '18px' }}>
+              SCAN_ID: {scanId.slice(0, 8).toUpperCase()}
+            </span>
           </div>
         </div>
       ),
-      {
-        width: 1200,
-        height: 675,
-      }
+      { width: 1200, height: 675 }
     );
   } catch (error) {
     console.error('OG image generation error:', error);
-    return new Response('Failed to generate image', { status: 500 });
+    return new Response(`Failed to generate image: ${error}`, { status: 500 });
   }
 }

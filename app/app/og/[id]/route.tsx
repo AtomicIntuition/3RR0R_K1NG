@@ -1,31 +1,28 @@
 import { ImageResponse } from 'next/og';
 import { createClient } from '@supabase/supabase-js';
-import { getGrade, getScoreColor } from '@/lib/scoring';
+import { getGrade } from '@/lib/scoring';
 
-export const runtime = 'edge';
-
-// Create Supabase client for edge runtime
-function getSupabaseClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
-}
+// Use Node.js runtime for better env var access
+export const runtime = 'nodejs';
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  // Await params in Next.js 14+
   const { id } = await params;
 
   try {
-    const supabase = getSupabaseClient();
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('Missing Supabase env vars');
+      return new Response('Server configuration error', { status: 500 });
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
 
     const { data: scan } = await supabase
       .from('scans')
@@ -46,42 +43,23 @@ export async function GET(
               alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: '#0a0a0f',
-              backgroundImage: 'linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px)',
-              backgroundSize: '50px 50px',
             }}
           >
-            <div
-              style={{
-                display: 'flex',
-                fontSize: 60,
-                fontWeight: 'bold',
-                color: '#00ff41',
-                marginBottom: 20,
-              }}
-            >
+            <div style={{ fontSize: 60, fontWeight: 'bold', color: '#00ff41', marginBottom: 20 }}>
               3RROR_K1NG
             </div>
-            <div
-              style={{
-                fontSize: 30,
-                color: '#9ca3af',
-              }}
-            >
+            <div style={{ fontSize: 30, color: '#9ca3af' }}>
               Website Roast Machine
             </div>
           </div>
         ),
-        {
-          width: 1200,
-          height: 630,
-        }
+        { width: 1200, height: 630 }
       );
     }
 
     const grade = getGrade(scan.score_overall);
     const domain = new URL(scan.url).hostname;
 
-    // Determine color based on score
     const getColor = (score: number) => {
       if (score >= 90) return '#00ff41';
       if (score >= 70) return '#fffc00';
@@ -100,8 +78,6 @@ export async function GET(
             display: 'flex',
             flexDirection: 'column',
             backgroundColor: '#0a0a0f',
-            backgroundImage: 'linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px)',
-            backgroundSize: '50px 50px',
             padding: 60,
           }}
         >
@@ -114,33 +90,16 @@ export async function GET(
               marginBottom: 40,
             }}
           >
-            <div
-              style={{
-                fontSize: 32,
-                fontWeight: 'bold',
-                color: '#00ff41',
-              }}
-            >
+            <div style={{ fontSize: 32, fontWeight: 'bold', color: '#00ff41' }}>
               3RROR_K1NG
             </div>
-            <div
-              style={{
-                fontSize: 20,
-                color: '#6b7280',
-              }}
-            >
+            <div style={{ fontSize: 20, color: '#6b7280' }}>
               Website Roast Report
             </div>
           </div>
 
           {/* Main content */}
-          <div
-            style={{
-              display: 'flex',
-              flex: 1,
-              gap: 60,
-            }}
-          >
+          <div style={{ display: 'flex', flexGrow: 1 }}>
             {/* Score circle */}
             <div
               style={{
@@ -148,39 +107,26 @@ export async function GET(
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
+                marginRight: 60,
               }}
             >
               <div
                 style={{
                   width: 200,
                   height: 200,
-                  borderRadius: '50%',
+                  borderRadius: 100,
                   border: `8px solid ${scoreColor}`,
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: `0 0 40px ${scoreColor}40`,
                 }}
               >
-                <div
-                  style={{
-                    fontSize: 80,
-                    fontWeight: 'bold',
-                    color: scoreColor,
-                  }}
-                >
+                <div style={{ fontSize: 80, fontWeight: 'bold', color: scoreColor }}>
                   {grade}
                 </div>
               </div>
-              <div
-                style={{
-                  fontSize: 48,
-                  fontWeight: 'bold',
-                  color: scoreColor,
-                  marginTop: 20,
-                }}
-              >
+              <div style={{ fontSize: 48, fontWeight: 'bold', color: scoreColor, marginTop: 20 }}>
                 {scan.score_overall}/100
               </div>
             </div>
@@ -190,70 +136,44 @@ export async function GET(
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                flex: 1,
                 justifyContent: 'center',
+                flexGrow: 1,
               }}
             >
               {/* Domain */}
-              <div
-                style={{
-                  fontSize: 36,
-                  color: '#e5e7eb',
-                  marginBottom: 20,
-                  fontWeight: 'bold',
-                }}
-              >
+              <div style={{ fontSize: 36, color: '#e5e7eb', marginBottom: 20, fontWeight: 'bold' }}>
                 {domain}
               </div>
 
               {/* Roast title */}
               {scan.roast_title && (
-                <div
-                  style={{
-                    fontSize: 24,
-                    color: scoreColor,
-                    marginBottom: 30,
-                    fontStyle: 'italic',
-                  }}
-                >
-                  "{scan.roast_title}"
+                <div style={{ fontSize: 24, color: scoreColor, marginBottom: 30 }}>
+                  "{scan.roast_title.length > 80 ? scan.roast_title.slice(0, 80) + '...' : scan.roast_title}"
                 </div>
               )}
 
               {/* Category scores */}
-              <div
-                style={{
-                  display: 'flex',
-                  gap: 20,
-                  flexWrap: 'wrap',
-                }}
-              >
+              <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                 {[
-                  { label: 'Security', score: scan.score_security, icon: '🛡️' },
-                  { label: 'Performance', score: scan.score_performance, icon: '⚡' },
-                  { label: 'SEO', score: scan.score_seo, icon: '🔍' },
-                  { label: 'A11y', score: scan.score_accessibility, icon: '♿' },
+                  { label: 'Security', score: scan.score_security },
+                  { label: 'Performance', score: scan.score_performance },
+                  { label: 'SEO', score: scan.score_seo },
+                  { label: 'A11y', score: scan.score_accessibility },
                 ].map((item) => (
                   <div
                     key={item.label}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: 8,
                       padding: '8px 16px',
                       backgroundColor: '#16161f',
                       borderRadius: 8,
+                      marginRight: 12,
+                      marginBottom: 8,
                     }}
                   >
-                    <span style={{ fontSize: 20 }}>{item.icon}</span>
-                    <span style={{ color: '#9ca3af', fontSize: 16 }}>{item.label}:</span>
-                    <span
-                      style={{
-                        color: getColor(item.score || 0),
-                        fontSize: 18,
-                        fontWeight: 'bold',
-                      }}
-                    >
+                    <span style={{ color: '#9ca3af', fontSize: 16, marginRight: 8 }}>{item.label}:</span>
+                    <span style={{ color: getColor(item.score || 0), fontSize: 18, fontWeight: 'bold' }}>
                       {item.score ?? '--'}
                     </span>
                   </div>
@@ -274,21 +194,16 @@ export async function GET(
             }}
           >
             <div style={{ color: '#6b7280', fontSize: 16 }}>
-              Get your website roasted at 3rror-k1ng.vercel.app
+              Get your website roasted at 3rror.app
             </div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-              }}
-            >
+            <div style={{ display: 'flex', alignItems: 'center' }}>
               <div
                 style={{
                   width: 8,
                   height: 8,
-                  borderRadius: '50%',
+                  borderRadius: 4,
                   backgroundColor: '#00ff41',
+                  marginRight: 8,
                 }}
               />
               <span style={{ color: '#6b7280', fontSize: 14 }}>Scan Complete</span>
@@ -296,15 +211,11 @@ export async function GET(
           </div>
         </div>
       ),
-      {
-        width: 1200,
-        height: 630,
-      }
+      { width: 1200, height: 630 }
     );
   } catch (error) {
     console.error('OG image generation error:', error);
 
-    // Return error OG image
     return new ImageResponse(
       (
         <div
@@ -318,21 +229,12 @@ export async function GET(
             backgroundColor: '#0a0a0f',
           }}
         >
-          <div
-            style={{
-              fontSize: 60,
-              fontWeight: 'bold',
-              color: '#00ff41',
-            }}
-          >
+          <div style={{ fontSize: 60, fontWeight: 'bold', color: '#00ff41' }}>
             3RROR_K1NG
           </div>
         </div>
       ),
-      {
-        width: 1200,
-        height: 630,
-      }
+      { width: 1200, height: 630 }
     );
   }
 }

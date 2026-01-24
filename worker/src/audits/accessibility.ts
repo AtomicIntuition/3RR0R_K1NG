@@ -30,7 +30,7 @@ const IMPACT_WEIGHTS = {
 
 export async function runAccessibilityAudit(page: Page): Promise<AccessibilityAuditResult> {
   try {
-    const axeResults = await new AxeBuilder({ page })
+    const axeResults = await new AxeBuilder({ page } as any)
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice'])
       .analyze();
 

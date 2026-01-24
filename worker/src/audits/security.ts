@@ -354,7 +354,7 @@ export async function runSecurityAudit(
       // Certificate validity - if SSL check failed due to timeout but page loaded over HTTPS, it's valid
       const isTimeoutOrConnectionError = sslInfo.errors?.some(e =>
         e.includes('timeout') || e.includes('ECONNREFUSED') || e.includes('ENOTFOUND')
-      );
+      ) ?? false;
       // If page loaded over HTTPS successfully (we got here), SSL is working
       const sslIsValid = sslInfo.valid || isTimeoutOrConnectionError;
 

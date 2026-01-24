@@ -76,7 +76,8 @@ async function checkSSL(hostname: string): Promise<SSLInfo> {
         const socket = res.socket as tls.TLSSocket;
 
         if (!socket.authorized) {
-          errors.push(socket.authorizationError || 'Certificate not authorized');
+          const authError = socket.authorizationError;
+          errors.push(typeof authError === 'string' ? authError : (authError?.toString() || 'Certificate not authorized'));
         }
 
         const cert = socket.getPeerCertificate();

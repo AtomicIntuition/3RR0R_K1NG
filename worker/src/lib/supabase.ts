@@ -37,6 +37,7 @@ export interface ScanUpdate {
   results_accessibility?: unknown;
   results_code_quality?: unknown;
   results_tech_stack?: unknown;
+  results_resources?: unknown;
   roast_title?: string;
   roast_body?: string;
   roast_fixes?: unknown;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import clsx from 'clsx';
 
 interface GlitchTextProps {
@@ -10,7 +10,7 @@ interface GlitchTextProps {
   as?: 'h1' | 'h2' | 'h3' | 'span' | 'div';
 }
 
-const GLITCH_CHARS = '!<>-_\\/[]{}—=+*^?#________';
+const GLITCH_CHARS = '!<>-_\\/[]{}—=+*^?#';
 
 export function GlitchText({
   text,
@@ -21,53 +21,73 @@ export function GlitchText({
   const [displayText, setDisplayText] = useState(text);
   const [isGlitching, setIsGlitching] = useState(false);
 
-  useEffect(() => {
-    const glitchIntervals = {
-      low: 5000,
-      medium: 3000,
-      high: 1500,
+  // Smooth text scramble effect
+  const triggerGlitch = useCallback(() => {
+    if (isGlitching) return;
+    setIsGlitching(true);
+
+    const iterations = glitchIntensity === 'high' ? 4 : glitchIntensity === 'medium' ? 3 : 2;
+    const frameTime = 50;
+    let frame = 0;
+
+    const animate = () => {
+      if (frame >= iterations) {
+        setDisplayText(text);
+        setIsGlitching(false);
+        return;
+      }
+
+      // Only glitch 20-40% of characters for subtle effect
+      const glitchProbability = 0.2 + (frame / iterations) * 0.2;
+      const glitched = text
+        .split('')
+        .map((char) => {
+          if (char === ' ') return ' ';
+          if (Math.random() < glitchProbability) {
+            return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+          }
+          return char;
+        })
+        .join('');
+
+      setDisplayText(glitched);
+      frame++;
+      setTimeout(animate, frameTime);
     };
 
-    const glitchDuration = {
-      low: 100,
-      medium: 150,
-      high: 200,
+    animate();
+  }, [text, glitchIntensity, isGlitching]);
+
+  useEffect(() => {
+    // Intervals between glitches - less frequent for smoother experience
+    const intervals = {
+      low: 12000,    // Every 12 seconds
+      medium: 8000,  // Every 8 seconds
+      high: 5000,    // Every 5 seconds
     };
 
     const interval = setInterval(() => {
-      if (Math.random() > 0.7) {
-        setIsGlitching(true);
-
-        // Randomly glitch characters
-        const glitched = text
-          .split('')
-          .map((char, i) => {
-            if (char === ' ') return ' ';
-            if (Math.random() > 0.7) {
-              return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
-            }
-            return char;
-          })
-          .join('');
-
-        setDisplayText(glitched);
-
-        // Reset after glitch duration
-        setTimeout(() => {
-          setDisplayText(text);
-          setIsGlitching(false);
-        }, glitchDuration[glitchIntensity]);
+      // Only 30% chance to actually glitch when interval fires
+      if (Math.random() < 0.3) {
+        triggerGlitch();
       }
-    }, glitchIntervals[glitchIntensity]);
+    }, intervals[glitchIntensity]);
 
     return () => clearInterval(interval);
-  }, [text, glitchIntensity]);
+  }, [glitchIntensity, triggerGlitch]);
+
+  // Update display text when prop changes
+  useEffect(() => {
+    if (!isGlitching) {
+      setDisplayText(text);
+    }
+  }, [text, isGlitching]);
 
   return (
     <Component
       className={clsx(
-        'glitch relative',
-        isGlitching && 'animate-glitch',
+        'glitch',
+        glitchIntensity === 'high' && 'glitch-high',
         className
       )}
       data-text={text}

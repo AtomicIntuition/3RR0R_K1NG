@@ -92,12 +92,12 @@ export default function ScanResultsPage() {
         <div id="shareable-results" className="relative bg-void rounded-xl p-8 pt-4 mb-8 border border-void-100">
           {/* Promo Banner - Visible in screenshots */}
           <div className="text-center mb-6 py-2 px-4 bg-terminal/10 border border-terminal/30 rounded-lg">
-            <span className="text-terminal font-bold text-sm tracking-wide">
-              GET YOUR FREE ROAST
-            </span>
-            <span className="text-gray-400 text-sm mx-2">→</span>
             <span className="text-gray-300 text-sm font-medium">
-              link in bio
+              ROAST YOUR SITE FREE
+            </span>
+            <span className="text-gray-500 text-sm mx-2">→</span>
+            <span className="text-terminal font-bold text-sm tracking-wide">
+              3RROR_K1NG.COM
             </span>
           </div>
 

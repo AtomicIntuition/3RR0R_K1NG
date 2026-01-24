@@ -92,10 +92,13 @@ export default function ScanResultsPage() {
         <div id="shareable-results" className="relative bg-void rounded-xl p-8 pt-4 mb-8 border border-void-100">
           {/* Promo Banner - Visible in screenshots */}
           <div className="text-center mb-8 py-4 px-6 bg-gradient-to-r from-terminal/20 via-terminal/10 to-terminal/20 border-2 border-terminal/50 rounded-xl">
-            <div className="text-2xl md:text-3xl font-black tracking-tight">
-              <span className="text-white">GET YOUR SITE ROASTED FREE</span>
+            <div className="text-xl md:text-2xl font-bold tracking-tight mb-1">
+              <span className="text-white">FREE ROAST + ACTIONABLE FIXES</span>
             </div>
-            <div className="mt-2 flex items-center justify-center gap-3">
+            <div className="text-sm md:text-base text-gray-400 mb-3">
+              Security • Performance • SEO • Accessibility audits
+            </div>
+            <div className="flex items-center justify-center gap-3">
               <div className="h-px w-12 bg-terminal/50"></div>
               <span className="text-terminal text-xl md:text-2xl font-bold tracking-wider" style={{ textShadow: '0 0 20px rgba(0, 255, 65, 0.5)' }}>
                 3RROR_K1NG.COM
@@ -113,14 +116,8 @@ export default function ScanResultsPage() {
             />
           </div>
 
-          {/* Header - 3RROR_K1NG branding */}
+          {/* Header - Target URL */}
           <header className="text-center mb-8">
-            <div className="mb-4">
-              <span className="text-3xl font-bold text-terminal" style={{ textShadow: '0 0 20px rgba(0, 255, 65, 0.5)' }}>
-                3RROR_K1NG
-              </span>
-            </div>
-
             <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
               <span className="text-terminal">TARGET:</span>
               <span className="text-gray-300 break-all max-w-md text-center">

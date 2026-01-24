@@ -1,4 +1,6 @@
 import { Page, Response } from 'playwright';
+import * as tls from 'tls';
+import * as https from 'https';
 
 export interface SecurityFinding {
   id: string;
@@ -7,11 +9,148 @@ export interface SecurityFinding {
   description: string;
   recommendation: string;
   passed: boolean;
+  // Enterprise: actionable details
+  details?: {
+    currentValue?: string;
+    expectedValue?: string;
+    affectedElements?: string[];
+    codeSnippet?: string;
+  };
+}
+
+export interface SSLInfo {
+  valid: boolean;
+  issuer?: string;
+  validFrom?: string;
+  validTo?: string;
+  daysUntilExpiry?: number;
+  protocol?: string;
+  cipher?: string;
+  keyExchange?: string;
+  errors?: string[];
+}
+
+export interface CORSInfo {
+  allowOrigin?: string;
+  allowCredentials?: boolean;
+  allowMethods?: string;
+  allowHeaders?: string;
+  exposeHeaders?: string;
+  maxAge?: string;
+  isPermissive: boolean;
+}
+
+export interface SRIViolation {
+  tagName: string;
+  src: string;
+  outerHtml: string;
+  isExternal: boolean;
 }
 
 export interface SecurityAuditResult {
   score: number;
   findings: SecurityFinding[];
+  // Enterprise additions
+  sslInfo?: SSLInfo;
+  corsInfo?: CORSInfo;
+  sriViolations?: SRIViolation[];
+}
+
+/**
+ * Check SSL/TLS certificate and connection security
+ */
+async function checkSSL(hostname: string): Promise<SSLInfo> {
+  return new Promise((resolve) => {
+    const errors: string[] = [];
+
+    try {
+      const options = {
+        host: hostname,
+        port: 443,
+        method: 'HEAD',
+        rejectUnauthorized: false, // We want to inspect even invalid certs
+        timeout: 10000,
+      };
+
+      const req = https.request(options, (res) => {
+        const socket = res.socket as tls.TLSSocket;
+
+        if (!socket.authorized) {
+          errors.push(socket.authorizationError || 'Certificate not authorized');
+        }
+
+        const cert = socket.getPeerCertificate();
+        const cipher = socket.getCipher();
+        const protocol = socket.getProtocol();
+
+        if (cert && Object.keys(cert).length > 0) {
+          const validFrom = new Date(cert.valid_from);
+          const validTo = new Date(cert.valid_to);
+          const now = new Date();
+          const daysUntilExpiry = Math.floor((validTo.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+          // Check for weak protocols
+          if (protocol && ['SSLv3', 'TLSv1', 'TLSv1.1'].includes(protocol)) {
+            errors.push(`Weak protocol: ${protocol}`);
+          }
+
+          resolve({
+            valid: socket.authorized && daysUntilExpiry > 0,
+            issuer: cert.issuer?.O || cert.issuer?.CN || 'Unknown',
+            validFrom: validFrom.toISOString(),
+            validTo: validTo.toISOString(),
+            daysUntilExpiry,
+            protocol: protocol || undefined,
+            cipher: cipher?.name,
+            keyExchange: cipher?.name?.includes('ECDHE') ? 'ECDHE' : cipher?.name?.includes('DHE') ? 'DHE' : 'RSA',
+            errors: errors.length > 0 ? errors : undefined,
+          });
+        } else {
+          resolve({ valid: false, errors: ['No certificate found'] });
+        }
+
+        req.destroy();
+      });
+
+      req.on('error', (err) => {
+        resolve({ valid: false, errors: [err.message] });
+      });
+
+      req.on('timeout', () => {
+        req.destroy();
+        resolve({ valid: false, errors: ['Connection timeout'] });
+      });
+
+      req.end();
+    } catch (err) {
+      resolve({ valid: false, errors: [(err as Error).message] });
+    }
+  });
+}
+
+/**
+ * Analyze CORS headers for security issues
+ */
+function analyzeCORS(headers: Record<string, string>): CORSInfo {
+  const allowOrigin = headers['access-control-allow-origin'];
+  const allowCredentials = headers['access-control-allow-credentials'] === 'true';
+  const allowMethods = headers['access-control-allow-methods'];
+  const allowHeaders = headers['access-control-allow-headers'];
+  const exposeHeaders = headers['access-control-expose-headers'];
+  const maxAge = headers['access-control-max-age'];
+
+  // Check if CORS is overly permissive
+  const isPermissive = allowOrigin === '*' || (allowOrigin === '*' && allowCredentials);
+
+  return {
+    allowOrigin,
+    allowCredentials,
+    allowMethods,
+    allowHeaders,
+    exposeHeaders,
+    maxAge,
+    isPermissive,
+  };
 }
 
 // Security header checks with severity weights
@@ -198,7 +337,244 @@ export async function runSecurityAudit(
     description: 'Server version information can help attackers find vulnerabilities.',
     recommendation: 'Remove or obfuscate Server and X-Powered-By headers.',
     passed: !exposesServer,
+    details: exposesServer ? {
+      currentValue: [serverHeader, poweredBy].filter(Boolean).join(', '),
+      expectedValue: '(hidden)',
+    } : undefined,
   });
+
+  // === ENTERPRISE: SSL/TLS Certificate Analysis ===
+  let sslInfo: SSLInfo | undefined;
+  try {
+    const urlObj = new URL(url);
+    if (urlObj.protocol === 'https:') {
+      sslInfo = await checkSSL(urlObj.hostname);
+
+      // Certificate validity
+      findings.push({
+        id: 'ssl-valid',
+        severity: 'critical',
+        title: 'SSL Certificate Valid',
+        description: 'SSL certificate must be valid and not expired.',
+        recommendation: 'Ensure your SSL certificate is valid and renew before expiry.',
+        passed: sslInfo.valid,
+        details: sslInfo.errors ? {
+          currentValue: sslInfo.errors.join(', '),
+          expectedValue: 'Valid certificate',
+        } : undefined,
+      });
+
+      // Certificate expiry warning (30 days)
+      if (sslInfo.daysUntilExpiry !== undefined) {
+        const expiryWarning = sslInfo.daysUntilExpiry < 30;
+        findings.push({
+          id: 'ssl-expiry',
+          severity: expiryWarning ? 'high' : 'info',
+          title: 'SSL Certificate Expiry',
+          description: expiryWarning
+            ? `Certificate expires in ${sslInfo.daysUntilExpiry} days!`
+            : `Certificate valid for ${sslInfo.daysUntilExpiry} days.`,
+          recommendation: expiryWarning
+            ? 'Renew your SSL certificate immediately.'
+            : 'Certificate expiry is healthy.',
+          passed: !expiryWarning,
+          details: {
+            currentValue: `Expires: ${sslInfo.validTo}`,
+            expectedValue: 'At least 30 days until expiry',
+          },
+        });
+      }
+
+      // TLS version check
+      if (sslInfo.protocol) {
+        const weakProtocol = ['SSLv3', 'TLSv1', 'TLSv1.1'].includes(sslInfo.protocol);
+        findings.push({
+          id: 'tls-version',
+          severity: weakProtocol ? 'high' : 'info',
+          title: 'TLS Protocol Version',
+          description: weakProtocol
+            ? `Weak TLS version: ${sslInfo.protocol}`
+            : `Strong TLS version: ${sslInfo.protocol}`,
+          recommendation: weakProtocol
+            ? 'Upgrade to TLS 1.2 or TLS 1.3. Disable older protocols.'
+            : 'TLS configuration is secure.',
+          passed: !weakProtocol,
+          details: {
+            currentValue: sslInfo.protocol,
+            expectedValue: 'TLSv1.2 or TLSv1.3',
+          },
+        });
+      }
+    }
+  } catch (err) {
+    console.error('SSL check failed:', err);
+  }
+
+  // === ENTERPRISE: CORS Analysis ===
+  const corsInfo = analyzeCORS(headers);
+
+  if (corsInfo.allowOrigin) {
+    findings.push({
+      id: 'cors-permissive',
+      severity: corsInfo.isPermissive ? 'high' : 'info',
+      title: 'CORS Configuration',
+      description: corsInfo.isPermissive
+        ? 'CORS allows requests from any origin (*), which may expose your API.'
+        : 'CORS is configured with specific origins.',
+      recommendation: corsInfo.isPermissive
+        ? 'Replace Access-Control-Allow-Origin: * with specific trusted domains.'
+        : 'CORS configuration appears secure.',
+      passed: !corsInfo.isPermissive,
+      details: {
+        currentValue: corsInfo.allowOrigin,
+        expectedValue: 'Specific domain(s), not *',
+      },
+    });
+
+    // Dangerous: wildcard + credentials
+    if (corsInfo.allowOrigin === '*' && corsInfo.allowCredentials) {
+      findings.push({
+        id: 'cors-credentials',
+        severity: 'critical',
+        title: 'CORS Credentials with Wildcard',
+        description: 'Allowing credentials with wildcard origin is a severe security risk.',
+        recommendation: 'Never use Access-Control-Allow-Credentials: true with wildcard origin.',
+        passed: false,
+      });
+    }
+  }
+
+  // === ENTERPRISE: Subresource Integrity (SRI) ===
+  const sriViolations = await page.evaluate(() => {
+    const violations: Array<{
+      tagName: string;
+      src: string;
+      outerHtml: string;
+      isExternal: boolean;
+    }> = [];
+
+    // Check scripts
+    document.querySelectorAll('script[src]').forEach((el) => {
+      const script = el as HTMLScriptElement;
+      const src = script.src;
+      const isExternal = src && !src.startsWith(window.location.origin);
+
+      if (isExternal && !script.integrity) {
+        violations.push({
+          tagName: 'script',
+          src: src,
+          outerHtml: script.outerHTML.slice(0, 200),
+          isExternal: true,
+        });
+      }
+    });
+
+    // Check stylesheets
+    document.querySelectorAll('link[rel="stylesheet"][href]').forEach((el) => {
+      const link = el as HTMLLinkElement;
+      const href = link.href;
+      const isExternal = href && !href.startsWith(window.location.origin);
+
+      if (isExternal && !link.integrity) {
+        violations.push({
+          tagName: 'link',
+          src: href,
+          outerHtml: link.outerHTML.slice(0, 200),
+          isExternal: true,
+        });
+      }
+    });
+
+    return violations;
+  });
+
+  if (sriViolations.length > 0) {
+    findings.push({
+      id: 'sri-missing',
+      severity: 'medium',
+      title: 'Subresource Integrity (SRI) Missing',
+      description: `${sriViolations.length} external resource(s) lack integrity attributes.`,
+      recommendation: 'Add integrity="sha384-..." to external scripts and stylesheets.',
+      passed: false,
+      details: {
+        affectedElements: sriViolations.slice(0, 5).map(v => v.src),
+        codeSnippet: sriViolations[0]?.outerHtml,
+      },
+    });
+  } else {
+    findings.push({
+      id: 'sri-present',
+      severity: 'info',
+      title: 'Subresource Integrity (SRI)',
+      description: 'All external resources have integrity attributes or none are loaded.',
+      recommendation: 'SRI is properly configured.',
+      passed: true,
+    });
+  }
+
+  // === ENTERPRISE: Form Security Checks ===
+  const formIssues = await page.evaluate(() => {
+    const issues: string[] = [];
+
+    document.querySelectorAll('form').forEach((form, i) => {
+      const action = form.action;
+      // Check for HTTP form actions on HTTPS page
+      if (window.location.protocol === 'https:' && action.startsWith('http://')) {
+        issues.push(`Form #${i + 1} submits to insecure HTTP: ${action}`);
+      }
+
+      // Check for password fields without autocomplete="off" or "new-password"
+      form.querySelectorAll('input[type="password"]').forEach((input) => {
+        const autocomplete = (input as HTMLInputElement).autocomplete;
+        if (!autocomplete || autocomplete === 'on') {
+          issues.push(`Password field missing autocomplete="new-password"`);
+        }
+      });
+    });
+
+    return issues;
+  });
+
+  if (formIssues.length > 0) {
+    findings.push({
+      id: 'form-security',
+      severity: 'medium',
+      title: 'Form Security Issues',
+      description: `Found ${formIssues.length} form security issue(s).`,
+      recommendation: 'Ensure forms submit over HTTPS and password fields have proper autocomplete attributes.',
+      passed: false,
+      details: {
+        affectedElements: formIssues.slice(0, 5),
+      },
+    });
+  }
+
+  // === ENTERPRISE: Dangerous JavaScript APIs ===
+  const dangerousAPIs = await page.evaluate(() => {
+    const found: string[] = [];
+    const html = document.documentElement.outerHTML;
+
+    // Check for eval usage in inline scripts
+    if (html.includes('eval(')) found.push('eval() detected');
+    if (html.includes('document.write(')) found.push('document.write() detected');
+    if (html.includes('innerHTML')) found.push('innerHTML usage detected');
+
+    return found;
+  });
+
+  if (dangerousAPIs.length > 0) {
+    findings.push({
+      id: 'dangerous-apis',
+      severity: 'low',
+      title: 'Potentially Dangerous JavaScript APIs',
+      description: `Detected usage of ${dangerousAPIs.join(', ')}.`,
+      recommendation: 'Avoid eval(), document.write(), and prefer textContent over innerHTML.',
+      passed: false,
+      details: {
+        affectedElements: dangerousAPIs,
+      },
+    });
+  }
 
   // Calculate score
   let totalPenalty = 0;
@@ -219,5 +595,8 @@ export async function runSecurityAudit(
   return {
     score,
     findings,
+    sslInfo,
+    corsInfo,
+    sriViolations: sriViolations.length > 0 ? sriViolations : undefined,
   };
 }

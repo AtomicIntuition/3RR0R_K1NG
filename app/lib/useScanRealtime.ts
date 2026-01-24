@@ -11,13 +11,14 @@ interface ScanProgress {
 }
 
 const AUDIT_PHASES = [
-  { key: 'results_security', name: 'Security', phase: 'Analyzing security headers...', weight: 15 },
-  { key: 'results_seo', name: 'SEO', phase: 'Checking SEO configuration...', weight: 15 },
-  { key: 'results_accessibility', name: 'Accessibility', phase: 'Testing accessibility...', weight: 15 },
-  { key: 'results_code_quality', name: 'Code Quality', phase: 'Auditing code quality...', weight: 10 },
+  { key: 'results_security', name: 'Security', phase: 'Analyzing security headers...', weight: 12 },
+  { key: 'results_seo', name: 'SEO', phase: 'Checking SEO configuration...', weight: 12 },
+  { key: 'results_accessibility', name: 'Accessibility', phase: 'Testing accessibility...', weight: 12 },
+  { key: 'results_code_quality', name: 'Code Quality', phase: 'Auditing code quality...', weight: 8 },
   { key: 'results_tech_stack', name: 'Tech Stack', phase: 'Detecting technologies...', weight: 5 },
-  { key: 'results_performance', name: 'Performance', phase: 'Running Lighthouse audit...', weight: 25 },
-  { key: 'roast_title', name: 'AI Roast', phase: 'Generating roast...', weight: 15 },
+  { key: 'results_resources', name: 'Resources', phase: 'Analyzing resource waterfall...', weight: 10 },
+  { key: 'results_performance', name: 'Performance', phase: 'Running Lighthouse audit...', weight: 23 },
+  { key: 'roast_title', name: 'AI Roast', phase: 'Generating roast...', weight: 18 },
 ];
 
 function calculateProgress(scan: DbScan): ScanProgress {

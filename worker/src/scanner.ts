@@ -5,6 +5,7 @@ import { runSeoAudit, type SeoAuditResult } from './audits/seo.js';
 import { runAccessibilityAudit, type AccessibilityAuditResult } from './audits/accessibility.js';
 import { runCodeQualityAudit, type CodeQualityAuditResult } from './audits/codeQuality.js';
 import { detectTechStack, type TechStackItem } from './audits/techStack.js';
+import { runResourceAnalysis, type ResourceAnalysis } from './audits/resources.js';
 import { generateRoast, type RoastResult } from './roastGenerator.js';
 import { updateScan } from './lib/supabase.js';
 
@@ -15,6 +16,7 @@ export interface ScanResult {
   accessibility: AccessibilityAuditResult;
   codeQuality: CodeQualityAuditResult;
   techStack: TechStackItem[];
+  resources: ResourceAnalysis;
   roast: RoastResult;
   overallScore: number;
 }
@@ -157,6 +159,13 @@ export async function runScan(scanId: string, url: string): Promise<ScanResult> 
     });
     console.log(`Tech stack detection complete: ${techStack.length} technologies found`);
 
+    // Resource analysis (waterfall, third-party impact)
+    const resourceAnalysis = await runResourceAnalysis(page);
+    await updateScan(scanId, {
+      results_resources: resourceAnalysis,
+    });
+    console.log(`Resource analysis complete: ${resourceAnalysis.totalResources} resources, ${resourceAnalysis.thirdParty.domains.length} third-party domains`);
+
     // Performance audit (Lighthouse - runs separately)
     const performanceResult = await runPerformanceAudit(url);
     await updateScan(scanId, {
@@ -191,6 +200,7 @@ export async function runScan(scanId: string, url: string): Promise<ScanResult> 
       accessibilityViolations: accessibilityResult.violations,
       codeQualityIssues: codeQualityResult.issues,
       techStack,
+      resourceAnalysis,
     });
 
     // Update final results
@@ -215,6 +225,7 @@ export async function runScan(scanId: string, url: string): Promise<ScanResult> 
       accessibility: accessibilityResult,
       codeQuality: codeQualityResult,
       techStack,
+      resources: resourceAnalysis,
       roast,
       overallScore,
     };

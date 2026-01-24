@@ -17,11 +17,12 @@ const AUDIT_ICONS: Record<string, string> = {
   'Accessibility': '♿',
   'Code Quality': '🧹',
   'Tech Stack': '⚙️',
+  'Resources': '📊',
   'Performance': '⚡',
   'AI Roast': '🔥',
 };
 
-const ALL_AUDITS = ['Security', 'SEO', 'Accessibility', 'Code Quality', 'Tech Stack', 'Performance', 'AI Roast'];
+const ALL_AUDITS = ['Security', 'SEO', 'Accessibility', 'Code Quality', 'Tech Stack', 'Resources', 'Performance', 'AI Roast'];
 
 export function LoadingState({ phase, percentage = 0, completedAudits = [], className }: LoadingStateProps) {
   const [dots, setDots] = useState('');

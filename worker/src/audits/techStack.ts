@@ -203,20 +203,27 @@ export async function detectTechStack(page: Page, response: Response | null): Pr
   const detected: TechStackItem[] = [];
   const headers = response?.headers() || {};
 
-  // Get page HTML and scripts
-  const pageData = await page.evaluate(() => {
-    const html = document.documentElement.outerHTML;
-    const scriptEls = document.querySelectorAll('script[src]');
-    const scripts: string[] = [];
-    for (let i = 0; i < scriptEls.length; i++) {
-      scripts.push(scriptEls[i].getAttribute('src') || '');
-    }
+  // Get page HTML and scripts - wrapped in try-catch to prevent crashes on heavy pages
+  let pageData: { html: string; scripts: string[]; globals: string[] };
+  try {
+    pageData = await page.evaluate(() => {
+      const html = document.documentElement.outerHTML.slice(0, 100000); // Limit HTML size
+      const scriptEls = document.querySelectorAll('script[src]');
+      const scripts: string[] = [];
+      const max = Math.min(scriptEls.length, 50); // Limit scripts checked
+      for (let i = 0; i < max; i++) {
+        scripts.push(scriptEls[i].getAttribute('src') || '');
+      }
 
-    // Get global variables
-    const globals = Object.keys(window);
+      // Get global variables (limited)
+      const globals = Object.keys(window).slice(0, 200);
 
-    return { html, scripts, globals };
-  });
+      return { html, scripts, globals };
+    }).catch(() => ({ html: '', scripts: [], globals: [] }));
+  } catch (e) {
+    console.warn('Tech stack detection failed, using headers only:', e);
+    pageData = { html: '', scripts: [], globals: [] };
+  }
 
   for (const tech of TECH_PATTERNS) {
     let confidence = 0;

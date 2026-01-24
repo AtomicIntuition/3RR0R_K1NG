@@ -26,21 +26,72 @@ us-east4-eqdc4a
 HISTORY
 3rror-k1ng-worker
 /
-c03f838b
+176fa8d0
 Active
 
-Jan 24, 2026 at 12:02 PM EST
+Jan 24, 2026 at 12:50 PM EST
 Details
 Build Logs
 Deploy Logs
 Network Flow Logs
 Filter and search logs
 
-Worker is ready and listening for jobs
+You reached the start of the range
+Jan 24, 2026 at 12:50 PM
+Starting Container
+Starting 3RROR_K1NG Worker...
+Worker started. Waiting for jobs...
 Redis worker connected
-Processing job dee68210-2701-4f4a-9772-7ef15f4d1500: https://3-rr-0-r-k1-ng-app.vercel.app/ (persona: meme)
-Starting scan for https://3-rr-0-r-k1-ng-app.vercel.app/ (dee68210-2701-4f4a-9772-7ef15f4d1500) with persona: meme
-Running audits for dee68210-2701-4f4a-9772-7ef15f4d1500...
+Worker is ready and listening for jobs
+Processing job bc5abfdf-bd57-4c4f-88a6-2d65973438e7: https://x.com/ (persona: drill)
+Starting scan for https://x.com/ (bc5abfdf-bd57-4c4f-88a6-2d65973438e7) with persona: drill
+Running audits for bc5abfdf-bd57-4c4f-88a6-2d65973438e7...
+Security audit complete: 71
+SEO audit complete: 64
+Accessibility audit complete: 72
+Code quality audit complete: 34
+Tech stack detection complete: 2 technologies found
+Resource analysis complete: 1 resources, 1 third-party domains
+Extended audits complete:
+  - Vulnerabilities: 0 vulnerable libraries
+  - Protocol: HTTP/1.1, HTTP/2: true
+  - Images: 0 images, 0 issues
+  - Caching: score 100
+  - Redirects: 0 redirects, 47ms
+  - PWA: score 85, installable: false
+  - Structured Data: 0 types found
+  - Links: 9 broken, 0 insecure
+Performance audit complete: 70
+Comprehensive score calculated: 72/100 (C-)
+AI roast generated successfully with drill persona
+Scan complete for bc5abfdf-bd57-4c4f-88a6-2d65973438e7: Overall score 72/100 (C-)
+Job bc5abfdf-bd57-4c4f-88a6-2d65973438e7 completed for scan bc5abfdf-bd57-4c4f-88a6-2d65973438e7
+Processing job 2e50e124-b838-486e-96a1-9b3d32528b6e: https://yahoo.com/ (persona: interviewer)
+Starting scan for https://yahoo.com/ (2e50e124-b838-486e-96a1-9b3d32528b6e) with persona: interviewer
+Running audits for 2e50e124-b838-486e-96a1-9b3d32528b6e...
+Security audit complete: 69
+SEO audit complete: 55
+Accessibility audit complete: 56
+Code quality audit complete: 35
+Tech stack detection complete: 4 technologies found
+Resource analysis complete: 418 resources, 65 third-party domains
+Extended audits complete:
+  - Vulnerabilities: 0 vulnerable libraries
+  - Protocol: HTTP/2, HTTP/2: true
+  - Images: 121 images, 20 issues
+  - Caching: score 0
+  - Redirects: 1 redirects, 328ms
+  - PWA: score 35, installable: false
+  - Structured Data: 2 types found
+  - Links: 1 broken, 0 insecure
+Performance audit complete: 0
+Comprehensive score calculated: 53/100 (F)
+AI roast generated successfully with interviewer persona
+Scan complete for 2e50e124-b838-486e-96a1-9b3d32528b6e: Overall score 53/100 (F)
+Job 2e50e124-b838-486e-96a1-9b3d32528b6e completed for scan 2e50e124-b838-486e-96a1-9b3d32528b6e
+Processing job 0478ab0f-4059-4f9d-a9eb-c4d927ca14f6: https://3-rr-0-r-k1-ng-app.vercel.app/ (persona: drill)
+Starting scan for https://3-rr-0-r-k1-ng-app.vercel.app/ (0478ab0f-4059-4f9d-a9eb-c4d927ca14f6) with persona: drill
+Running audits for 0478ab0f-4059-4f9d-a9eb-c4d927ca14f6...
 Security audit complete: 88
 SEO audit complete: 100
 Accessibility audit complete: 100
@@ -50,108 +101,43 @@ Resource analysis complete: 21 resources, 0 third-party domains
 Extended audits complete:
   - Vulnerabilities: 0 vulnerable libraries
   - Protocol: HTTP/2, HTTP/2: true
-  - Structured Data: 0 types found
-  - Links: 0 broken, 0 insecure
   - Images: 0 images, 0 issues
   - Caching: score 100
-  - Redirects: 0 redirects, 59ms
+  - Redirects: 0 redirects, 51ms
   - PWA: score 35, installable: false
+  - Structured Data: 0 types found
+  - Links: 0 broken, 0 insecure
 Performance audit complete: 100
 Comprehensive score calculated: 91/100 (A-)
-AI roast generated successfully with meme persona
-Scan complete for dee68210-2701-4f4a-9772-7ef15f4d1500: Overall score 91/100 (A-)
-Job dee68210-2701-4f4a-9772-7ef15f4d1500 completed for scan dee68210-2701-4f4a-9772-7ef15f4d1500
-Security audit complete: 83
-SEO audit complete: 64
-Processing job 1e4b7464-7928-41f8-ad67-b842267a7880: https://github.com/ (persona: gordon)
-Starting scan for https://github.com/ (1e4b7464-7928-41f8-ad67-b842267a7880) with persona: gordon
-Running audits for 1e4b7464-7928-41f8-ad67-b842267a7880...
-Accessibility audit complete: 88
-Code quality audit complete: 92
-Tech stack detection complete: 3 technologies found
-Resource analysis complete: 136 resources, 2 third-party domains
-Extended audits complete:
-  - Vulnerabilities: 0 vulnerable libraries
-  - Protocol: HTTP/1.1, HTTP/2: true
-  - Images: 24 images, 13 issues
-  - Caching: score 100
-  - Redirects: 0 redirects, 31ms
-  - PWA: score 55, installable: false
-  - Structured Data: 0 types found
-  - Links: 1 broken, 0 insecure
-Performance audit complete: 47
-Comprehensive score calculated: 74/100 (C)
-AI roast generated successfully with gordon persona
-Scan complete for 1e4b7464-7928-41f8-ad67-b842267a7880: Overall score 74/100 (C)
-Job 1e4b7464-7928-41f8-ad67-b842267a7880 completed for scan 1e4b7464-7928-41f8-ad67-b842267a7880
-Processing job f463b4fa-3c24-4660-94a9-e0fb8daa3516: https://vercel.com/ (persona: parent)
-Starting scan for https://vercel.com/ (f463b4fa-3c24-4660-94a9-e0fb8daa3516) with persona: parent
-Running audits for f463b4fa-3c24-4660-94a9-e0fb8daa3516...
-Security audit complete: 79
-SEO audit complete: 73
-Accessibility audit complete: 0
-Code quality audit complete: 100
-Tech stack detection complete: 4 technologies found
-Resource analysis complete: 250 resources, 2 third-party domains
-Extended audits complete:
-  - Vulnerabilities: 0 vulnerable libraries
-  - Protocol: HTTP/2, HTTP/2: true
-  - Images: 51 images, 3 issues
-  - Caching: score 100
-  - Redirects: 0 redirects, 44ms
-  - PWA: score 80, installable: false
-  - Structured Data: 1 types found
-  - Links: 0 broken, 0 insecure
-Performance audit complete: 69
-Comprehensive score calculated: 73/100 (C)
-AI roast generated successfully with parent persona
-Scan complete for f463b4fa-3c24-4660-94a9-e0fb8daa3516: Overall score 73/100 (C)
-Job f463b4fa-3c24-4660-94a9-e0fb8daa3516 completed for scan f463b4fa-3c24-4660-94a9-e0fb8daa3516
-Processing job 6b5c5477-21c6-46c7-be08-4abd6a2682ca: https://stripe.com/ (persona: drill)
-Starting scan for https://stripe.com/ (6b5c5477-21c6-46c7-be08-4abd6a2682ca) with persona: drill
-Running audits for 6b5c5477-21c6-46c7-be08-4abd6a2682ca...
+AI roast generated successfully with drill persona
+Scan complete for 0478ab0f-4059-4f9d-a9eb-c4d927ca14f6: Overall score 91/100 (A-)
+Job 0478ab0f-4059-4f9d-a9eb-c4d927ca14f6 completed for scan 0478ab0f-4059-4f9d-a9eb-c4d927ca14f6
+Processing job 37b060a5-c41a-4b19-b577-80d282f9bc60: https://stripe.com/ (persona: meme)
+Starting scan for https://stripe.com/ (37b060a5-c41a-4b19-b577-80d282f9bc60) with persona: meme
+Running audits for 37b060a5-c41a-4b19-b577-80d282f9bc60...
 Security audit complete: 74
 SEO audit complete: 64
 Accessibility audit complete: 0
-Processing job 6b5c5477-21c6-46c7-be08-4abd6a2682ca: https://stripe.com/ (persona: drill)
-Starting scan for https://stripe.com/ (6b5c5477-21c6-46c7-be08-4abd6a2682ca) with persona: drill
-Scan failed for 6b5c5477-21c6-46c7-be08-4abd6a2682ca: page.evaluate: Target crashed 
-Job 6b5c5477-21c6-46c7-be08-4abd6a2682ca failed: page.evaluate: Target crashed 
-    at async runScan (/app/worker/dist/scanner.js:145:35)
-Job 6b5c5477-21c6-46c7-be08-4abd6a2682ca failed: page.evaluate: Target crashed 
-    at async Worker.processScanJob (/app/worker/dist/index.js:17:13)
-    at runCodeQualityAudit (/app/worker/dist/audits/codeQuality.js:65:39)
-    at /app/worker/async /app/node_modules/bullmq/dist/cjs/classes/worker.js:565:32 {
-  name: 'Error'
-}
-Running audits for 6b5c5477-21c6-46c7-be08-4abd6a2682ca...
-Security audit complete: 74
-SEO audit complete: 64
-Job 6b5c5477-21c6-46c7-be08-4abd6a2682ca failed: page.evaluate: Target crashed 
-Job 6b5c5477-21c6-46c7-be08-4abd6a2682ca failed: page.evaluate: Target crashed 
-    at runCodeQualityAudit (/app/worker/dist/audits/codeQuality.js:28:34)
-    at runScan (/app/worker/dist/scanner.js:145:41)
+Code quality audit complete: 65
+Scan failed for 37b060a5-c41a-4b19-b577-80d282f9bc60: page.evaluate: Target crashed 
+Job 37b060a5-c41a-4b19-b577-80d282f9bc60 failed: page.evaluate: Target crashed 
+Processing job 3d7043e3-d3be-4d4f-8c79-bc2ab2f03f00: https://stripe.com/ (persona: parent)
+Starting scan for https://stripe.com/ (3d7043e3-d3be-4d4f-8c79-bc2ab2f03f00) with persona: parent
+Job 37b060a5-c41a-4b19-b577-80d282f9bc60 failed: page.evaluate: Target crashed 
+    at detectTechStack (/app/worker/dist/audits/techStack.js:195:33)
+    at runScan (/app/worker/dist/scanner.js:155:33)
     at async Worker.processScanJob (/app/worker/dist/index.js:17:13)
     at /app/worker/async /app/node_modules/bullmq/dist/cjs/classes/worker.js:565:32 {
   name: 'Error'
 }
-Accessibility audit complete: 0
-Scan failed for 6b5c5477-21c6-46c7-be08-4abd6a2682ca: page.evaluate: Target crashed 
-Processing job 6b5c5477-21c6-46c7-be08-4abd6a2682ca: https://stripe.com/ (persona: drill)
-Starting scan for https://stripe.com/ (6b5c5477-21c6-46c7-be08-4abd6a2682ca) with persona: drill
-Running audits for 6b5c5477-21c6-46c7-be08-4abd6a2682ca...
+Processing job 37b060a5-c41a-4b19-b577-80d282f9bc60: https://stripe.com/ (persona: meme)
+Starting scan for https://stripe.com/ (37b060a5-c41a-4b19-b577-80d282f9bc60) with persona: meme
+Running audits for 3d7043e3-d3be-4d4f-8c79-bc2ab2f03f00...
+Running audits for 37b060a5-c41a-4b19-b577-80d282f9bc60...
+Security audit complete: 74
 Security audit complete: 74
 SEO audit complete: 64
-Accessibility audit complete: 0
-Scan failed for 6b5c5477-21c6-46c7-be08-4abd6a2682ca: page.evaluate: Target crashed 
-Job 6b5c5477-21c6-46c7-be08-4abd6a2682ca failed: page.evaluate: Target crashed 
-Job 6b5c5477-21c6-46c7-be08-4abd6a2682ca failed: page.evaluate: Target crashed 
-    at runCodeQualityAudit (/app/worker/dist/audits/codeQuality.js:65:39)
-    at async runScan (/app/worker/dist/scanner.js:145:35)
-    at async Worker.processScanJob (/app/worker/dist/index.js:17:13)
-    at /app/worker/async /app/node_modules/bullmq/dist/cjs/classes/worker.js:565:32 {
-  name: 'Error'
-}
+SEO audit complete: 64
 
 
 3rror-k1ng-worker | Railway

@@ -145,6 +145,17 @@
     100% { clip: rect(38px, 9999px, 91px, 0); }
   }
 
+  /* Screenshot mode - disable all animations for clean capture */
+  body.screenshot-mode .glitch::before,
+  body.screenshot-mode .glitch::after {
+    display: none !important;
+  }
+
+  body.screenshot-mode * {
+    animation: none !important;
+    transition: none !important;
+  }
+
   /* Terminal cursor */
   .cursor-blink::after {
     content: '_';

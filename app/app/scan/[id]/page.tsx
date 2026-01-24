@@ -11,6 +11,7 @@ import { GlitchText } from '@/components/GlitchText';
 import { ShareCard } from '@/components/ShareCard';
 import { LLMReport } from '@/components/LLMReport';
 import { ExtendedAudits } from '@/components/ExtendedAudits';
+import { ScreenshotButton } from '@/components/ScreenshotButton';
 import { useScanRealtime } from '@/lib/useScanRealtime';
 import { getGrade, getGradeColor } from '@/lib/scoring';
 
@@ -87,76 +88,83 @@ export default function ScanResultsPage() {
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <header className="text-center mb-12">
-          <Link href="/" className="inline-block mb-6">
-            <span className="text-2xl font-bold text-terminal hover:text-terminal-bright transition-colors">
-              3RROR_K1NG
-            </span>
-          </Link>
-
-          <div className="flex items-center justify-center gap-2 text-sm text-gray-500 mb-4">
-            <span className="text-terminal">TARGET:</span>
-            <a
-              href={scan.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-300 hover:text-terminal transition-colors truncate max-w-xs"
-            >
-              {scan.url}
-            </a>
-          </div>
-        </header>
-
-        {/* Overall Score with Letter Grade */}
-        <section className="text-center mb-12">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-8">
-            {/* Numeric Score */}
-            <ScoreRing
-              score={scan.scoreOverall || 0}
-              size="xl"
-              label="OVERALL SCORE"
+        {/* Shareable Results Section - This entire area gets captured */}
+        <div id="shareable-results" className="relative bg-void rounded-xl p-6 mb-8">
+          {/* Screenshot Button - Floating at top right */}
+          <div className="absolute top-4 right-4 z-10 screenshot-ignore">
+            <ScreenshotButton
+              targetId="shareable-results"
+              filename={`3rror-k1ng-${scan.url.replace(/https?:\/\//, '').replace(/[^a-z0-9]/gi, '-').slice(0, 30)}`}
+              variant="floating"
             />
-
-            {/* Letter Grade */}
-            <div className="flex flex-col items-center">
-              <div className={`text-8xl md:text-9xl font-black tracking-tight ${getGradeColor(scan.letterGrade || getGrade(scan.scoreOverall || 0))}`}
-                   style={{ textShadow: '0 0 30px currentColor, 0 0 60px currentColor' }}>
-                {scan.letterGrade || getGrade(scan.scoreOverall || 0)}
-              </div>
-              <span className="text-lg text-gray-400 font-medium mt-2">GRADE</span>
-            </div>
           </div>
 
-          {/* Scoring Breakdown (if available) */}
-          {scan.scoringBreakdown?.breakdown && (
-            <div className="mt-8 max-w-2xl mx-auto">
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                {scan.scoringBreakdown.breakdown.map((cat) => (
-                  <div key={cat.category} className="bg-void-50 border border-void-100 rounded-lg p-3 text-center">
-                    <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">{cat.category}</div>
-                    <div className={`text-xl font-bold ${cat.score >= 90 ? 'text-terminal' : cat.score >= 70 ? 'text-neon-yellow' : cat.score >= 50 ? 'text-neon-orange' : 'text-danger'}`}>
-                      {cat.score}
+          {/* Header */}
+          <header className="text-center mb-8">
+            <Link href="/" className="inline-block mb-4 screenshot-ignore">
+              <span className="text-2xl font-bold text-terminal hover:text-terminal-bright transition-colors">
+                3RROR_K1NG
+              </span>
+            </Link>
+
+            <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+              <span className="text-terminal">TARGET:</span>
+              <span className="text-gray-300 truncate max-w-xs">
+                {scan.url}
+              </span>
+            </div>
+          </header>
+
+          {/* Overall Score with Letter Grade */}
+          <section className="text-center mb-8">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-8">
+              {/* Numeric Score */}
+              <ScoreRing
+                score={scan.scoreOverall || 0}
+                size="xl"
+                label="OVERALL SCORE"
+              />
+
+              {/* Letter Grade */}
+              <div className="flex flex-col items-center">
+                <div className={`text-8xl md:text-9xl font-black tracking-tight ${getGradeColor(scan.letterGrade || getGrade(scan.scoreOverall || 0))}`}
+                     style={{ textShadow: '0 0 30px currentColor, 0 0 60px currentColor' }}>
+                  {scan.letterGrade || getGrade(scan.scoreOverall || 0)}
+                </div>
+                <span className="text-lg text-gray-400 font-medium mt-2">GRADE</span>
+              </div>
+            </div>
+
+            {/* Scoring Breakdown (if available) */}
+            {scan.scoringBreakdown?.breakdown && (
+              <div className="mt-8 max-w-2xl mx-auto">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                  {scan.scoringBreakdown.breakdown.map((cat) => (
+                    <div key={cat.category} className="bg-void-50 border border-void-100 rounded-lg p-3 text-center">
+                      <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">{cat.category}</div>
+                      <div className={`text-xl font-bold ${cat.score >= 90 ? 'text-terminal' : cat.score >= 70 ? 'text-neon-yellow' : cat.score >= 50 ? 'text-neon-orange' : 'text-danger'}`}>
+                        {cat.score}
+                      </div>
+                      <div className="text-xs text-gray-600">{cat.weight}% weight</div>
                     </div>
-                    <div className="text-xs text-gray-600">{cat.weight}% weight</div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-        </section>
-
-        {/* Roast Section */}
-        {scan.roastTitle && scan.roastBody && (
-          <section id="roast-container" className="mb-12">
-            <RoastText
-              title={scan.roastTitle}
-              body={scan.roastBody}
-              score={scan.scoreOverall || 0}
-              persona={scan.roastPersona}
-            />
+            )}
           </section>
-        )}
+
+          {/* Roast Section */}
+          {scan.roastTitle && scan.roastBody && (
+            <section className="mb-4">
+              <RoastText
+                title={scan.roastTitle}
+                body={scan.roastBody}
+                score={scan.scoreOverall || 0}
+                persona={scan.roastPersona}
+              />
+            </section>
+          )}
+        </div>
 
         {/* Category Scores Grid */}
         <section className="mb-12">

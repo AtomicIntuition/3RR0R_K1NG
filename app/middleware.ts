@@ -19,10 +19,10 @@ export function middleware(request: NextRequest) {
     [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "font-src 'self' https://fonts.gstatic.com",
+      "style-src 'self' 'unsafe-inline'",
+      "font-src 'self'",
       "img-src 'self' data: https: blob:",
-      "connect-src 'self' https://*.supabase.co https://api.stripe.com wss://*.supabase.co https://3-rr-0-r-k1-ng-app.vercel.app https://*.vercel.app https://fonts.googleapis.com https://fonts.gstatic.com",
+      "connect-src 'self' https://*.supabase.co https://api.stripe.com wss://*.supabase.co https://3-rr-0-r-k1-ng-app.vercel.app https://*.vercel.app",
       "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
       "object-src 'none'",
       "base-uri 'self'",

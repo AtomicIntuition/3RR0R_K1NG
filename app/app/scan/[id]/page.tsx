@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ScoreRing } from '@/components/ScoreRing';
 import { ResultsCard } from '@/components/ResultsCard';
@@ -11,63 +10,14 @@ import { FixList } from '@/components/FixList';
 import { GlitchText } from '@/components/GlitchText';
 import { ShareCard } from '@/components/ShareCard';
 import { LLMReport } from '@/components/LLMReport';
-import type { Scan, ScanPollResponse } from '@/types/scan';
+import { useScanRealtime } from '@/lib/useScanRealtime';
 
 export default function ScanResultsPage() {
   const params = useParams();
-  const router = useRouter();
   const scanId = params.id as string;
 
-  const [scan, setScan] = useState<Scan | null>(null);
-  const [progress, setProgress] = useState({ phase: '', percentage: 5 });
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const pollScan = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/scan/${scanId}`);
-      const data: ScanPollResponse = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.scan?.errorMessage || 'Failed to fetch scan');
-      }
-
-      setScan(data.scan);
-
-      if (data.progress) {
-        setProgress(data.progress);
-      }
-
-      // Continue polling if not complete
-      if (data.scan.status === 'pending' || data.scan.status === 'processing') {
-        return true; // Continue polling
-      }
-
-      setIsLoading(false);
-      return false; // Stop polling
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
-      setIsLoading(false);
-      return false;
-    }
-  }, [scanId]);
-
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-
-    const poll = async () => {
-      const shouldContinue = await pollScan();
-      if (shouldContinue) {
-        timeoutId = setTimeout(poll, 2000); // Poll every 2 seconds
-      }
-    };
-
-    poll();
-
-    return () => {
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-  }, [pollScan]);
+  // Use real-time Supabase subscription instead of polling
+  const { scan, progress, error, isLoading } = useScanRealtime(scanId);
 
   // Error state
   if (error) {
@@ -96,7 +46,11 @@ export default function ScanResultsPage() {
             Scanning: <span className="text-terminal">{scan?.url || 'Loading...'}</span>
           </p>
         </div>
-        <LoadingState phase={progress.phase} percentage={progress.percentage} />
+        <LoadingState
+          phase={progress.phase}
+          percentage={progress.percentage}
+          completedAudits={progress.completedAudits}
+        />
       </div>
     );
   }

@@ -91,14 +91,17 @@ export default function ScanResultsPage() {
         {/* Shareable Results Section - This entire area gets captured */}
         <div id="shareable-results" className="relative bg-void rounded-xl p-8 pt-4 mb-8 border border-void-100">
           {/* Promo Banner - Visible in screenshots */}
-          <div className="text-center mb-6 py-2 px-4 bg-terminal/10 border border-terminal/30 rounded-lg">
-            <span className="text-gray-300 text-sm font-medium">
-              ROAST YOUR SITE FREE
-            </span>
-            <span className="text-gray-500 text-sm mx-2">→</span>
-            <span className="text-terminal font-bold text-sm tracking-wide">
-              3RROR_K1NG.COM
-            </span>
+          <div className="text-center mb-8 py-4 px-6 bg-gradient-to-r from-terminal/20 via-terminal/10 to-terminal/20 border-2 border-terminal/50 rounded-xl">
+            <div className="text-2xl md:text-3xl font-black tracking-tight">
+              <span className="text-white">GET YOUR SITE ROASTED FREE</span>
+            </div>
+            <div className="mt-2 flex items-center justify-center gap-3">
+              <div className="h-px w-12 bg-terminal/50"></div>
+              <span className="text-terminal text-xl md:text-2xl font-bold tracking-wider" style={{ textShadow: '0 0 20px rgba(0, 255, 65, 0.5)' }}>
+                3RROR_K1NG.COM
+              </span>
+              <div className="h-px w-12 bg-terminal/50"></div>
+            </div>
           </div>
 
           {/* Screenshot Button - Floating at top right */}

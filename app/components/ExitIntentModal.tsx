@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Modal } from './Modal';
 import { GlitchText } from './GlitchText';
 import { PRICING } from '@/lib/constants';
 import { wasExitIntentShown, setExitIntentShown } from '@/lib/conversion-tracking';
+import { useAuth } from '@/lib/auth-context';
 import clsx from 'clsx';
 
 interface ExitIntentModalProps {
@@ -13,6 +15,8 @@ interface ExitIntentModalProps {
 }
 
 export function ExitIntentModal({ discountPriceId }: ExitIntentModalProps) {
+  const router = useRouter();
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes in seconds
@@ -68,6 +72,12 @@ export function ExitIntentModal({ discountPriceId }: ExitIntentModalProps) {
   };
 
   const handleClaimOffer = async () => {
+    // Redirect to login if not authenticated
+    if (!user) {
+      router.push('/login?redirect=/pricing');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -81,15 +91,18 @@ export function ExitIntentModal({ discountPriceId }: ExitIntentModalProps) {
           priceId,
           mode: 'subscription',
           applyExitDiscount: true, // This triggers the coupon
-          metadata: {
-            discount: 'exit_intent',
-          },
+          userId: user.id,
+          userEmail: user.email,
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 401) {
+          router.push('/login?redirect=/pricing');
+          return;
+        }
         throw new Error(data.error || 'Checkout failed');
       }
 

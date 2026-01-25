@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Modal } from './Modal';
 import { GlitchText } from './GlitchText';
 import { PRICING } from '@/lib/constants';
+import { useAuth } from '@/lib/auth-context';
 import clsx from 'clsx';
 
 const DISCOUNT_STORAGE_KEY = 'errorking_discount_expiry';
@@ -18,6 +19,7 @@ interface PaywallModalProps {
 
 export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
   const router = useRouter();
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState<'monthly' | 'yearly' | 'pack' | 'discount' | null>(null);
   const [showDiscount, setShowDiscount] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
@@ -101,6 +103,8 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
           priceId: priceIdMap[type],
           mode,
           applyExitDiscount: type === 'discount',
+          userId: user?.id,
+          userEmail: user?.email,
         }),
       });
 

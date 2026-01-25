@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/auth-context';
 import clsx from 'clsx';
 
 interface PaymentButtonProps {
@@ -18,10 +20,18 @@ export function PaymentButton({
   description,
   className,
 }: PaymentButtonProps) {
+  const router = useRouter();
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleClick = async () => {
+    // Redirect to login if not authenticated
+    if (!user) {
+      router.push('/login?redirect=/pricing');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -34,12 +44,18 @@ export function PaymentButton({
         body: JSON.stringify({
           priceId,
           mode,
+          userId: user.id,
+          userEmail: user.email,
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 401) {
+          router.push('/login?redirect=/pricing');
+          return;
+        }
         throw new Error(data.error || 'Failed to create checkout session');
       }
 

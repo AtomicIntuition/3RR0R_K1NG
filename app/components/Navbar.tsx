@@ -1,13 +1,21 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { UserMenu } from './UserMenu';
 
 export function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 py-4 bg-void/80 backdrop-blur-sm border-b border-void-100">
-      <Link href="/" className="text-xl font-bold text-terminal hover:text-terminal-bright transition-colors">
-        3RROR_K1NG
+      <Link href="/" className="flex items-center gap-3 text-xl font-bold text-terminal hover:text-terminal-bright transition-colors">
+        <Image
+          src="/images/logo.png"
+          alt="3RROR_K1NG"
+          width={32}
+          height={32}
+          className="w-8 h-8"
+        />
+        <span className="hidden sm:inline">3RROR_K1NG</span>
       </Link>
       <div className="flex items-center gap-6">
         <Link

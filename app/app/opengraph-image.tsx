@@ -10,6 +10,9 @@ export const size = {
 export const contentType = 'image/png';
 
 export default async function Image() {
+  // Fetch logo from public URL
+  const logoUrl = new URL('/images/logo.png', 'https://3rrork1ng.com').toString();
+
   return new ImageResponse(
     (
       <div
@@ -32,22 +35,33 @@ export default async function Image() {
             justifyContent: 'center',
           }}
         >
+          {/* Logo */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={logoUrl}
+            alt="3RROR_K1NG Logo"
+            width={180}
+            height={180}
+            style={{
+              marginBottom: 30,
+            }}
+          />
           <div
             style={{
-              fontSize: 80,
+              fontSize: 72,
               fontWeight: 'bold',
-              color: '#00ff9d',
-              marginBottom: 20,
-              textShadow: '0 0 40px rgba(0, 255, 157, 0.5)',
+              color: '#00ff41',
+              marginBottom: 16,
+              textShadow: '0 0 40px rgba(0, 255, 65, 0.5)',
             }}
           >
             3RROR_K1NG
           </div>
           <div
             style={{
-              fontSize: 36,
+              fontSize: 32,
               color: '#9ca3af',
-              marginBottom: 40,
+              marginBottom: 32,
             }}
           >
             Website Roast Machine
@@ -56,16 +70,16 @@ export default async function Image() {
             style={{
               display: 'flex',
               gap: 20,
-              fontSize: 24,
+              fontSize: 22,
               color: '#6b7280',
             }}
           >
             <span>Security</span>
-            <span style={{ color: '#00ff9d' }}>|</span>
+            <span style={{ color: '#00ff41' }}>|</span>
             <span>Performance</span>
-            <span style={{ color: '#00ff9d' }}>|</span>
+            <span style={{ color: '#00ff41' }}>|</span>
             <span>SEO</span>
-            <span style={{ color: '#00ff9d' }}>|</span>
+            <span style={{ color: '#00ff41' }}>|</span>
             <span>Accessibility</span>
           </div>
         </div>

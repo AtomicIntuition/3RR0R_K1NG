@@ -37,6 +37,20 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   manifest: '/manifest.json',
+  icons: {
+    icon: [
+      { url: '/icons/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icons/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+      { url: '/icons/apple-touch-icon-152x152.png', sizes: '152x152', type: 'image/png' },
+      { url: '/icons/apple-touch-icon-120x120.png', sizes: '120x120', type: 'image/png' },
+    ],
+    other: [
+      { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png', rel: 'icon' },
+    ],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
@@ -90,7 +104,7 @@ const jsonLd = {
       url: siteUrl,
       logo: {
         '@type': 'ImageObject',
-        url: `${siteUrl}/icons/icon-512x512.svg`,
+        url: `${siteUrl}/icons/icon-512x512.png`,
         width: 512,
         height: 512,
       },
@@ -138,8 +152,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${jetbrainsMono.variable} ${spaceGrotesk.variable}`}>
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.svg" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -163,7 +175,9 @@ export default function RootLayout({
             {/* Footer */}
             <footer className="relative z-10 py-6 px-4 border-t border-void-100">
               <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/images/logo.png" alt="3RROR_K1NG" className="w-6 h-6" />
                   <span className="text-terminal font-bold">3RROR_K1NG</span>
                   <span className="text-gray-400">|</span>
                   <span>Website Roast Machine</span>

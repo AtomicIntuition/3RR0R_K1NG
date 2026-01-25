@@ -82,8 +82,17 @@ export async function GET(
               marginBottom: '30px',
             }}
           >
-            <div style={{ color: '#00ff41', fontSize: '36px', fontWeight: 'bold' }}>
-              3RROR_K1NG
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://3rrork1ng.com/images/logo.png"
+                alt="Logo"
+                width={50}
+                height={50}
+              />
+              <span style={{ color: '#00ff41', fontSize: '36px', fontWeight: 'bold' }}>
+                3RROR_K1NG
+              </span>
             </div>
             <div style={{ color: '#6b7280', fontSize: '24px' }}>
               WEBSITE ROAST

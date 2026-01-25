@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { GlitchText } from '@/components/GlitchText';
 import { PricingCard } from '@/components/PaymentButton';
 import { Navbar } from '@/components/Navbar';
+import { ExitIntentModal } from '@/components/ExitIntentModal';
+import { PRICING } from '@/lib/constants';
 
 // Price IDs from environment
 const PRICE_IDS = {
@@ -34,7 +36,7 @@ export default function PricingPage() {
             </h1>
 
             <p className="text-gray-400 max-w-lg mx-auto">
-              Free scans have limits. Unlock unlimited roasting power with Pro, or grab a scan pack for occasional audits.
+              Free scans have limits. Unlock more roasting power with Pro, or grab a scan pack for bulk audits.
             </p>
           </div>
 
@@ -60,7 +62,7 @@ export default function PricingPage() {
               }`}
             >
               Yearly
-              <span className="ml-1.5 text-xs text-neon-cyan">Save 35%</span>
+              <span className="ml-1.5 text-xs text-neon-cyan">Save 43%</span>
             </button>
           </div>
         </div>
@@ -78,8 +80,8 @@ export default function PricingPage() {
 
             <ul className="space-y-3 mb-6">
               {[
-                '5 scans per hour',
-                'Basic security audit',
+                `${PRICING.FREE_SCANS_PER_DAY} scans per day`,
+                'Security audit',
                 'Performance metrics',
                 'SEO analysis',
                 'Accessibility check',
@@ -103,16 +105,15 @@ export default function PricingPage() {
           {/* Pro Subscription */}
           <PricingCard
             name="Pro"
-            price={billingPeriod === 'monthly' ? '$19' : '$149'}
+            price={billingPeriod === 'monthly' ? `$${PRICING.PRO_MONTHLY}` : `$${PRICING.PRO_YEARLY}`}
             period={billingPeriod === 'monthly' ? 'month' : 'year'}
             features={[
-              'Unlimited scans',
+              `${PRICING.PRO_SCANS_PER_MONTH} scans per month`,
               'Priority queue (faster results)',
-              'Advanced security deep-dive',
+              'Full security deep-dive',
               'Historical scan data',
-              'Export reports as PDF',
-              'API access (coming soon)',
-              'Email support',
+              'All audit categories',
+              'Multiple roast personas',
             ]}
             priceId={billingPeriod === 'monthly' ? PRICE_IDS.proMonthly : PRICE_IDS.proYearly}
             mode="subscription"
@@ -122,9 +123,9 @@ export default function PricingPage() {
           {/* Scan Pack */}
           <PricingCard
             name="Scan Pack"
-            price="$9.99"
+            price={`$${PRICING.SCAN_PACK}`}
             features={[
-              '50 scans (one-time)',
+              `${PRICING.SCAN_PACK_SCANS} scans (one-time)`,
               'Never expires',
               'All Pro features included',
               'Perfect for agencies',
@@ -134,6 +135,43 @@ export default function PricingPage() {
             priceId={PRICE_IDS.scanPack}
             mode="payment"
           />
+        </div>
+
+        {/* Comparison Table */}
+        <div className="mt-16">
+          <h2 className="text-2xl font-bold text-center mb-8">
+            <span className="text-terminal">&gt;</span> Feature Comparison
+          </h2>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-void-100">
+                  <th className="text-left py-3 px-4 text-gray-400 font-medium">Feature</th>
+                  <th className="text-center py-3 px-4 text-gray-400 font-medium">Free</th>
+                  <th className="text-center py-3 px-4 text-terminal font-medium">Pro</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { feature: 'Daily Scans', free: '3', pro: '200/month' },
+                  { feature: 'Security Audit', free: '✓', pro: '✓' },
+                  { feature: 'Performance Analysis', free: '✓', pro: '✓' },
+                  { feature: 'SEO & Accessibility', free: '✓', pro: '✓' },
+                  { feature: 'AI Roasts', free: '✓', pro: '✓' },
+                  { feature: 'Priority Queue', free: '—', pro: '✓' },
+                  { feature: 'Scan History', free: '—', pro: '✓' },
+                  { feature: 'Multiple Personas', free: '—', pro: '✓' },
+                ].map((row, i) => (
+                  <tr key={i} className="border-b border-void-100/50">
+                    <td className="py-3 px-4 text-gray-300">{row.feature}</td>
+                    <td className="text-center py-3 px-4 text-gray-500">{row.free}</td>
+                    <td className="text-center py-3 px-4 text-terminal">{row.pro}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* FAQ Section */}
@@ -181,6 +219,9 @@ export default function PricingPage() {
           </div>
         </div>
       </div>
+
+      {/* Exit Intent Modal - auto-triggers on mouse leave */}
+      <ExitIntentModal discountPriceId={PRICE_IDS.proMonthly} />
     </div>
   );
 }

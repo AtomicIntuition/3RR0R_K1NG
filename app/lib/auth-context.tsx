@@ -10,6 +10,11 @@ interface Profile {
   tier: 'anonymous' | 'free' | 'pro';
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
+  scan_credits: number;
+  scans_today: number;
+  last_scan_date: string | null;
+  scans_this_month: number;
+  billing_cycle_start: string | null;
   scans_this_hour: number;
   created_at: string;
 }

@@ -4,7 +4,7 @@ import { createCheckoutSession, PRODUCTS } from '@/lib/stripe';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { priceId, mode } = body;
+    const { priceId, mode, applyExitDiscount } = body;
 
     if (!priceId || !mode) {
       return NextResponse.json(
@@ -30,11 +30,16 @@ export async function POST(request: NextRequest) {
     // Get origin for redirect URLs
     const origin = request.headers.get('origin') || 'http://localhost:3000';
 
+    // Apply exit intent coupon if requested
+    const exitIntentCouponId = process.env.STRIPE_EXIT_INTENT_COUPON_ID;
+    const couponId = applyExitDiscount && exitIntentCouponId ? exitIntentCouponId : undefined;
+
     const session = await createCheckoutSession({
       priceId,
       mode,
       successUrl: `${origin}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
       cancelUrl: `${origin}/pricing`,
+      couponId,
       metadata: {
         // Add user ID here if authenticated
         scanCount: priceId === PRODUCTS.scanPack.priceId

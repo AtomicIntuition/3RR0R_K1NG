@@ -50,16 +50,19 @@ export async function POST(request: NextRequest) {
             // Add scans to user's account
             const { data: profile } = await supabase
               .from('profiles')
-              .select('scans_this_hour')
+              .select('scan_credits')
               .eq('id', userId)
               .single();
 
             if (profile) {
-              // Reset their rate limit and add purchased scans
+              // Add purchased scan credits to existing balance
+              const currentCredits = profile.scan_credits || 0;
               await supabase.from('profiles').update({
-                scans_this_hour: 0,
+                scan_credits: currentCredits + scanCount,
                 stripe_customer_id: session.customer as string,
               }).eq('id', userId);
+
+              console.log(`Added ${scanCount} scan credits to user ${userId}. New total: ${currentCredits + scanCount}`);
             }
           }
         }

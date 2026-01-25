@@ -1,139 +1,320 @@
-# Website Audit Report - LLM Fix Instructions
-## URL: https://3rrork1ng.com/
-## Overall Score: 97/100 (Grade: A+)
+Skip to content
+Navigated to Dashboard – Adam Ives – Stripe
 
-### COMPREHENSIVE SCORING BREAKDOWN
-- **Security:** 95/100 (30% weight, contributes 29 points)
-- **Performance:** 98/100 (25% weight, contributes 25 points)
-- **User Experience:** 100/100 (20% weight, contributes 20 points)
-- **SEO:** 100/100 (15% weight, contributes 15 points)
-- **Code Quality:** 90/100 (10% weight, contributes 9 points)
+A
+Adam Ives
+Home
+Balances
+Transactions
+Customers
+Product catalog
+Shortcuts
+Subscriptions
+Payment Links
+Products
+Payments
+Billing
+Reporting
+More
+Search
 
-### TECH STACK DETECTED
-- Vercel (hosting, 70% confidence)
-- Next.js (framework, 30% confidence)
-- Webflow (cms, 20% confidence)
-- Tailwind CSS (library, 20% confidence)
+Setup guide
 
----
+Create an event destination
 
-## CRITICAL FIXES REQUIRED
+Select events
+Choose destination type
+Configure your destination
+Start by selecting which events you want to listen to
+Stripe will send these events to your destination.
+Events from
+Choose which accounts this destination listens to. Receive events fired in your account or from other accounts you manage which includes your v1 and v2 accounts. Learn more about Connect and v2 account webhooks.
 
-### SECURITY ISSUES (2 issues)
+Your account
+Receive events from resources in this account.
 
-#### [INFO] Server Information Disclosure
-- **Problem:** Server version information can help attackers find vulnerabilities.
-- **Fix:** Remove or obfuscate Server and X-Powered-By headers.
+Connected and v2 accounts
+Receive events that fire in the context of connected accounts and v2 accounts.
+API version
 
-#### [HIGH] CORS Configuration
-- **Problem:** CORS allows requests from any origin (*), which may expose your API.
-- **Fix:** Replace Access-Control-Allow-Origin: * with specific trusted domains.
+API version
+2025-12-15.clover
+Events
+All events
+Selected events
+0
 
-### CODE QUALITY ISSUES (3 issues)
-
-#### [CONSOLE_ERROR] Failed to fetch RSC payload for https://3rrork1ng.com/signup. Falling back to browser navigation. Ty
-- **Count:** 1
-- **FIX:** This is a Next.js React Server Components issue. Check:
-  1. Server component errors in your app/ pages
-  2. CSP headers blocking RSC fetches (add your domain to connect-src)
-  3. Middleware interfering with RSC routes
-
-#### [CONSOLE_ERROR] Failed to fetch RSC payload for https://3rrork1ng.com/login. Falling back to browser navigation. Typ
-- **Count:** 1
-- **FIX:** This is a Next.js React Server Components issue. Check:
-  1. Server component errors in your app/ pages
-  2. CSP headers blocking RSC fetches (add your domain to connect-src)
-  3. Middleware interfering with RSC routes
-
-#### [CONSOLE_ERROR] Failed to fetch RSC payload for https://3rrork1ng.com/pricing. Falling back to browser navigation. T
-- **Count:** 1
-- **FIX:** This is a Next.js React Server Components issue. Check:
-  1. Server component errors in your app/ pages
-  2. CSP headers blocking RSC fetches (add your domain to connect-src)
-  3. Middleware interfering with RSC routes
-
-### PERFORMANCE METRICS
-
-- ✅ **First Contentful Paint:** 0.3 s (score: 100/100)
-- ✅ **Largest Contentful Paint:** 0.5 s (score: 100/100)
-- ✅ **Total Blocking Time:** 0 ms (score: 100/100)
-- ✅ **Cumulative Layout Shift:** 0.006 (score: 100/100)
-- ✅ **Speed Index:** 0.3 s (score: 100/100)
-- ✅ **Time to Interactive:** 0.5 s (score: 100/100)
-
-### RESOURCE ANALYSIS
-
-**Overview:**
-- Total Resources: 21
-- Total Page Weight: 709.7KB
-- First-Party: 21 resources (709.7KB)
-- Third-Party: 0 resources (0.0KB)
-
-**Render-Blocking Resources:**
-- CSS: `89faedc7aad09fb2.css` (0ms)
+Select all
 
 
-### PROTOCOL ANALYSIS
+Account Link
+v2
+1 event
 
-- **HTTP Version:** HTTP/2
-- **HTTP/2 Supported:** Yes
-- **HTTP/3 (QUIC):** No
-- **ALPN Protocol:** h2
+Account Person
+v2
+3 events
 
-**Recommendations:**
-- Consider enabling HTTP/3 (QUIC) for improved performance on unreliable networks
-- HTTP/3 reduces latency with 0-RTT connection establishment
+Account
+4 events
+Select all Account events
 
+account.external_account.created
+Occurs whenever an external account is created.
 
-### PWA ANALYSIS (Score: 100/100)
+account.external_account.deleted
+Occurs whenever an external account is deleted.
 
-- **Installable:** Yes
-- **HTTPS:** Yes
-- **Manifest:** Valid
-- **Service Worker:** Registered
-- **192x192 Icon:** Yes
-- **512x512 Icon:** Yes
-- **Theme Color:** Set
-- **Viewport:** Set
+account.external_account.updated
+Occurs whenever an external account is updated.
 
-
-### STRUCTURED DATA (Score: 100/100)
-
-- **Found:** Yes
-- **JSON-LD Blocks:** 1
-- **Microdata Items:** 0
-- **Schema Types:** WebSite, Organization, SoftwareApplication, BreadcrumbList
+account.updated
+Occurs whenever an account status or property has changed.
 
 
-### LINK AUDIT (Score: 100/100)
+Account
+v2
+13 events
 
-- **Total Links:** 8
-- **Internal:** 7
-- **External:** 1
-- **Checked:** 8
+Adjustment
+v2
+1 event
+
+Balance Settings
+1 event
+
+Balance
+1 event
+
+Billing Meter
+2 events
+
+Billing Portal
+3 events
+Select all Billing Portal events
+
+billing_portal.configuration.created
+Occurs whenever a portal configuration is created.
+
+billing_portal.configuration.updated
+Occurs whenever a portal configuration is updated.
+
+billing_portal.session.created
+Occurs whenever a portal session is created.
 
 
----
+Billing
+8 events
+Select all Billing events
 
-## 📋 COPY-PASTE CODE FIXES
+billing.alert.triggered
+Occurs whenever your custom alert threshold is met.
 
-*No critical copy-paste fixes needed - your site is in good shape!*
+billing.credit_balance_transaction.created
+Occurs when a credit balance transaction is created
+
+billing.credit_grant.created
+Occurs when a credit grant is created
+
+billing.credit_grant.updated
+Occurs when a credit grant is updated
+
+billing.meter.created
+Occurs when a meter is created
+
+billing.meter.deactivated
+Occurs when a meter is deactivated
+
+billing.meter.reactivated
+Occurs when a meter is reactivated
+
+billing.meter.updated
+Occurs when a meter is updated
 
 
----
+Capability
+1 event
 
-## INSTRUCTIONS FOR AI ASSISTANT
+Cash Balance
+1 event
 
-Please analyze this report and provide specific code fixes for each issue. For each fix:
-1. Identify the exact file(s) that need to be modified
-2. Provide the exact code changes needed
-3. Explain why the change fixes the issue
+Charge
+13 events
 
-Prioritize fixes in this order:
-1. Critical/High security issues
-2. Serious accessibility violations
-3. Performance issues under 50
-4. SEO issues
-5. Code quality issues
+Checkout
+4 events
 
-Start with the highest priority items and work through the list.
+Climate
+7 events
+
+Coupon
+3 events
+
+Credit Note
+3 events
+
+Customer Cash Balance Transaction
+1 event
+
+Customer
+21 events
+
+Entitlements
+1 event
+
+File
+1 event
+
+Financial Account
+v2
+2 events
+
+Financial Address
+v2
+2 events
+
+Financial Connections
+9 events
+
+Health
+v2
+1 event
+
+Identity
+6 events
+
+Inbound Transfer
+v2
+6 events
+
+Invoice Payment
+1 event
+
+Invoice
+17 events
+
+Invoiceitem
+2 events
+
+Issuing Authorization
+3 events
+
+Issuing Card
+2 events
+
+Issuing Cardholder
+2 events
+
+Issuing Dispute
+6 events
+
+Issuing Personalization Design
+4 events
+
+Issuing Token
+2 events
+
+Issuing Transaction
+3 events
+
+Mandate
+1 event
+
+Outbound Payment
+v2
+6 events
+
+Outbound Transfer
+v2
+6 events
+
+Payment Intent
+8 events
+
+Payment Link
+2 events
+
+Payment Method
+4 events
+
+Payout Method
+v2
+2 events
+
+Payout
+6 events
+
+Person
+3 events
+
+Plan
+3 events
+
+Price
+3 events
+
+Product
+3 events
+
+Promotion Code
+2 events
+
+Quote
+5 events
+
+Radar
+2 events
+
+Received Credit
+v2
+4 events
+
+Received Debit
+v2
+5 events
+
+Refund
+3 events
+
+Reporting
+3 events
+
+Review
+2 events
+
+Setup Intent
+5 events
+
+Sigma
+1 event
+
+Source
+7 events
+
+Subscription Schedule
+7 events
+
+Tax Rate
+2 events
+
+Tax
+1 event
+
+Terminal
+3 events
+
+Test Helpers
+5 events
+
+Topup
+5 events
+
+Transaction
+v2
+2 events
+
+Transfer
+3 events
+Cancel
+Continue
+Developers

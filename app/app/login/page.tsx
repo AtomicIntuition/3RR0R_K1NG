@@ -8,7 +8,7 @@ import { GlitchText } from '@/components/GlitchText';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { signIn, signInWithGoogle, signInWithGithub } = useAuth();
+  const { signIn, signInWithGoogle, signInWithGithub, refreshProfile } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -26,6 +26,8 @@ export default function LoginPage() {
       setError(error.message);
       setLoading(false);
     } else {
+      // Wait for profile to load before redirecting
+      await refreshProfile();
       router.push('/');
     }
   };

@@ -14,7 +14,7 @@ export const PRODUCTS = {
   // One-time purchase for extra scans
   scanPack: {
     priceId: process.env.STRIPE_SCAN_PACK_PRICE_ID || 'price_xxx',
-    scans: 50,
+    scans: 150,
   },
   // Pro subscription
   proMonthly: {
@@ -32,10 +32,11 @@ export interface CreateCheckoutParams {
   successUrl: string;
   cancelUrl: string;
   metadata?: Record<string, string>;
+  couponId?: string;
 }
 
 export async function createCheckoutSession(params: CreateCheckoutParams): Promise<Stripe.Checkout.Session> {
-  const session = await stripe.checkout.sessions.create({
+  const sessionParams: Stripe.Checkout.SessionCreateParams = {
     payment_method_types: ['card'],
     line_items: [
       {
@@ -49,7 +50,15 @@ export async function createCheckoutSession(params: CreateCheckoutParams): Promi
     cancel_url: params.cancelUrl,
     metadata: params.metadata,
     allow_promotion_codes: true,
-  });
+  };
+
+  // Apply coupon if provided (for exit intent discount)
+  if (params.couponId && params.mode === 'subscription') {
+    sessionParams.discounts = [{ coupon: params.couponId }];
+    delete sessionParams.allow_promotion_codes;
+  }
+
+  const session = await stripe.checkout.sessions.create(sessionParams);
 
   return session;
 }

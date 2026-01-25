@@ -10,6 +10,14 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
+  // Skip CSP for RSC (React Server Components) requests to avoid navigation errors
+  const isRSCRequest = request.headers.get('RSC') === '1' ||
+                       request.headers.get('Next-Router-State-Tree') !== null ||
+                       request.nextUrl.searchParams.has('_rsc');
+  if (isRSCRequest) {
+    return response;
+  }
+
   // Add security headers (production only)
   const headers = response.headers;
 

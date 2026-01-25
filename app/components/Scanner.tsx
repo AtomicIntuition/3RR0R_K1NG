@@ -6,6 +6,7 @@ import Link from 'next/link';
 import clsx from 'clsx';
 import { useAuth } from '@/lib/auth-context';
 import { PersonaSelector, type RoastPersona } from './PersonaSelector';
+import { PaywallModal } from './PaywallModal';
 
 interface ScannerProps {
   className?: string;
@@ -38,6 +39,7 @@ export function Scanner({ className }: ScannerProps) {
   const [persona, setPersona] = useState<RoastPersona>('hacker');
   const [skipRoast, setSkipRoast] = useState(false);
   const [showAuthWall, setShowAuthWall] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -76,7 +78,14 @@ export function Scanner({ className }: ScannerProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to start scan');
+        // Check if it's a rate limit error
+        if (response.status === 429 && data.requiresUpgrade) {
+          setShowPaywall(true);
+          setIsLoading(false);
+          setScanPhase('');
+          return;
+        }
+        throw new Error(data.message || data.error || 'Failed to start scan');
       }
 
       setScanPhase('Redirecting to results...');
@@ -271,6 +280,12 @@ export function Scanner({ className }: ScannerProps) {
           ))}
         </div>
       </div>}
+
+      {/* Paywall Modal for rate limited users */}
+      <PaywallModal
+        isOpen={showPaywall}
+        onClose={() => setShowPaywall(false)}
+      />
     </div>
   );
 }

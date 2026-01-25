@@ -2,11 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { Queue } from 'bullmq';
 import Redis from 'ioredis';
-
-// Rate limit constants - disabled for development
-const RATE_LIMIT_ENABLED = false;
-const ANONYMOUS_LIMIT = 5;
-const HOUR_IN_MS = 60 * 60 * 1000;
+import { RATE_LIMITS } from '@/lib/constants';
 
 // Initialize Redis connection for BullMQ
 function getRedisConnection() {
@@ -73,32 +69,97 @@ export async function POST(request: NextRequest) {
     const realIp = request.headers.get('x-real-ip');
     const ip = forwardedFor?.split(',')[0] ?? realIp ?? 'unknown';
 
-    // Create identifier for rate limiting (IP + fingerprint)
+    // Create identifier for anonymous rate limiting (IP + fingerprint)
     const identifier = `${ip}:${fingerprint || 'none'}`;
 
     const supabase = createServiceClient();
 
-    // Check user tier for priority queue
+    // Check user tier and enforce rate limits
     let userTier: 'anonymous' | 'free' | 'pro' = 'anonymous';
+    let canScan = true;
+    let rateLimitMessage = '';
+
     if (userId) {
+      // Get user profile
       const { data: profile } = await supabase
         .from('profiles')
-        .select('tier')
+        .select('tier, scans_today, last_scan_date, scans_this_month, billing_cycle_start, scan_credits')
         .eq('id', userId)
         .single();
 
       if (profile?.tier) {
         userTier = profile.tier as 'anonymous' | 'free' | 'pro';
       }
-    }
 
-    // Determine job priority based on user tier
-    const jobPriority = userTier === 'pro' ? PRIORITY_PRO :
-                        userTier === 'free' ? PRIORITY_FREE :
-                        PRIORITY_ANONYMOUS;
+      const today = new Date().toISOString().split('T')[0];
+      const scansToday = profile?.last_scan_date === today ? (profile?.scans_today || 0) : 0;
 
-    // Check rate limit for anonymous users (skip if disabled)
-    if (RATE_LIMIT_ENABLED) {
+      if (userTier === 'free') {
+        // Check if they have purchased scan credits
+        const scanCredits = profile?.scan_credits || 0;
+
+        if (scanCredits > 0) {
+          // Use a scan credit
+          await supabase
+            .from('profiles')
+            .update({ scan_credits: scanCredits - 1 })
+            .eq('id', userId);
+        } else if (scansToday >= RATE_LIMITS.FREE_DAILY_LIMIT) {
+          // Free user hit daily limit and no credits
+          canScan = false;
+          rateLimitMessage = `You've used all ${RATE_LIMITS.FREE_DAILY_LIMIT} free scans for today. Upgrade to Pro or purchase a scan pack for more.`;
+        } else {
+          // Increment daily scan count
+          await supabase
+            .from('profiles')
+            .update({
+              scans_today: scansToday + 1,
+              last_scan_date: today,
+            })
+            .eq('id', userId);
+        }
+      } else if (userTier === 'pro') {
+        // Pro users get 200 scans/month
+        const now = new Date();
+        const billingStart = profile?.billing_cycle_start ? new Date(profile.billing_cycle_start) : null;
+
+        // Check if we're in a new billing cycle (30 days)
+        let scansThisMonth = profile?.scans_this_month || 0;
+        if (billingStart) {
+          const daysSinceBillingStart = Math.floor((now.getTime() - billingStart.getTime()) / RATE_LIMITS.DAY_IN_MS);
+          if (daysSinceBillingStart >= 30) {
+            // New billing cycle, reset counter
+            scansThisMonth = 0;
+            await supabase
+              .from('profiles')
+              .update({
+                scans_this_month: 1,
+                billing_cycle_start: now.toISOString().split('T')[0],
+              })
+              .eq('id', userId);
+          } else if (scansThisMonth >= RATE_LIMITS.PRO_MONTHLY_LIMIT) {
+            canScan = false;
+            rateLimitMessage = `You've used all ${RATE_LIMITS.PRO_MONTHLY_LIMIT} Pro scans this month. Your limit resets on your next billing date.`;
+          } else {
+            // Increment monthly scan count
+            await supabase
+              .from('profiles')
+              .update({ scans_this_month: scansThisMonth + 1 })
+              .eq('id', userId);
+          }
+        } else {
+          // First scan as Pro, set billing cycle start
+          await supabase
+            .from('profiles')
+            .update({
+              scans_this_month: 1,
+              billing_cycle_start: now.toISOString().split('T')[0],
+            })
+            .eq('id', userId);
+        }
+      }
+    } else {
+      // Anonymous user - rate limit by IP + fingerprint
       const { data: rateLimit } = await supabase
         .from('rate_limits')
         .select('*')
@@ -106,29 +167,25 @@ export async function POST(request: NextRequest) {
         .single();
 
       const now = new Date();
+      const hourInMs = 60 * 60 * 1000;
+      const anonymousLimit = 2; // Anonymous gets 2 scans per hour
 
       if (rateLimit) {
         const windowStart = new Date(rateLimit.window_start);
         const windowAge = now.getTime() - windowStart.getTime();
 
-        if (windowAge < HOUR_IN_MS) {
+        if (windowAge < hourInMs) {
           // Within rate limit window
-          if (rateLimit.scan_count >= ANONYMOUS_LIMIT) {
-            return NextResponse.json(
-              {
-                error: 'Rate limit exceeded',
-                message: `You can only scan ${ANONYMOUS_LIMIT} sites per hour. Create an account for more scans.`,
-                retryAfter: Math.ceil((HOUR_IN_MS - windowAge) / 1000),
-              },
-              { status: 429 }
-            );
+          if (rateLimit.scan_count >= anonymousLimit) {
+            canScan = false;
+            rateLimitMessage = `You've used your ${anonymousLimit} free scans. Create a free account to get ${RATE_LIMITS.FREE_DAILY_LIMIT} scans per day!`;
+          } else {
+            // Increment counter
+            await supabase
+              .from('rate_limits')
+              .update({ scan_count: rateLimit.scan_count + 1 })
+              .eq('id', rateLimit.id);
           }
-
-          // Increment counter
-          await supabase
-            .from('rate_limits')
-            .update({ scan_count: rateLimit.scan_count + 1 })
-            .eq('id', rateLimit.id);
         } else {
           // Window expired, reset
           await supabase
@@ -147,6 +204,24 @@ export async function POST(request: NextRequest) {
         });
       }
     }
+
+    // Return rate limit error if user can't scan
+    if (!canScan) {
+      return NextResponse.json(
+        {
+          error: 'Rate limit exceeded',
+          message: rateLimitMessage,
+          requiresUpgrade: true,
+          userTier,
+        },
+        { status: 429 }
+      );
+    }
+
+    // Determine job priority based on user tier
+    const jobPriority = userTier === 'pro' ? PRIORITY_PRO :
+                        userTier === 'free' ? PRIORITY_FREE :
+                        PRIORITY_ANONYMOUS;
 
     // Create scan record in database
     const { data: scan, error: insertError } = await supabase

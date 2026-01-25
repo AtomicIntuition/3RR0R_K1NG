@@ -76,7 +76,7 @@ export function RoastText({ title, body, score, persona = 'hacker', className }:
   return (
     <div
       className={clsx(
-        'relative overflow-hidden rounded-lg border-2 p-6',
+        'relative overflow-hidden rounded-lg border-2 p-4 sm:p-6',
         styles.borderClass,
         'shadow-lg',
         styles.glowClass,
@@ -91,7 +91,7 @@ export function RoastText({ title, body, score, persona = 'hacker', className }:
       </div>
 
       {/* Intensity label */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
         <span
           className={clsx(
             'inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider',
@@ -102,7 +102,7 @@ export function RoastText({ title, body, score, persona = 'hacker', className }:
           <span>{styles.emoji}</span>
           <span className={styles.titleColor}>{styles.label}</span>
         </span>
-        <span className="text-xs text-gray-500 font-mono">ROAST_ID: {Math.random().toString(36).slice(2, 8).toUpperCase()}</span>
+        <span className="text-[10px] sm:text-xs text-gray-500 font-mono">ROAST_ID: {Math.random().toString(36).slice(2, 8).toUpperCase()}</span>
       </div>
 
       {/* Title */}
@@ -121,14 +121,14 @@ export function RoastText({ title, body, score, persona = 'hacker', className }:
       </div>
 
       {/* Footer decoration */}
-      <div className="mt-6 pt-4 border-t border-void-100 flex items-center justify-between">
-        <span className="text-xs text-gray-500 font-mono flex items-center gap-2">
-          <span className="text-lg">{personaInfo.emoji}</span>
+      <div className="mt-6 pt-4 border-t border-void-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+        <span className="text-[10px] sm:text-xs text-gray-500 font-mono flex items-center gap-2">
+          <span className="text-base sm:text-lg">{personaInfo.emoji}</span>
           <span>// ROASTED BY {personaInfo.name.toUpperCase()}</span>
         </span>
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-terminal animate-pulse" />
-          <span className="text-xs text-gray-500">ANALYSIS COMPLETE</span>
+          <span className="text-[10px] sm:text-xs text-gray-500">ANALYSIS COMPLETE</span>
         </div>
       </div>
     </div>

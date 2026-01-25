@@ -89,26 +89,26 @@ export default function ScanResultsPage() {
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Shareable Results Section - This entire area gets captured */}
-        <div id="shareable-results" className="relative bg-void rounded-xl p-8 pt-4 mb-8 border border-void-100">
+        <div id="shareable-results" className="relative bg-void rounded-xl p-4 sm:p-8 pt-4 mb-8 border border-void-100">
           {/* Promo Banner - Visible in screenshots */}
-          <div className="text-center mb-8 py-4 px-6 bg-gradient-to-r from-terminal/20 via-terminal/10 to-terminal/20 border-2 border-terminal/50 rounded-xl">
-            <div className="text-xl md:text-2xl font-bold tracking-tight mb-1">
+          <div className="text-center mb-6 sm:mb-8 py-3 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-terminal/20 via-terminal/10 to-terminal/20 border-2 border-terminal/50 rounded-xl">
+            <div className="text-base sm:text-xl md:text-2xl font-bold tracking-tight mb-1">
               <span className="text-white">FREE ROAST + ACTIONABLE FIXES</span>
             </div>
-            <div className="text-sm md:text-base text-gray-400 mb-3">
-              Security • Performance • SEO • Accessibility audits
+            <div className="text-xs sm:text-sm md:text-base text-gray-400 mb-2 sm:mb-3">
+              Security • Performance • SEO • Accessibility
             </div>
-            <div className="flex items-center justify-center gap-3">
-              <div className="h-px w-12 bg-terminal/50"></div>
-              <span className="text-terminal text-xl md:text-2xl font-bold tracking-wider" style={{ textShadow: '0 0 20px rgba(0, 255, 65, 0.5)' }}>
+            <div className="flex items-center justify-center gap-2 sm:gap-3">
+              <div className="h-px w-8 sm:w-12 bg-terminal/50"></div>
+              <span className="text-terminal text-base sm:text-xl md:text-2xl font-bold tracking-wider" style={{ textShadow: '0 0 20px rgba(0, 255, 65, 0.5)' }}>
                 3RRORK1NG.COM
               </span>
-              <div className="h-px w-12 bg-terminal/50"></div>
+              <div className="h-px w-8 sm:w-12 bg-terminal/50"></div>
             </div>
           </div>
 
           {/* Screenshot Button - Floating at top right */}
-          <div className="absolute top-4 right-4 z-10 screenshot-ignore">
+          <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 screenshot-ignore">
             <ScreenshotButton
               targetId="shareable-results"
               filename={`3rror-k1ng-${scan.url.replace(/https?:\/\//, '').replace(/[^a-z0-9]/gi, '-').slice(0, 30)}`}
@@ -117,10 +117,10 @@ export default function ScanResultsPage() {
           </div>
 
           {/* Header - Target URL */}
-          <header className="text-center mb-8">
-            <div className="inline-flex items-center gap-3 px-4 py-2 bg-void-50/50 border border-terminal/20 rounded-lg">
-              <span className="text-terminal font-bold text-base md:text-lg tracking-widest">TARGET:</span>
-              <span className="text-white font-mono text-base md:text-lg break-all">
+          <header className="text-center mb-6 sm:mb-8">
+            <div className="inline-flex flex-col sm:flex-row items-center gap-1 sm:gap-3 px-3 sm:px-4 py-2 bg-void-50/50 border border-terminal/20 rounded-lg max-w-full">
+              <span className="text-terminal font-bold text-sm sm:text-base md:text-lg tracking-widest">TARGET:</span>
+              <span className="text-white font-mono text-sm sm:text-base md:text-lg break-all max-w-[280px] sm:max-w-none truncate sm:truncate-none">
                 {scan.url}
               </span>
             </div>
@@ -128,35 +128,37 @@ export default function ScanResultsPage() {
 
           {/* Overall Score with Letter Grade */}
           <section className="text-center mb-8">
-            <div className="flex flex-col md:flex-row items-center justify-center gap-8">
-              {/* Numeric Score */}
-              <ScoreRing
-                score={scan.scoreOverall || 0}
-                size="xl"
-                label="OVERALL SCORE"
-              />
+            <div className="flex flex-row items-center justify-center gap-4 sm:gap-8">
+              {/* Numeric Score - scales down on mobile */}
+              <div className="transform scale-75 sm:scale-100 origin-center">
+                <ScoreRing
+                  score={scan.scoreOverall || 0}
+                  size="xl"
+                  label="OVERALL SCORE"
+                />
+              </div>
 
-              {/* Letter Grade */}
+              {/* Letter Grade - responsive sizing */}
               <div className="flex flex-col items-center">
-                <div className={`text-8xl md:text-9xl font-black tracking-tight ${getGradeColor(scan.letterGrade || getGrade(scan.scoreOverall || 0))}`}
+                <div className={`text-6xl sm:text-8xl md:text-9xl font-black tracking-tight ${getGradeColor(scan.letterGrade || getGrade(scan.scoreOverall || 0))}`}
                      style={{ textShadow: '0 0 30px currentColor, 0 0 60px currentColor' }}>
                   {scan.letterGrade || getGrade(scan.scoreOverall || 0)}
                 </div>
-                <span className="text-lg text-gray-400 font-medium" style={{ marginTop: '40px' }}>GRADE</span>
+                <span className="text-sm sm:text-lg text-gray-400 font-medium mt-2 sm:mt-4">GRADE</span>
               </div>
             </div>
 
             {/* Scoring Breakdown (if available) */}
             {scan.scoringBreakdown?.breakdown && (
-              <div className="mt-8 max-w-2xl mx-auto">
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+              <div className="mt-6 sm:mt-8 max-w-2xl mx-auto px-2 sm:px-0">
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-3">
                   {scan.scoringBreakdown.breakdown.map((cat) => (
-                    <div key={cat.category} className="bg-void-50 border border-void-100 rounded-lg p-3 text-center">
-                      <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">{cat.category}</div>
-                      <div className={`text-xl font-bold ${cat.score >= 90 ? 'text-terminal' : cat.score >= 70 ? 'text-neon-yellow' : cat.score >= 50 ? 'text-neon-orange' : 'text-danger'}`}>
+                    <div key={cat.category} className="bg-void-50 border border-void-100 rounded-lg p-2 sm:p-3 text-center">
+                      <div className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wide mb-1 truncate">{cat.category}</div>
+                      <div className={`text-lg sm:text-xl font-bold ${cat.score >= 90 ? 'text-terminal' : cat.score >= 70 ? 'text-neon-yellow' : cat.score >= 50 ? 'text-neon-orange' : 'text-danger'}`}>
                         {cat.score}
                       </div>
-                      <div className="text-xs text-gray-600">{cat.weight}% weight</div>
+                      <div className="text-[10px] sm:text-xs text-gray-600">{cat.weight}%</div>
                     </div>
                   ))}
                 </div>

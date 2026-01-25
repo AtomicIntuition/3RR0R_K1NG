@@ -32,18 +32,20 @@ CREATE TRIGGER update_leads_updated_at
 
 -- Function to link lead to user on signup
 CREATE OR REPLACE FUNCTION link_lead_to_user()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
-  -- Try to find and update existing lead record
-  UPDATE leads
+  UPDATE public.leads
   SET
     user_id = NEW.id,
     converted_at = NOW()
   WHERE email = NEW.email AND user_id IS NULL;
-
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
 
 -- Trigger to link leads when user signs up
 CREATE TRIGGER on_user_created_link_lead

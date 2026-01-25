@@ -1,320 +1,54 @@
-Skip to content
-Navigated to Dashboard – Adam Ives – Stripe
+Function Search Path Mutable
+SECURITY
 
-A
-Adam Ives
-Home
-Balances
-Transactions
-Customers
-Product catalog
-Shortcuts
-Subscriptions
-Payment Links
-Products
-Payments
-Billing
-Reporting
-More
-Search
+Entity
 
-Setup guide
+public.link_lead_to_user
+Issue
 
-Create an event destination
+Function public.link_lead_to_user has a role mutable search_path
+Description
 
-Select events
-Choose destination type
-Configure your destination
-Start by selecting which events you want to listen to
-Stripe will send these events to your destination.
-Events from
-Choose which accounts this destination listens to. Receive events fired in your account or from other accounts you manage which includes your v1 and v2 accounts. Learn more about Connect and v2 account webhooks.
+Detects functions where the search_path parameter is not set.
 
-Your account
-Receive events from resources in this account.
+RLS Policy Always True
+SECURITY
 
-Connected and v2 accounts
-Receive events that fire in the context of connected accounts and v2 accounts.
-API version
+Entity
 
-API version
-2025-12-15.clover
-Events
-All events
-Selected events
-0
+public.profiles
+Issue
 
-Select all
+Table public.profiles has an RLS policy Service role can insert profiles for INSERT that allows unrestricted access (WITH CHECK clause is always true). This effectively bypasses row-level security for -.
+Description
 
+Detects RLS policies that use overly permissive expressions like USING (true) or WITH CHECK (true) for UPDATE, DELETE, or INSERT operations. SELECT policies with USING (true) are intentionally excluded as this pattern is often used deliberately for public read access.
+Resolve
 
-Account Link
-v2
-1 event
+RLS Policy Always True
+SECURITY
 
-Account Person
-v2
-3 events
+Entity
 
-Account
-4 events
-Select all Account events
+public.scan_files
+Issue
 
-account.external_account.created
-Occurs whenever an external account is created.
+Table public.scan_files has an RLS policy Service role has full access to scan_files for ALL that allows unrestricted access (both USING and WITH CHECK are always true). This effectively bypasses row-level security for -.
+Description
 
-account.external_account.deleted
-Occurs whenever an external account is deleted.
+Detects RLS policies that use overly permissive expressions like USING (true) or WITH CHECK (true) for UPDATE, DELETE, or INSERT operations. SELECT policies with USING (true) are intentionally excluded as this pattern is often used deliberately for public read access.
+Resolve
 
-account.external_account.updated
-Occurs whenever an external account is updated.
+RLS Policy Always True
+SECURITY
 
-account.updated
-Occurs whenever an account status or property has changed.
+Entity
 
+public.scans
+Issue
 
-Account
-v2
-13 events
+Table public.scans has an RLS policy Anyone can create scans for INSERT that allows unrestricted access (WITH CHECK clause is always true). This effectively bypasses row-level security for -.
+Description
 
-Adjustment
-v2
-1 event
-
-Balance Settings
-1 event
-
-Balance
-1 event
-
-Billing Meter
-2 events
-
-Billing Portal
-3 events
-Select all Billing Portal events
-
-billing_portal.configuration.created
-Occurs whenever a portal configuration is created.
-
-billing_portal.configuration.updated
-Occurs whenever a portal configuration is updated.
-
-billing_portal.session.created
-Occurs whenever a portal session is created.
-
-
-Billing
-8 events
-Select all Billing events
-
-billing.alert.triggered
-Occurs whenever your custom alert threshold is met.
-
-billing.credit_balance_transaction.created
-Occurs when a credit balance transaction is created
-
-billing.credit_grant.created
-Occurs when a credit grant is created
-
-billing.credit_grant.updated
-Occurs when a credit grant is updated
-
-billing.meter.created
-Occurs when a meter is created
-
-billing.meter.deactivated
-Occurs when a meter is deactivated
-
-billing.meter.reactivated
-Occurs when a meter is reactivated
-
-billing.meter.updated
-Occurs when a meter is updated
-
-
-Capability
-1 event
-
-Cash Balance
-1 event
-
-Charge
-13 events
-
-Checkout
-4 events
-
-Climate
-7 events
-
-Coupon
-3 events
-
-Credit Note
-3 events
-
-Customer Cash Balance Transaction
-1 event
-
-Customer
-21 events
-
-Entitlements
-1 event
-
-File
-1 event
-
-Financial Account
-v2
-2 events
-
-Financial Address
-v2
-2 events
-
-Financial Connections
-9 events
-
-Health
-v2
-1 event
-
-Identity
-6 events
-
-Inbound Transfer
-v2
-6 events
-
-Invoice Payment
-1 event
-
-Invoice
-17 events
-
-Invoiceitem
-2 events
-
-Issuing Authorization
-3 events
-
-Issuing Card
-2 events
-
-Issuing Cardholder
-2 events
-
-Issuing Dispute
-6 events
-
-Issuing Personalization Design
-4 events
-
-Issuing Token
-2 events
-
-Issuing Transaction
-3 events
-
-Mandate
-1 event
-
-Outbound Payment
-v2
-6 events
-
-Outbound Transfer
-v2
-6 events
-
-Payment Intent
-8 events
-
-Payment Link
-2 events
-
-Payment Method
-4 events
-
-Payout Method
-v2
-2 events
-
-Payout
-6 events
-
-Person
-3 events
-
-Plan
-3 events
-
-Price
-3 events
-
-Product
-3 events
-
-Promotion Code
-2 events
-
-Quote
-5 events
-
-Radar
-2 events
-
-Received Credit
-v2
-4 events
-
-Received Debit
-v2
-5 events
-
-Refund
-3 events
-
-Reporting
-3 events
-
-Review
-2 events
-
-Setup Intent
-5 events
-
-Sigma
-1 event
-
-Source
-7 events
-
-Subscription Schedule
-7 events
-
-Tax Rate
-2 events
-
-Tax
-1 event
-
-Terminal
-3 events
-
-Test Helpers
-5 events
-
-Topup
-5 events
-
-Transaction
-v2
-2 events
-
-Transfer
-3 events
-Cancel
-Continue
-Developers
+Detects RLS policies that use overly permissive expressions like USING (true) or WITH CHECK (true) for UPDATE, DELETE, or INSERT operations. SELECT policies with USING (true) are intentionally excluded as this pattern is often used deliberately for public read access.
+Resolve

@@ -21,7 +21,10 @@ ADD COLUMN IF NOT EXISTS billing_cycle_start DATE;
 
 -- Create function to reset daily scans
 CREATE OR REPLACE FUNCTION reset_daily_scans()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SET search_path = public
+AS $$
 BEGIN
   IF NEW.last_scan_date <> CURRENT_DATE THEN
     NEW.scans_today := 0;
@@ -29,7 +32,7 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 -- Trigger to reset daily scans on profile access
 DROP TRIGGER IF EXISTS reset_daily_scans_trigger ON profiles;

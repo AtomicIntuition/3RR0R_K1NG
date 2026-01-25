@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import clsx from 'clsx';
 import { useAuth } from '@/lib/auth-context';
 import { PersonaSelector, type RoastPersona } from './PersonaSelector';
@@ -36,6 +37,7 @@ export function Scanner({ className }: ScannerProps) {
   const [scanPhase, setScanPhase] = useState('');
   const [persona, setPersona] = useState<RoastPersona>('hacker');
   const [skipRoast, setSkipRoast] = useState(false);
+  const [showAuthWall, setShowAuthWall] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -45,6 +47,12 @@ export function Scanner({ className }: ScannerProps) {
 
     if (!isValidUrl(normalizedUrl)) {
       setError('Please enter a valid URL');
+      return;
+    }
+
+    // Check if user is signed in
+    if (!user) {
+      setShowAuthWall(true);
       return;
     }
 
@@ -129,6 +137,7 @@ export function Scanner({ className }: ScannerProps) {
               onChange={(e) => {
                 setUrl(e.target.value);
                 setError('');
+                setShowAuthWall(false);
               }}
               placeholder="Enter target URL (e.g., example.com)"
               className={clsx(
@@ -196,19 +205,57 @@ export function Scanner({ className }: ScannerProps) {
           </div>
         )}
 
-        {/* Persona Selector */}
-        <div className="mt-4">
-          <PersonaSelector
-            selected={persona}
-            onSelect={setPersona}
-            compact={false}
-            disabled={skipRoast}
-          />
-        </div>
+        {/* Auth Wall */}
+        {showAuthWall && (
+          <div className="mt-4 p-6 bg-gradient-to-b from-terminal/10 to-terminal/5 border border-terminal/30 rounded-lg">
+            <div className="text-center">
+              <div className="text-4xl mb-3">🔒</div>
+              <h3 className="text-xl font-bold text-white mb-2">
+                Free Account Required
+              </h3>
+              <p className="text-gray-400 text-sm mb-4">
+                Create a free account to scan websites and get brutal roasts with actionable fixes.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link
+                  href="/signup"
+                  className="px-6 py-3 bg-terminal text-void font-bold rounded hover:bg-terminal-bright transition-colors"
+                >
+                  Create Free Account
+                </Link>
+                <Link
+                  href="/login"
+                  className="px-6 py-3 bg-void-100 text-gray-300 font-bold rounded border border-void-200 hover:border-terminal/50 hover:text-terminal transition-colors"
+                >
+                  Sign In
+                </Link>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAuthWall(false)}
+                className="mt-4 text-xs text-gray-500 hover:text-gray-400 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Persona Selector - hide when auth wall is showing */}
+        {!showAuthWall && (
+          <div className="mt-4">
+            <PersonaSelector
+              selected={persona}
+              onSelect={setPersona}
+              compact={false}
+              disabled={skipRoast}
+            />
+          </div>
+        )}
       </form>
 
-      {/* Example URLs */}
-      <div className="mt-6 text-center">
+      {/* Example URLs - hide when auth wall is showing */}
+      {!showAuthWall && <div className="mt-6 text-center">
         <p className="text-xs text-gray-400 mb-2">Try scanning:</p>
         <div className="flex flex-wrap justify-center gap-2">
           {['github.com', 'stripe.com', 'vercel.com'].map((example) => (
@@ -223,7 +270,7 @@ export function Scanner({ className }: ScannerProps) {
             </button>
           ))}
         </div>
-      </div>
+      </div>}
     </div>
   );
 }

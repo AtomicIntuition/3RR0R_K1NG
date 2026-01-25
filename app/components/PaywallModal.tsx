@@ -14,9 +14,31 @@ interface PaywallModalProps {
 
 export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState<'monthly' | 'yearly' | 'pack' | null>(null);
+  const [isLoading, setIsLoading] = useState<'monthly' | 'yearly' | 'pack' | 'discount' | null>(null);
+  const [showDiscount, setShowDiscount] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes
 
-  const handleCheckout = async (type: 'monthly' | 'yearly' | 'pack') => {
+  // Start countdown when discount view shows
+  const startCountdown = () => {
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  };
+
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleCheckout = async (type: 'monthly' | 'yearly' | 'pack' | 'discount') => {
     setIsLoading(type);
 
     try {
@@ -24,6 +46,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
         monthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID,
         yearly: process.env.NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID,
         pack: process.env.NEXT_PUBLIC_STRIPE_SCAN_PACK_PRICE_ID,
+        discount: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID, // Same price, coupon applied
       };
 
       const mode = type === 'pack' ? 'payment' : 'subscription';
@@ -34,6 +57,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
         body: JSON.stringify({
           priceId: priceIdMap[type],
           mode,
+          applyExitDiscount: type === 'discount', // Apply coupon for discount option
         }),
       });
 
@@ -53,8 +77,146 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
     }
   };
 
+  const handleDecline = () => {
+    if (!showDiscount) {
+      // First decline - show discount offer
+      setShowDiscount(true);
+      startCountdown();
+    } else {
+      // Already showing discount, close for real
+      setShowDiscount(false);
+      setTimeLeft(15 * 60);
+      onClose();
+    }
+  };
+
+  const handleClose = () => {
+    setShowDiscount(false);
+    setTimeLeft(15 * 60);
+    onClose();
+  };
+
+  // Discount view
+  if (showDiscount) {
+    return (
+      <Modal isOpen={isOpen} onClose={handleClose} showCloseButton={false} className="max-w-md">
+        <div className="relative overflow-hidden">
+          {/* Animated background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-terminal/10 via-transparent to-neon-cyan/10 animate-pulse" />
+
+          <div className="relative p-8">
+            {/* Header */}
+            <div className="text-center mb-6">
+              <div className="inline-block px-3 py-1 bg-danger/20 text-danger text-xs font-bold rounded-full mb-4 animate-pulse">
+                WAIT — EXCLUSIVE OFFER
+              </div>
+
+              <h2 className="text-3xl font-bold text-gray-100 mb-3">
+                <GlitchText
+                  text="One Last Chance!"
+                  glitchIntensity="medium"
+                  as="span"
+                />
+              </h2>
+
+              <p className="text-gray-400">
+                Get your first month of Pro for just
+              </p>
+            </div>
+
+            {/* Price display */}
+            <div className="text-center mb-6">
+              <div className="inline-flex items-baseline gap-2">
+                <span className="text-2xl text-gray-500 line-through">
+                  ${PRICING.PRO_MONTHLY}
+                </span>
+                <span className="text-5xl font-bold text-terminal">
+                  ${PRICING.EXIT_INTENT_DISCOUNT_PRICE}
+                </span>
+              </div>
+              <div className="mt-2">
+                <span className="inline-block px-3 py-1 bg-terminal/20 text-terminal text-sm font-bold rounded-full">
+                  {PRICING.EXIT_INTENT_DISCOUNT_PERCENT}% OFF
+                </span>
+              </div>
+            </div>
+
+            {/* What you get */}
+            <div className="bg-void-100 rounded-lg p-4 mb-6">
+              <p className="text-sm text-gray-400 font-medium mb-3">What you get:</p>
+              <ul className="space-y-2">
+                {[
+                  `${PRICING.PRO_SCANS_PER_MONTH} scans per month`,
+                  'Priority queue (faster results)',
+                  'Full security, SEO & accessibility audits',
+                  'Cancel anytime',
+                ].map((feature, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-gray-300">
+                    <svg className="w-4 h-4 text-terminal flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Timer */}
+            <div className="text-center mb-6">
+              <p className="text-sm text-gray-500 mb-1">Offer expires in</p>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-danger/10 border border-danger/30 rounded-lg">
+                <svg className="w-5 h-5 text-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-xl font-mono font-bold text-danger">
+                  {formatTime(timeLeft)}
+                </span>
+              </div>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="space-y-3">
+              <button
+                onClick={() => handleCheckout('discount')}
+                disabled={isLoading !== null}
+                className={clsx(
+                  'w-full px-6 py-4 font-bold rounded-lg transition-all duration-200',
+                  'bg-gradient-to-r from-terminal to-neon-cyan text-void',
+                  'hover:from-terminal-bright hover:to-neon-cyan',
+                  'hover:shadow-lg hover:shadow-terminal/25',
+                  'disabled:opacity-50 disabled:cursor-not-allowed',
+                  'active:scale-[0.98]'
+                )}
+              >
+                {isLoading === 'discount' ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Processing...
+                  </span>
+                ) : (
+                  'Claim My Discount'
+                )}
+              </button>
+
+              <button
+                onClick={handleDecline}
+                className="w-full px-6 py-3 text-gray-500 hover:text-gray-400 transition-colors text-sm"
+              >
+                No thanks, I&apos;ll pay full price later
+              </button>
+            </div>
+          </div>
+        </div>
+      </Modal>
+    );
+  }
+
+  // Regular paywall view
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-lg">
+    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-lg">
       <div className="p-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -205,7 +367,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
         {/* Footer */}
         <div className="mt-6 text-center">
           <button
-            onClick={onClose}
+            onClick={handleDecline}
             className="text-sm text-gray-500 hover:text-gray-400 transition-colors"
           >
             Come back tomorrow for free scans

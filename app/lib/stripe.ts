@@ -29,6 +29,7 @@ export interface CreateCheckoutParams {
   priceId: string;
   mode: 'payment' | 'subscription';
   customerId?: string;
+  customerEmail?: string;
   successUrl: string;
   cancelUrl: string;
   metadata?: Record<string, string>;
@@ -46,6 +47,7 @@ export async function createCheckoutSession(params: CreateCheckoutParams): Promi
     ],
     mode: params.mode,
     customer: params.customerId,
+    customer_email: params.customerId ? undefined : params.customerEmail, // Only set if no customer ID
     success_url: params.successUrl,
     cancel_url: params.cancelUrl,
     metadata: params.metadata,

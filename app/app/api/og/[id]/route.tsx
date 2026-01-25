@@ -183,7 +183,7 @@ export async function GET(
             }}
           >
             <span style={{ color: '#6b7280', fontSize: '20px' }}>
-              Get roasted at 3rror.app
+              Get roasted at 3RRORK1NG.COM
             </span>
             <span style={{ color: '#6b7280', fontSize: '18px' }}>
               SCAN_ID: {scanId.slice(0, 8).toUpperCase()}
@@ -195,6 +195,6 @@ export async function GET(
     );
   } catch (error) {
     console.error('OG image generation error:', error);
-    return new Response(`Failed to generate image: ${error}`, { status: 500 });
+    return new Response('Failed to generate image', { status: 500 });
   }
 }

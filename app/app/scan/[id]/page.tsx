@@ -107,22 +107,21 @@ export default function ScanResultsPage() {
             </div>
           </div>
 
-          {/* Screenshot Button - Floating at top right */}
-          <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 screenshot-ignore">
-            <ScreenshotButton
-              targetId="shareable-results"
-              filename={`3rror-k1ng-${scan.url.replace(/https?:\/\//, '').replace(/[^a-z0-9]/gi, '-').slice(0, 30)}`}
-              variant="floating"
-            />
-          </div>
-
-          {/* Header - Target URL */}
-          <header className="text-center mb-6 sm:mb-8">
-            <div className="inline-flex flex-col sm:flex-row items-center gap-1 sm:gap-3 px-3 sm:px-4 py-2 bg-void-50/50 border border-terminal/20 rounded-lg max-w-full">
-              <span className="text-terminal font-bold text-sm sm:text-base md:text-lg tracking-widest">TARGET:</span>
-              <span className="text-white font-mono text-sm sm:text-base md:text-lg break-all max-w-[280px] sm:max-w-none truncate sm:truncate-none">
-                {scan.url}
-              </span>
+          {/* Header - Target URL with Screenshot Button */}
+          <header className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 sm:mb-8">
+            <div className="flex-1 flex justify-center sm:justify-start">
+              <div className="inline-flex flex-col sm:flex-row items-center gap-1 sm:gap-3 px-3 sm:px-4 py-2 bg-void-50/50 border border-terminal/20 rounded-lg max-w-full">
+                <span className="text-terminal font-bold text-sm sm:text-base md:text-lg tracking-widest">TARGET:</span>
+                <span className="text-white font-mono text-sm sm:text-base md:text-lg break-all max-w-[280px] sm:max-w-none truncate sm:truncate-none">
+                  {scan.url}
+                </span>
+              </div>
+            </div>
+            <div className="screenshot-ignore flex-shrink-0">
+              <ScreenshotButton
+                targetId="shareable-results"
+                filename={`3rror-k1ng-${scan.url.replace(/https?:\/\//, '').replace(/[^a-z0-9]/gi, '-').slice(0, 30)}`}
+              />
             </div>
           </header>
 

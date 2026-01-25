@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import { Providers } from '@/components/Providers';
+import { Navbar } from '@/components/Navbar';
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration';
 import './globals.css';
 
@@ -148,11 +149,14 @@ export default function RootLayout({
         <ServiceWorkerRegistration />
         <Providers>
           <div className="relative min-h-screen flex flex-col">
+            {/* Navbar */}
+            <Navbar />
+
             {/* Gradient overlay */}
             <div className="fixed inset-0 bg-gradient-to-b from-void via-transparent to-void/80 pointer-events-none" />
 
-            {/* Content */}
-            <main className="relative z-10 flex-1">
+            {/* Content - add top padding for fixed navbar */}
+            <main className="relative z-10 flex-1 pt-16">
               {children}
             </main>
 

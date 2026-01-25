@@ -112,20 +112,20 @@ export default function HomePage() {
             Need more roasting power?
           </h2>
           <p className="text-gray-400 mb-6">
-            Free users get 5 scans/hour. Go Pro for unlimited scans, priority queue, and advanced features.
+            Free users get 3 scans/day. Go Pro for 200 scans/month, priority queue, and full audit reports.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/pricing"
               className="px-6 py-3 font-bold rounded transition-all duration-200 bg-terminal text-void hover:bg-terminal-bright"
             >
-              View Pricing
+              Go Pro — $29/mo
             </Link>
             <Link
               href="/pricing"
               className="px-6 py-3 font-bold rounded transition-all duration-200 border border-terminal/50 text-terminal hover:bg-terminal/10"
             >
-              50 Scans for $9.99
+              View All Plans
             </Link>
           </div>
         </div>

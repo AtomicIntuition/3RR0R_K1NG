@@ -116,9 +116,9 @@ const weights = {
 
 ## Rate Limits
 
-- **Anonymous**: 5 scans/hour (IP + fingerprint)
-- **Free authenticated**: 20 scans/hour
-- **Pro**: Unlimited (priority queue)
+- **Anonymous**: 2 scans/hour (IP + fingerprint)
+- **Free authenticated**: 3 scans/day
+- **Pro**: 200 scans/month (priority queue)
 
 ## Tech Stack
 

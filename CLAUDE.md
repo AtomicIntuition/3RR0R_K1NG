@@ -89,9 +89,9 @@ const WEIGHTS = {
 ## Monetization (Stripe)
 
 **Products:**
-- Scan Pack: 50 scans for $9.99 (one-time payment)
-- Pro Monthly: $19/month (subscription)
-- Pro Yearly: $149/year (subscription)
+- Scan Pack: 150 scans for $29 (one-time payment)
+- Pro Monthly: $29/month (200 scans/month, subscription)
+- Pro Yearly: $199/year (200 scans/month, subscription)
 
 **Key files:**
 - `app/lib/stripe.ts` - Stripe client and checkout helpers

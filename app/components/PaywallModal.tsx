@@ -1,11 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Modal } from './Modal';
 import { GlitchText } from './GlitchText';
 import { PRICING } from '@/lib/constants';
 import clsx from 'clsx';
+
+const DISCOUNT_STORAGE_KEY = 'errorking_discount_expiry';
+const DISCOUNT_SHOWN_KEY = 'errorking_discount_shown';
+const DISCOUNT_DURATION = 15 * 60 * 1000; // 15 minutes in ms
 
 interface PaywallModalProps {
   isOpen: boolean;
@@ -16,21 +20,58 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<'monthly' | 'yearly' | 'pack' | 'discount' | null>(null);
   const [showDiscount, setShowDiscount] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [discountExpired, setDiscountExpired] = useState(false);
 
-  // Start countdown when discount view shows
-  const startCountdown = () => {
+  // Check if discount was already shown and if timer is still valid
+  const checkDiscountState = useCallback(() => {
+    if (typeof window === 'undefined') return;
+
+    const wasShown = localStorage.getItem(DISCOUNT_SHOWN_KEY) === 'true';
+    const expiryStr = localStorage.getItem(DISCOUNT_STORAGE_KEY);
+
+    if (wasShown && expiryStr) {
+      const expiry = parseInt(expiryStr, 10);
+      const now = Date.now();
+
+      if (now < expiry) {
+        // Still within the 15 minute window - show discount with remaining time
+        setShowDiscount(true);
+        setTimeLeft(Math.floor((expiry - now) / 1000));
+        setDiscountExpired(false);
+      } else {
+        // Timer expired - discount is no longer available
+        setDiscountExpired(true);
+        setShowDiscount(false);
+      }
+    }
+  }, []);
+
+  // Check state when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      checkDiscountState();
+    }
+  }, [isOpen, checkDiscountState]);
+
+  // Countdown timer
+  useEffect(() => {
+    if (!showDiscount || timeLeft <= 0) return;
+
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
+          setDiscountExpired(true);
+          setShowDiscount(false);
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
+
     return () => clearInterval(interval);
-  };
+  }, [showDiscount, timeLeft]);
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
@@ -46,7 +87,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
         monthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID,
         yearly: process.env.NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID,
         pack: process.env.NEXT_PUBLIC_STRIPE_SCAN_PACK_PRICE_ID,
-        discount: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID, // Same price, coupon applied
+        discount: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID,
       };
 
       const mode = type === 'pack' ? 'payment' : 'subscription';
@@ -57,7 +98,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
         body: JSON.stringify({
           priceId: priceIdMap[type],
           mode,
-          applyExitDiscount: type === 'discount', // Apply coupon for discount option
+          applyExitDiscount: type === 'discount',
         }),
       });
 
@@ -70,7 +111,6 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
       window.location.href = data.url;
     } catch (err) {
       console.error('Checkout error:', err);
-      // Fallback to pricing page
       router.push('/pricing');
     } finally {
       setIsLoading(null);
@@ -78,40 +118,39 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
   };
 
   const handleDecline = () => {
-    if (!showDiscount) {
-      // First decline - show discount offer
+    if (!showDiscount && !discountExpired) {
+      // First decline - show discount offer and start timer
+      const expiry = Date.now() + DISCOUNT_DURATION;
+      localStorage.setItem(DISCOUNT_SHOWN_KEY, 'true');
+      localStorage.setItem(DISCOUNT_STORAGE_KEY, expiry.toString());
       setShowDiscount(true);
-      startCountdown();
+      setTimeLeft(15 * 60); // 15 minutes
     } else {
-      // Already showing discount, close for real
-      setShowDiscount(false);
-      setTimeLeft(15 * 60);
-      onClose();
+      // Already showing discount or expired - close for real
+      handleClose();
     }
   };
 
   const handleClose = () => {
-    setShowDiscount(false);
-    setTimeLeft(15 * 60);
     onClose();
   };
 
   // Discount view
-  if (showDiscount) {
+  if (showDiscount && !discountExpired && timeLeft > 0) {
     return (
-      <Modal isOpen={isOpen} onClose={handleClose} showCloseButton={false} className="max-w-md">
+      <Modal isOpen={isOpen} onClose={handleClose} showCloseButton={false} className="max-w-md max-h-[90vh] overflow-y-auto">
         <div className="relative overflow-hidden">
           {/* Animated background */}
           <div className="absolute inset-0 bg-gradient-to-br from-terminal/10 via-transparent to-neon-cyan/10 animate-pulse" />
 
-          <div className="relative p-8">
+          <div className="relative p-6 sm:p-8">
             {/* Header */}
-            <div className="text-center mb-6">
-              <div className="inline-block px-3 py-1 bg-danger/20 text-danger text-xs font-bold rounded-full mb-4 animate-pulse">
+            <div className="text-center mb-5">
+              <div className="inline-block px-3 py-1 bg-danger/20 text-danger text-xs font-bold rounded-full mb-3 animate-pulse">
                 WAIT — EXCLUSIVE OFFER
               </div>
 
-              <h2 className="text-3xl font-bold text-gray-100 mb-3">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-2">
                 <GlitchText
                   text="One Last Chance!"
                   glitchIntensity="medium"
@@ -119,18 +158,18 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                 />
               </h2>
 
-              <p className="text-gray-400">
+              <p className="text-gray-400 text-sm sm:text-base">
                 Get your first month of Pro for just
               </p>
             </div>
 
             {/* Price display */}
-            <div className="text-center mb-6">
+            <div className="text-center mb-5">
               <div className="inline-flex items-baseline gap-2">
-                <span className="text-2xl text-gray-500 line-through">
+                <span className="text-xl sm:text-2xl text-gray-500 line-through">
                   ${PRICING.PRO_MONTHLY}
                 </span>
-                <span className="text-5xl font-bold text-terminal">
+                <span className="text-4xl sm:text-5xl font-bold text-terminal">
                   ${PRICING.EXIT_INTENT_DISCOUNT_PRICE}
                 </span>
               </div>
@@ -142,9 +181,9 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             </div>
 
             {/* What you get */}
-            <div className="bg-void-100 rounded-lg p-4 mb-6">
-              <p className="text-sm text-gray-400 font-medium mb-3">What you get:</p>
-              <ul className="space-y-2">
+            <div className="bg-void-100 rounded-lg p-4 mb-5">
+              <p className="text-sm text-gray-400 font-medium mb-2">What you get:</p>
+              <ul className="space-y-1.5">
                 {[
                   `${PRICING.PRO_SCANS_PER_MONTH} scans per month`,
                   'Priority queue (faster results)',
@@ -162,7 +201,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             </div>
 
             {/* Timer */}
-            <div className="text-center mb-6">
+            <div className="text-center mb-5">
               <p className="text-sm text-gray-500 mb-1">Offer expires in</p>
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-danger/10 border border-danger/30 rounded-lg">
                 <svg className="w-5 h-5 text-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -180,7 +219,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                 onClick={() => handleCheckout('discount')}
                 disabled={isLoading !== null}
                 className={clsx(
-                  'w-full px-6 py-4 font-bold rounded-lg transition-all duration-200',
+                  'w-full px-6 py-3 sm:py-4 font-bold rounded-lg transition-all duration-200',
                   'bg-gradient-to-r from-terminal to-neon-cyan text-void',
                   'hover:from-terminal-bright hover:to-neon-cyan',
                   'hover:shadow-lg hover:shadow-terminal/25',
@@ -203,7 +242,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
 
               <button
                 onClick={handleDecline}
-                className="w-full px-6 py-3 text-gray-500 hover:text-gray-400 transition-colors text-sm"
+                className="w-full px-6 py-2 text-gray-500 hover:text-gray-400 transition-colors text-sm"
               >
                 No thanks, I&apos;ll pay full price later
               </button>
@@ -216,13 +255,13 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
 
   // Regular paywall view
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-lg">
-      <div className="p-8">
+    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <div className="p-6 sm:p-8">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-danger/10 border border-danger/30 mb-4">
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-danger/10 border border-danger/30 mb-4">
             <svg
-              className="w-10 h-10 text-danger"
+              className="w-8 h-8 sm:w-10 sm:h-10 text-danger"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -236,7 +275,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             </svg>
           </div>
 
-          <h2 className="text-2xl font-bold text-gray-100 mb-2">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-100 mb-2">
             <GlitchText
               text="Daily Limit Reached"
               glitchIntensity="medium"
@@ -244,7 +283,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             />
           </h2>
 
-          <p className="text-gray-400">
+          <p className="text-gray-400 text-sm sm:text-base">
             You&apos;ve used all {PRICING.FREE_SCANS_PER_DAY} free scans for today.
             <br />
             Upgrade to keep roasting.
@@ -252,7 +291,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
         </div>
 
         {/* Options */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* Pro Monthly - Featured */}
           <button
             onClick={() => handleCheckout('monthly')}
@@ -267,12 +306,12 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             <div className="flex items-center justify-between">
               <div className="text-left">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-terminal text-lg">Pro Monthly</span>
+                  <span className="font-bold text-terminal text-base sm:text-lg">Pro Monthly</span>
                   <span className="px-2 py-0.5 text-xs font-bold bg-terminal text-void rounded">
-                    BEST VALUE
+                    BEST
                   </span>
                 </div>
-                <p className="text-sm text-gray-400 mt-1">
+                <p className="text-xs sm:text-sm text-gray-400 mt-1">
                   {PRICING.PRO_SCANS_PER_MONTH} scans/month + priority queue
                 </p>
               </div>
@@ -284,8 +323,8 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                   </svg>
                 ) : (
                   <>
-                    <span className="text-2xl font-bold text-terminal">${PRICING.PRO_MONTHLY}</span>
-                    <span className="text-gray-500">/mo</span>
+                    <span className="text-xl sm:text-2xl font-bold text-terminal">${PRICING.PRO_MONTHLY}</span>
+                    <span className="text-gray-500 text-sm">/mo</span>
                   </>
                 )}
               </div>
@@ -305,12 +344,12 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             <div className="flex items-center justify-between">
               <div className="text-left">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-gray-100 text-lg">Pro Yearly</span>
+                  <span className="font-bold text-gray-100 text-base sm:text-lg">Pro Yearly</span>
                   <span className="px-2 py-0.5 text-xs font-bold bg-neon-cyan/20 text-neon-cyan rounded">
                     SAVE 43%
                   </span>
                 </div>
-                <p className="text-sm text-gray-400 mt-1">
+                <p className="text-xs sm:text-sm text-gray-400 mt-1">
                   {PRICING.PRO_SCANS_PER_MONTH} scans/month, billed annually
                 </p>
               </div>
@@ -322,8 +361,8 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                   </svg>
                 ) : (
                   <>
-                    <span className="text-2xl font-bold text-gray-100">${PRICING.PRO_YEARLY}</span>
-                    <span className="text-gray-500">/yr</span>
+                    <span className="text-xl sm:text-2xl font-bold text-gray-100">${PRICING.PRO_YEARLY}</span>
+                    <span className="text-gray-500 text-sm">/yr</span>
                   </>
                 )}
               </div>
@@ -342,8 +381,8 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
           >
             <div className="flex items-center justify-between">
               <div className="text-left">
-                <span className="font-bold text-gray-100 text-lg">Scan Pack</span>
-                <p className="text-sm text-gray-400 mt-1">
+                <span className="font-bold text-gray-100 text-base sm:text-lg">Scan Pack</span>
+                <p className="text-xs sm:text-sm text-gray-400 mt-1">
                   {PRICING.SCAN_PACK_SCANS} scans, one-time purchase
                 </p>
               </div>
@@ -355,8 +394,8 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                   </svg>
                 ) : (
                   <>
-                    <span className="text-2xl font-bold text-gray-100">${PRICING.SCAN_PACK}</span>
-                    <span className="text-gray-500"> once</span>
+                    <span className="text-xl sm:text-2xl font-bold text-gray-100">${PRICING.SCAN_PACK}</span>
+                    <span className="text-gray-500 text-sm"> once</span>
                   </>
                 )}
               </div>
@@ -365,12 +404,12 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
         </div>
 
         {/* Footer */}
-        <div className="mt-6 text-center">
+        <div className="mt-5 text-center">
           <button
             onClick={handleDecline}
             className="text-sm text-gray-500 hover:text-gray-400 transition-colors"
           >
-            Come back tomorrow for free scans
+            {discountExpired ? 'Close' : 'Come back tomorrow for free scans'}
           </button>
         </div>
       </div>

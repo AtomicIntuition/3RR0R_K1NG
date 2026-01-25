@@ -6,7 +6,7 @@ const nextConfig = {
     serverActions: {
       allowedOrigins: [
         'localhost:3000',
-        '3-rr-0-r-k1-ng-app.vercel.app',
+        '3rrork1ng.com',
         '*.vercel.app',
       ],
     },
@@ -22,7 +22,7 @@ const nextConfig = {
   async headers() {
     // Allowed origins for CORS (no wildcards for security)
     const allowedOrigins = [
-      'https://3-rr-0-r-k1-ng-app.vercel.app',
+      'https://3rrork1ng.com',
       'https://3rr0rk1ng.com',
     ];
 
@@ -51,7 +51,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Access-Control-Allow-Origin',
-            value: 'https://3-rr-0-r-k1-ng-app.vercel.app',
+            value: 'https://3rrork1ng.com',
           },
           {
             key: 'Access-Control-Allow-Methods',

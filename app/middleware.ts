@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
   const headers = response.headers;
 
   // Get the host for dynamic CSP
-  const host = request.headers.get('host') || '3-rr-0-r-k1-ng-app.vercel.app';
+  const host = request.headers.get('host') || '3rrork1ng.com';
   const protocol = host.includes('localhost') ? 'http' : 'https';
   const origin = `${protocol}://${host}`;
 
@@ -28,7 +28,7 @@ export function middleware(request: NextRequest) {
       "font-src 'self'",
       "img-src 'self' data: https: blob:",
       // RSC payloads need to fetch from same origin - explicitly include self and the domain
-      `connect-src 'self' ${origin} https://*.supabase.co https://api.stripe.com wss://*.supabase.co https://3-rr-0-r-k1-ng-app.vercel.app https://*.vercel.app`,
+      `connect-src 'self' ${origin} https://*.supabase.co https://api.stripe.com wss://*.supabase.co https://3rrork1ng.com https://*.vercel.app`,
       "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
       "object-src 'none'",
       "base-uri 'self'",

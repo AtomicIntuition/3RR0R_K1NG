@@ -16,7 +16,7 @@ const spaceGrotesk = Space_Grotesk({
   display: 'swap',
 });
 
-const siteUrl = 'https://3-rr-0-r-k1-ng-app.vercel.app';
+const siteUrl = 'https://3rrork1ng.com';
 
 // Viewport configuration with theme color
 export const viewport: Viewport = {

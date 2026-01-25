@@ -101,7 +101,7 @@ export default function ScanResultsPage() {
             <div className="flex items-center justify-center gap-3">
               <div className="h-px w-12 bg-terminal/50"></div>
               <span className="text-terminal text-xl md:text-2xl font-bold tracking-wider" style={{ textShadow: '0 0 20px rgba(0, 255, 65, 0.5)' }}>
-                3RROR_K1NG.COM
+                3RRORK1NG.COM
               </span>
               <div className="h-px w-12 bg-terminal/50"></div>
             </div>

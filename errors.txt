@@ -1,140 +1,54 @@
-# Website Audit Report - LLM Fix Instructions
-## URL: https://3-rr-0-r-k1-ng-app.vercel.app/
-## Overall Score: 97/100 (Grade: A+)
+Function Search Path Mutable
+SECURITY
 
-### COMPREHENSIVE SCORING BREAKDOWN
-- **Security:** 95/100 (30% weight, contributes 29 points)
-- **Performance:** 98/100 (25% weight, contributes 25 points)
-- **User Experience:** 100/100 (20% weight, contributes 20 points)
-- **SEO:** 100/100 (15% weight, contributes 15 points)
-- **Code Quality:** 90/100 (10% weight, contributes 9 points)
+Entity
 
-### TECH STACK DETECTED
-- Vercel (hosting, 70% confidence)
-- Next.js (framework, 30% confidence)
-- Angular (framework, 20% confidence)
-- Webflow (cms, 20% confidence)
-- Tailwind CSS (library, 20% confidence)
+public.update_updated_at_column
+Issue
 
----
+Function public.update_updated_at_column has a role mutable search_path
+Description
 
-## CRITICAL FIXES REQUIRED
+Detects functions where the search_path parameter is not set.
 
-### SECURITY ISSUES (2 issues)
+Function Search Path Mutable
+SECURITY
 
-#### [INFO] Server Information Disclosure
-- **Problem:** Server version information can help attackers find vulnerabilities.
-- **Fix:** Remove or obfuscate Server and X-Powered-By headers.
+Entity
 
-#### [HIGH] CORS Configuration
-- **Problem:** CORS allows requests from any origin (*), which may expose your API.
-- **Fix:** Replace Access-Control-Allow-Origin: * with specific trusted domains.
+public.handle_new_user
+Issue
 
-### CODE QUALITY ISSUES (3 issues)
+Function public.handle_new_user has a role mutable search_path
+Description
 
-#### [CONSOLE_ERROR] Failed to fetch RSC payload for https://3-rr-0-r-k1-ng-app.vercel.app/pricing. Falling back to brows
-- **Count:** 1
-- **FIX:** This is a Next.js React Server Components issue. Check:
-  1. Server component errors in your app/ pages
-  2. CSP headers blocking RSC fetches (add your domain to connect-src)
-  3. Middleware interfering with RSC routes
+Detects functions where the search_path parameter is not set.
+Resolve
 
-#### [CONSOLE_ERROR] Failed to fetch RSC payload for https://3-rr-0-r-k1-ng-app.vercel.app/login. Falling back to browser
-- **Count:** 1
-- **FIX:** This is a Next.js React Server Components issue. Check:
-  1. Server component errors in your app/ pages
-  2. CSP headers blocking RSC fetches (add your domain to connect-src)
-  3. Middleware interfering with RSC routes
+RLS Policy Always True
+SECURITY
 
-#### [CONSOLE_ERROR] Failed to fetch RSC payload for https://3-rr-0-r-k1-ng-app.vercel.app/signup. Falling back to browse
-- **Count:** 1
-- **FIX:** This is a Next.js React Server Components issue. Check:
-  1. Server component errors in your app/ pages
-  2. CSP headers blocking RSC fetches (add your domain to connect-src)
-  3. Middleware interfering with RSC routes
+Entity
 
-### PERFORMANCE METRICS
+public.scan_files
+Issue
 
-- ✅ **First Contentful Paint:** 0.3 s (score: 100/100)
-- ✅ **Largest Contentful Paint:** 0.5 s (score: 100/100)
-- ✅ **Total Blocking Time:** 0 ms (score: 100/100)
-- ✅ **Cumulative Layout Shift:** 0.006 (score: 100/100)
-- ✅ **Speed Index:** 0.4 s (score: 100/100)
-- ✅ **Time to Interactive:** 0.5 s (score: 100/100)
+Table public.scan_files has an RLS policy Service role has full access to scan_files for ALL that allows unrestricted access (both USING and WITH CHECK are always true). This effectively bypasses row-level security for -.
+Description
 
-### RESOURCE ANALYSIS
+Detects RLS policies that use overly permissive expressions like USING (true) or WITH CHECK (true) for UPDATE, DELETE, or INSERT operations. SELECT policies with USING (true) are intentionally excluded as this pattern is often used deliberately for public read access.
+Resolve
 
-**Overview:**
-- Total Resources: 21
-- Total Page Weight: 708.0KB
-- First-Party: 21 resources (708.0KB)
-- Third-Party: 0 resources (0.0KB)
+RLS Policy Always True
+SECURITY
 
-**Render-Blocking Resources:**
-- CSS: `281fdc4fa1f41a5d.css` (0ms)
+Entity
 
+public.scans
+Issue
 
-### PROTOCOL ANALYSIS
+Table public.scans has an RLS policy Anyone can create scans for INSERT that allows unrestricted access (WITH CHECK clause is always true). This effectively bypasses row-level security for -.
+Description
 
-- **HTTP Version:** HTTP/2
-- **HTTP/2 Supported:** Yes
-- **HTTP/3 (QUIC):** No
-- **ALPN Protocol:** h2
-
-**Recommendations:**
-- Consider enabling HTTP/3 (QUIC) for improved performance on unreliable networks
-- HTTP/3 reduces latency with 0-RTT connection establishment
-
-
-### PWA ANALYSIS (Score: 100/100)
-
-- **Installable:** Yes
-- **HTTPS:** Yes
-- **Manifest:** Valid
-- **Service Worker:** Registered
-- **192x192 Icon:** Yes
-- **512x512 Icon:** Yes
-- **Theme Color:** Set
-- **Viewport:** Set
-
-
-### STRUCTURED DATA (Score: 100/100)
-
-- **Found:** Yes
-- **JSON-LD Blocks:** 1
-- **Microdata Items:** 0
-- **Schema Types:** WebSite, Organization, SoftwareApplication, BreadcrumbList
-
-
-### LINK AUDIT (Score: 100/100)
-
-- **Total Links:** 8
-- **Internal:** 7
-- **External:** 1
-- **Checked:** 8
-
-
----
-
-## 📋 COPY-PASTE CODE FIXES
-
-*No critical copy-paste fixes needed - your site is in good shape!*
-
-
----
-
-## INSTRUCTIONS FOR AI ASSISTANT
-
-Please analyze this report and provide specific code fixes for each issue. For each fix:
-1. Identify the exact file(s) that need to be modified
-2. Provide the exact code changes needed
-3. Explain why the change fixes the issue
-
-Prioritize fixes in this order:
-1. Critical/High security issues
-2. Serious accessibility violations
-3. Performance issues under 50
-4. SEO issues
-5. Code quality issues
-
-Start with the highest priority items and work through the list.
+Detects RLS policies that use overly permissive expressions like USING (true) or WITH CHECK (true) for UPDATE, DELETE, or INSERT operations. SELECT policies with USING (true) are intentionally excluded as this pattern is often used deliberately for public read access.
+Resolve

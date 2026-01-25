@@ -1,54 +1,15 @@
-Function Search Path Mutable
-SECURITY
-
-Entity
-
-public.link_lead_to_user
-Issue
-
-Function public.link_lead_to_user has a role mutable search_path
-Description
-
-Detects functions where the search_path parameter is not set.
-
-RLS Policy Always True
-SECURITY
-
-Entity
-
-public.profiles
-Issue
-
-Table public.profiles has an RLS policy Service role can insert profiles for INSERT that allows unrestricted access (WITH CHECK clause is always true). This effectively bypasses row-level security for -.
-Description
-
-Detects RLS policies that use overly permissive expressions like USING (true) or WITH CHECK (true) for UPDATE, DELETE, or INSERT operations. SELECT policies with USING (true) are intentionally excluded as this pattern is often used deliberately for public read access.
-Resolve
-
-RLS Policy Always True
-SECURITY
-
-Entity
-
-public.scan_files
-Issue
-
-Table public.scan_files has an RLS policy Service role has full access to scan_files for ALL that allows unrestricted access (both USING and WITH CHECK are always true). This effectively bypasses row-level security for -.
-Description
-
-Detects RLS policies that use overly permissive expressions like USING (true) or WITH CHECK (true) for UPDATE, DELETE, or INSERT operations. SELECT policies with USING (true) are intentionally excluded as this pattern is often used deliberately for public read access.
-Resolve
-
-RLS Policy Always True
-SECURITY
-
-Entity
-
-public.scans
-Issue
-
-Table public.scans has an RLS policy Anyone can create scans for INSERT that allows unrestricted access (WITH CHECK clause is always true). This effectively bypasses row-level security for -.
-Description
-
-Detects RLS policies that use overly permissive expressions like USING (true) or WITH CHECK (true) for UPDATE, DELETE, or INSERT operations. SELECT policies with USING (true) are intentionally excluded as this pattern is often used deliberately for public read access.
-Resolve
+3rror-k1ng-app:build:    Generating static pages (0/28) ...
+3rror-k1ng-app:build: Error fetching subscription: n [Error]: Dynamic server usage: Route /api/account/subscription couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+3rror-k1ng-app:build:     at l (/vercel/path0/app/.next/server/chunks/916.js:1:56328)
+3rror-k1ng-app:build:     at f (/vercel/path0/app/.next/server/chunks/769.js:5:9239)
+3rror-k1ng-app:build:     at d (/vercel/path0/app/.next/server/app/api/account/subscription/route.js:1:1098)
+3rror-k1ng-app:build:     at /vercel/path0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+3rror-k1ng-app:build:     at /vercel/path0/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+3rror-k1ng-app:build:     at NoopContextManager.with (/vercel/path0/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+3rror-k1ng-app:build:     at ContextAPI.with (/vercel/path0/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+3rror-k1ng-app:build:     at NoopTracer.startActiveSpan (/vercel/path0/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+3rror-k1ng-app:build:     at ProxyTracer.startActiveSpan (/vercel/path0/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24)
+3rror-k1ng-app:build:     at /vercel/path0/node_modules/next/dist/server/lib/trace/tracer.js:122:103 {
+3rror-k1ng-app:build:   description: "Route /api/account/subscription couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+3rror-k1ng-app:build:   digest: 'DYNAMIC_SERVER_USAGE'
+3rror-k1ng-app:build: }

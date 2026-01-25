@@ -4,6 +4,8 @@ import { createServerClient } from '@supabase/ssr';
 import { stripe } from '@/lib/stripe';
 import { createServiceClient } from '@/lib/supabase';
 
+export const dynamic = 'force-dynamic';
+
 export async function DELETE() {
   try {
     const cookieStore = await cookies();

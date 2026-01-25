@@ -22,6 +22,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
   const [showDiscount, setShowDiscount] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   const [discountExpired, setDiscountExpired] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Check if discount was already shown and if timer is still valid
   const checkDiscountState = useCallback(() => {
@@ -81,6 +82,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
 
   const handleCheckout = async (type: 'monthly' | 'yearly' | 'pack' | 'discount') => {
     setIsLoading(type);
+    setError(null);
 
     try {
       const priceIdMap = {
@@ -105,13 +107,18 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
       const data = await response.json();
 
       if (!response.ok) {
+        // If not logged in, redirect to login
+        if (response.status === 401) {
+          router.push('/login?redirect=/pricing');
+          return;
+        }
         throw new Error(data.error || 'Checkout failed');
       }
 
       window.location.href = data.url;
     } catch (err) {
       console.error('Checkout error:', err);
-      router.push('/pricing');
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
       setIsLoading(null);
     }
@@ -213,6 +220,13 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
               </div>
             </div>
 
+            {/* Error message */}
+            {error && (
+              <div className="mb-4 p-3 bg-danger/10 border border-danger/30 rounded-lg text-danger text-sm text-center">
+                {error}
+              </div>
+            )}
+
             {/* CTA Buttons */}
             <div className="space-y-3">
               <button
@@ -289,6 +303,13 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             Upgrade to keep roasting.
           </p>
         </div>
+
+        {/* Error message */}
+        {error && (
+          <div className="mb-4 p-3 bg-danger/10 border border-danger/30 rounded-lg text-danger text-sm text-center">
+            {error}
+          </div>
+        )}
 
         {/* Options */}
         <div className="space-y-3">

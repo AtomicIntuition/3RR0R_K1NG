@@ -1,54 +1,174 @@
-Function Search Path Mutable
-SECURITY
+# Website Audit Report - LLM Fix Instructions
+## URL: https://3rrork1ng.com/
+## Overall Score: 95/100 (Grade: A)
 
-Entity
+### COMPREHENSIVE SCORING BREAKDOWN
+- **Security:** 95/100 (30% weight, contributes 29 points)
+- **Performance:** 98/100 (25% weight, contributes 25 points)
+- **User Experience:** 90/100 (20% weight, contributes 18 points)
+- **SEO:** 100/100 (15% weight, contributes 15 points)
+- **Code Quality:** 90/100 (10% weight, contributes 9 points)
 
-public.update_updated_at_column
-Issue
+### TECH STACK DETECTED
+- Vercel (hosting, 70% confidence)
+- Next.js (framework, 30% confidence)
+- Webflow (cms, 20% confidence)
+- Tailwind CSS (library, 20% confidence)
 
-Function public.update_updated_at_column has a role mutable search_path
-Description
+---
 
-Detects functions where the search_path parameter is not set.
+## CRITICAL FIXES REQUIRED
 
-Function Search Path Mutable
-SECURITY
+### SECURITY ISSUES (2 issues)
 
-Entity
+#### [INFO] Server Information Disclosure
+- **Problem:** Server version information can help attackers find vulnerabilities.
+- **Fix:** Remove or obfuscate Server and X-Powered-By headers.
 
-public.handle_new_user
-Issue
+#### [HIGH] CORS Configuration
+- **Problem:** CORS allows requests from any origin (*), which may expose your API.
+- **Fix:** Replace Access-Control-Allow-Origin: * with specific trusted domains.
 
-Function public.handle_new_user has a role mutable search_path
-Description
+### ACCESSIBILITY ISSUES (1 violations)
 
-Detects functions where the search_path parameter is not set.
-Resolve
+#### [SERIOUS] Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds
+- **Rule:** color-contrast
+- **Fix:** Elements must meet minimum color contrast ratio thresholds
+- **Elements Affected:** 1 elements
+- **Reference:** https://dequeuniversity.com/rules/axe/4.11/color-contrast?application=playwright
 
-RLS Policy Always True
-SECURITY
+**ACTIONABLE FIXES:**
 
-Entity
+**Element:** `Quick Mode`
+- **Search for:** `"Quick Mode"` in your codebase
+- **HTML:** `<span>Quick Mode</span>`
+- **Current Color:** `#6b7280` on `#16161f`
+- **Current Ratio:** 3.71 (needs 4.5:1)
+- **FIX: Change color to** `#ffffff`
+- **Tailwind Fix:** Change `text-gray-500` to `text-gray-400` or `text-gray-300`
 
-public.scan_files
-Issue
+### CODE QUALITY ISSUES (3 issues)
 
-Table public.scan_files has an RLS policy Service role has full access to scan_files for ALL that allows unrestricted access (both USING and WITH CHECK are always true). This effectively bypasses row-level security for -.
-Description
+#### [CONSOLE_ERROR] Failed to fetch RSC payload for https://3rrork1ng.com/pricing. Falling back to browser navigation. T
+- **Count:** 1
+- **FIX:** This is a Next.js React Server Components issue. Check:
+  1. Server component errors in your app/ pages
+  2. CSP headers blocking RSC fetches (add your domain to connect-src)
+  3. Middleware interfering with RSC routes
 
-Detects RLS policies that use overly permissive expressions like USING (true) or WITH CHECK (true) for UPDATE, DELETE, or INSERT operations. SELECT policies with USING (true) are intentionally excluded as this pattern is often used deliberately for public read access.
-Resolve
+#### [CONSOLE_ERROR] Failed to fetch RSC payload for https://3rrork1ng.com/login. Falling back to browser navigation. Typ
+- **Count:** 1
+- **FIX:** This is a Next.js React Server Components issue. Check:
+  1. Server component errors in your app/ pages
+  2. CSP headers blocking RSC fetches (add your domain to connect-src)
+  3. Middleware interfering with RSC routes
 
-RLS Policy Always True
-SECURITY
+#### [CONSOLE_ERROR] Failed to fetch RSC payload for https://3rrork1ng.com/signup. Falling back to browser navigation. Ty
+- **Count:** 1
+- **FIX:** This is a Next.js React Server Components issue. Check:
+  1. Server component errors in your app/ pages
+  2. CSP headers blocking RSC fetches (add your domain to connect-src)
+  3. Middleware interfering with RSC routes
 
-Entity
+### PERFORMANCE METRICS
 
-public.scans
-Issue
+- ✅ **First Contentful Paint:** 0.3 s (score: 100/100)
+- ✅ **Largest Contentful Paint:** 0.5 s (score: 100/100)
+- ✅ **Total Blocking Time:** 0 ms (score: 100/100)
+- ✅ **Cumulative Layout Shift:** 0.006 (score: 100/100)
+- ✅ **Speed Index:** 0.3 s (score: 100/100)
+- ✅ **Time to Interactive:** 0.5 s (score: 100/100)
 
-Table public.scans has an RLS policy Anyone can create scans for INSERT that allows unrestricted access (WITH CHECK clause is always true). This effectively bypasses row-level security for -.
-Description
+### RESOURCE ANALYSIS
 
-Detects RLS policies that use overly permissive expressions like USING (true) or WITH CHECK (true) for UPDATE, DELETE, or INSERT operations. SELECT policies with USING (true) are intentionally excluded as this pattern is often used deliberately for public read access.
-Resolve
+**Overview:**
+- Total Resources: 21
+- Total Page Weight: 708.3KB
+- First-Party: 21 resources (708.3KB)
+- Third-Party: 0 resources (0.0KB)
+
+**Render-Blocking Resources:**
+- CSS: `26fc46634042cf5c.css` (0ms)
+
+
+### PROTOCOL ANALYSIS
+
+- **HTTP Version:** HTTP/2
+- **HTTP/2 Supported:** Yes
+- **HTTP/3 (QUIC):** No
+- **ALPN Protocol:** h2
+
+**Recommendations:**
+- Consider enabling HTTP/3 (QUIC) for improved performance on unreliable networks
+- HTTP/3 reduces latency with 0-RTT connection establishment
+
+
+### PWA ANALYSIS (Score: 100/100)
+
+- **Installable:** Yes
+- **HTTPS:** Yes
+- **Manifest:** Valid
+- **Service Worker:** Registered
+- **192x192 Icon:** Yes
+- **512x512 Icon:** Yes
+- **Theme Color:** Set
+- **Viewport:** Set
+
+
+### STRUCTURED DATA (Score: 100/100)
+
+- **Found:** Yes
+- **JSON-LD Blocks:** 1
+- **Microdata Items:** 0
+- **Schema Types:** WebSite, Organization, SoftwareApplication, BreadcrumbList
+
+
+### LINK AUDIT (Score: 100/100)
+
+- **Total Links:** 8
+- **Internal:** 7
+- **External:** 1
+- **Checked:** 8
+
+
+---
+
+## 📋 COPY-PASTE CODE FIXES
+
+### Accessibility: Color Contrast Fixes (CSS)
+
+```css
+/* Common Tailwind contrast fixes */
+/* Replace text-gray-500 with text-gray-400 for better contrast on dark backgrounds */
+/* Replace text-gray-600 with text-gray-400 for light backgrounds */
+
+/* Custom CSS color fixes */
+.low-contrast-text {
+  /* Before: color: #6b7280 (gray-500) - 4.5:1 ratio needed */
+  color: #9ca3af; /* gray-400 - meets contrast requirements */
+}
+
+.muted-text {
+  /* Before: color: #9ca3af (gray-400) */
+  color: #d1d5db; /* gray-300 - for dark backgrounds */
+}
+```
+
+
+---
+
+## INSTRUCTIONS FOR AI ASSISTANT
+
+Please analyze this report and provide specific code fixes for each issue. For each fix:
+1. Identify the exact file(s) that need to be modified
+2. Provide the exact code changes needed
+3. Explain why the change fixes the issue
+
+Prioritize fixes in this order:
+1. Critical/High security issues
+2. Serious accessibility violations
+3. Performance issues under 50
+4. SEO issues
+5. Code quality issues
+
+Start with the highest priority items and work through the list.

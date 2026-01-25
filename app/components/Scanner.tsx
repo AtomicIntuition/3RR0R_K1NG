@@ -104,7 +104,7 @@ export function Scanner({ className }: ScannerProps) {
               'flex items-center gap-1.5 px-3 py-1 rounded border transition-all text-xs font-medium',
               skipRoast
                 ? 'bg-neon-cyan/20 border-neon-cyan/50 text-neon-cyan'
-                : 'bg-void-50 border-void-200 text-gray-500 hover:border-gray-400 hover:text-gray-300'
+                : 'bg-void-50 border-void-200 text-gray-400 hover:border-gray-300 hover:text-gray-200'
             )}
           >
             <svg

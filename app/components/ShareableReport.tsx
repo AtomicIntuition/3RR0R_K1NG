@@ -213,7 +213,7 @@ export function ShareableReport({
           >
             {grade}
           </div>
-          <div style={{ fontSize: '14px', color: '#9ca3af', marginTop: '16px', letterSpacing: '2px' }}>
+          <div style={{ fontSize: '14px', color: '#9ca3af', marginTop: '24px', letterSpacing: '2px' }}>
             GRADE
           </div>
         </div>

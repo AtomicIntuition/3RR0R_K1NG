@@ -4,21 +4,26 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { GlitchText } from '@/components/GlitchText';
+import { useAuth } from '@/lib/auth-context';
+import { toast } from 'sonner';
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
+  const { refreshProfile } = useAuth();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
 
   useEffect(() => {
     if (sessionId) {
-      // In a real app, you'd verify the session with your backend
-      // For now, we'll just show success
+      // Refresh the profile to update the tier badge in navbar
+      refreshProfile();
       setStatus('success');
+      toast.success('Payment successful!', { description: 'Your account has been upgraded.' });
     } else {
       setStatus('error');
+      toast.error('Payment verification failed');
     }
-  }, [sessionId]);
+  }, [sessionId, refreshProfile]);
 
   if (status === 'loading') {
     return (

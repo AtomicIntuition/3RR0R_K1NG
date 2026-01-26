@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/lib/supabase';
-import { Navbar } from '@/components/Navbar';
 
 interface Scan {
   id: string;
@@ -72,9 +71,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen">
-      <Navbar />
-
-      <div className="pt-20 pb-12 px-4">
+      <div className="pt-4 pb-12 px-4">
         <div className="max-w-5xl mx-auto">
           {/* Header */}
           <div className="mb-8">

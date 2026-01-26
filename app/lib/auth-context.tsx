@@ -1,7 +1,7 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, Session } from '@supabase/supabase-js';
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
+import { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 
 interface Profile {
@@ -24,6 +24,8 @@ interface AuthContextType {
   session: Session | null;
   profile: Profile | null;
   loading: boolean;
+  profileLoading: boolean;
+  authEvent: AuthChangeEvent | null;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string) => Promise<{ error: Error | null }>;
   signInWithGoogle: () => Promise<{ error: Error | null }>;
@@ -39,39 +41,54 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [authEvent, setAuthEvent] = useState<AuthChangeEvent | null>(null);
 
-  // Fetch user profile from database
-  const fetchProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
+  // Fetch user profile from database with retry logic
+  const fetchProfile = useCallback(async (userId: string, retries = 3): Promise<Profile | null> => {
+    for (let i = 0; i < retries; i++) {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
 
-    if (error) {
-      console.error('Error fetching profile:', error);
-      return null;
+      if (!error && data) {
+        return data as Profile;
+      }
+
+      if (error) {
+        console.error(`Error fetching profile (attempt ${i + 1}):`, error);
+        // Wait a bit before retrying (profile might not exist yet after signup)
+        if (i < retries - 1) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
     }
-
-    return data as Profile;
-  };
+    return null;
+  }, []);
 
   // Refresh profile data
-  const refreshProfile = async () => {
+  const refreshProfile = useCallback(async () => {
     if (user) {
+      setProfileLoading(true);
       const profileData = await fetchProfile(user.id);
       setProfile(profileData);
+      setProfileLoading(false);
     }
-  };
+  }, [user, fetchProfile]);
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
 
       if (session?.user) {
-        fetchProfile(session.user.id).then(setProfile);
+        setProfileLoading(true);
+        const profileData = await fetchProfile(session.user.id);
+        setProfile(profileData);
+        setProfileLoading(false);
       }
 
       setLoading(false);
@@ -80,12 +97,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        setAuthEvent(event);
         setSession(session);
         setUser(session?.user ?? null);
 
         if (session?.user) {
+          setProfileLoading(true);
           const profileData = await fetchProfile(session.user.id);
           setProfile(profileData);
+          setProfileLoading(false);
         } else {
           setProfile(null);
         }
@@ -97,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [fetchProfile]);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
@@ -152,6 +172,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         session,
         profile,
         loading,
+        profileLoading,
+        authEvent,
         signIn,
         signUp,
         signInWithGoogle,

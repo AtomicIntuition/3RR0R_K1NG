@@ -4,6 +4,7 @@ import { useState, FormEvent } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { GlitchText } from '@/components/GlitchText';
+import { toast } from 'sonner';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -22,9 +23,11 @@ export default function ForgotPasswordPage() {
 
     if (error) {
       setError(error.message);
+      toast.error('Failed to send reset email', { description: error.message });
       setLoading(false);
     } else {
       setSent(true);
+      toast.success('Reset email sent!', { description: 'Check your inbox for the reset link.' });
       setLoading(false);
     }
   };

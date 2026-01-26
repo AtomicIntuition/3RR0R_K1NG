@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { GlitchText } from '@/components/GlitchText';
 import { PricingCard } from '@/components/PaymentButton';
-import { Navbar } from '@/components/Navbar';
 import { ExitIntentModal } from '@/components/ExitIntentModal';
 import { PRICING } from '@/lib/constants';
 
@@ -20,9 +19,7 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen">
-      <Navbar />
-
-      <div className="pt-20 pb-12 px-4">
+      <div className="pt-4 pb-12 px-4">
         <div className="max-w-5xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">

@@ -1,18 +1,14 @@
 import Link from 'next/link';
 import { Scanner } from '@/components/Scanner';
 import { GlitchText } from '@/components/GlitchText';
-import { Navbar } from '@/components/Navbar';
 import { Stats } from '@/components/Stats';
 import { ExampleRoasts } from '@/components/ExampleRoasts';
 
 export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
-      {/* Navigation */}
-      <Navbar />
-
       {/* Hero Section */}
-      <div className="text-center mb-12 mt-16">
+      <div className="text-center mb-12 mt-4">
         {/* Logo/Title */}
         <h1 className="text-5xl sm:text-7xl font-bold mb-4">
           <GlitchText

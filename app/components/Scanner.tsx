@@ -7,6 +7,7 @@ import clsx from 'clsx';
 import { useAuth } from '@/lib/auth-context';
 import { PersonaSelector, type RoastPersona } from './PersonaSelector';
 import { PaywallModal } from './PaywallModal';
+import { toast } from 'sonner';
 
 interface ScannerProps {
   className?: string;
@@ -49,6 +50,7 @@ export function Scanner({ className }: ScannerProps) {
 
     if (!isValidUrl(normalizedUrl)) {
       setError('Please enter a valid URL');
+      toast.error('Invalid URL', { description: 'Please enter a valid website URL' });
       return;
     }
 
@@ -80,6 +82,7 @@ export function Scanner({ className }: ScannerProps) {
       if (!response.ok) {
         // Check if it's a rate limit error
         if (response.status === 429 && data.requiresUpgrade) {
+          toast.error('Scan limit reached', { description: data.message || 'Upgrade for more scans' });
           setShowPaywall(true);
           setIsLoading(false);
           setScanPhase('');
@@ -93,7 +96,9 @@ export function Scanner({ className }: ScannerProps) {
       // Navigate to results page
       router.push(`/scan/${data.scanId}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+      const message = err instanceof Error ? err.message : 'Something went wrong';
+      setError(message);
+      toast.error('Scan failed', { description: message });
       setIsLoading(false);
       setScanPhase('');
     }

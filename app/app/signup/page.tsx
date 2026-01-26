@@ -4,6 +4,7 @@ import { useState, FormEvent } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { GlitchText } from '@/components/GlitchText';
+import { toast } from 'sonner';
 
 export default function SignUpPage() {
   const { signUp, signInWithGoogle, signInWithGithub } = useAuth();
@@ -21,11 +22,13 @@ export default function SignUpPage() {
 
     if (password !== confirmPassword) {
       setError('Passwords do not match');
+      toast.error('Passwords do not match');
       return;
     }
 
     if (password.length < 6) {
       setError('Password must be at least 6 characters');
+      toast.error('Password must be at least 6 characters');
       return;
     }
 
@@ -35,26 +38,32 @@ export default function SignUpPage() {
 
     if (error) {
       setError(error.message);
+      toast.error('Sign up failed', { description: error.message });
       setLoading(false);
     } else {
       setSuccess(true);
+      toast.success('Check your email!', { description: 'We sent you a confirmation link.' });
       setLoading(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
     setError('');
+    toast.loading('Redirecting to Google...');
     const { error } = await signInWithGoogle();
     if (error) {
       setError(error.message);
+      toast.error('Sign up failed', { description: error.message });
     }
   };
 
   const handleGithubSignIn = async () => {
     setError('');
+    toast.loading('Redirecting to GitHub...');
     const { error } = await signInWithGithub();
     if (error) {
       setError(error.message);
+      toast.error('Sign up failed', { description: error.message });
     }
   };
 

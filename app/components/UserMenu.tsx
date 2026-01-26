@@ -3,9 +3,10 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
+import { toast } from 'sonner';
 
 export function UserMenu() {
-  const { user, profile, loading, signOut } = useAuth();
+  const { user, profile, loading, profileLoading, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -72,11 +73,13 @@ export function UserMenu() {
         </div>
 
         {/* Tier badge */}
-        {profile && (
+        {profileLoading ? (
+          <span className="w-8 h-4 bg-void-100 rounded animate-pulse" />
+        ) : profile ? (
           <span className={`text-xs font-medium ${tierColors[profile.tier]}`}>
             {tierLabels[profile.tier]}
           </span>
-        )}
+        ) : null}
 
         {/* Dropdown arrow */}
         <svg
@@ -156,9 +159,10 @@ export function UserMenu() {
           {/* Sign out */}
           <div className="border-t border-void-100 py-2">
             <button
-              onClick={() => {
-                signOut();
+              onClick={async () => {
+                await signOut();
                 setIsOpen(false);
+                toast.success('Signed out successfully');
               }}
               className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-400 hover:bg-void-100 hover:text-danger transition-colors"
             >

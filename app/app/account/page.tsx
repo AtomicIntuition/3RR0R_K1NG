@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
-import { Navbar } from '@/components/Navbar';
 import { Modal } from '@/components/Modal';
 import { PRICING } from '@/lib/constants';
+import { toast } from 'sonner';
 import clsx from 'clsx';
 
 interface SubscriptionInfo {
@@ -77,11 +77,14 @@ export default function AccountPage() {
       }
 
       setActionSuccess('Your subscription has been canceled. You\'ll retain access until the end of your billing period.');
+      toast.success('Subscription canceled', { description: 'You\'ll retain access until the end of your billing period.' });
       setShowCancelModal(false);
       await fetchSubscription();
       await refreshProfile();
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Failed to cancel subscription');
+      const message = err instanceof Error ? err.message : 'Failed to cancel subscription';
+      setActionError(message);
+      toast.error('Failed to cancel subscription', { description: message });
     } finally {
       setIsProcessing(false);
     }
@@ -90,6 +93,7 @@ export default function AccountPage() {
   const handleDeleteAccount = async () => {
     if (deleteConfirmText !== 'DELETE') {
       setActionError('Please type DELETE to confirm');
+      toast.error('Please type DELETE to confirm');
       return;
     }
 
@@ -107,11 +111,15 @@ export default function AccountPage() {
         throw new Error(data.error || 'Failed to delete account');
       }
 
+      toast.success('Account deleted', { description: 'Signing you out...' });
+
       // Sign out and redirect
       await signOut();
       router.push('/?deleted=true');
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Failed to delete account');
+      const message = err instanceof Error ? err.message : 'Failed to delete account';
+      setActionError(message);
+      toast.error('Failed to delete account', { description: message });
       setIsProcessing(false);
     }
   };
@@ -132,10 +140,13 @@ export default function AccountPage() {
       }
 
       setActionSuccess('Your subscription has been reactivated!');
+      toast.success('Subscription reactivated!', { description: 'Your Pro access has been restored.' });
       await fetchSubscription();
       await refreshProfile();
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Failed to reactivate subscription');
+      const message = err instanceof Error ? err.message : 'Failed to reactivate subscription';
+      setActionError(message);
+      toast.error('Failed to reactivate subscription', { description: message });
     } finally {
       setIsProcessing(false);
     }
@@ -159,9 +170,7 @@ export default function AccountPage() {
 
   return (
     <div className="min-h-screen">
-      <Navbar />
-
-      <div className="pt-20 pb-12 px-4">
+      <div className="pt-4 pb-12 px-4">
         <div className="max-w-2xl mx-auto">
           {/* Header */}
           <div className="mb-8">
@@ -220,6 +229,7 @@ export default function AccountPage() {
             {loadingSubscription ? (
               <p className="text-gray-500">Loading subscription info...</p>
             ) : profile?.tier === 'pro' && subscription ? (
+              // Pro user with active Stripe subscription
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -282,7 +292,41 @@ export default function AccountPage() {
                   )}
                 </div>
               </div>
+            ) : profile?.tier === 'pro' && !subscription ? (
+              // Pro user without Stripe subscription (whitelisted/gifted)
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-sm text-gray-500">Plan</label>
+                    <p className="text-gray-200">Pro (Complimentary)</p>
+                  </div>
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-terminal/20 text-terminal">
+                    ACTIVE
+                  </span>
+                </div>
+
+                <div>
+                  <label className="text-sm text-gray-500">Monthly Scans</label>
+                  <p className="text-gray-200">
+                    {profile.scans_this_month || 0} / {PRICING.PRO_SCANS_PER_MONTH} used
+                  </p>
+                </div>
+
+                {profile.scan_credits > 0 && (
+                  <div>
+                    <label className="text-sm text-gray-500">Bonus Scan Credits</label>
+                    <p className="text-gray-200">{profile.scan_credits} remaining</p>
+                  </div>
+                )}
+
+                <div className="pt-4 border-t border-void-200">
+                  <p className="text-sm text-gray-500">
+                    Your Pro access was granted via whitelist. Enjoy priority queue and unlimited roasting power!
+                  </p>
+                </div>
+              </div>
             ) : (
+              // Free or anonymous user
               <div>
                 <p className="text-gray-400 mb-4">
                   You&apos;re on the free plan ({PRICING.FREE_SCANS_PER_DAY} scans/day).

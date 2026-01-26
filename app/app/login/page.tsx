@@ -1,19 +1,33 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, FormEvent, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { GlitchText } from '@/components/GlitchText';
+import { toast } from 'sonner';
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { signIn, signInWithGoogle, signInWithGithub, refreshProfile } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Handle error from OAuth redirect
+  useEffect(() => {
+    const errorParam = searchParams.get('error');
+    if (errorParam) {
+      const decodedError = decodeURIComponent(errorParam);
+      setError(decodedError);
+      toast.error('Sign in failed', { description: decodedError });
+      // Clean up URL
+      router.replace('/login');
+    }
+  }, [searchParams, router]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -24,27 +38,33 @@ export default function LoginPage() {
 
     if (error) {
       setError(error.message);
+      toast.error('Sign in failed', { description: error.message });
       setLoading(false);
     } else {
       // Wait for profile to load before redirecting
       await refreshProfile();
+      toast.success('Welcome back!');
       router.push('/');
     }
   };
 
   const handleGoogleSignIn = async () => {
     setError('');
+    toast.loading('Redirecting to Google...');
     const { error } = await signInWithGoogle();
     if (error) {
       setError(error.message);
+      toast.error('Sign in failed', { description: error.message });
     }
   };
 
   const handleGithubSignIn = async () => {
     setError('');
+    toast.loading('Redirecting to GitHub...');
     const { error } = await signInWithGithub();
     if (error) {
       setError(error.message);
+      toast.error('Sign in failed', { description: error.message });
     }
   };
 
@@ -185,5 +205,21 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-terminal border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <LoginContent />
+    </Suspense>
   );
 }

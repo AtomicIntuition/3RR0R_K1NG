@@ -163,7 +163,6 @@ export function UserMenu() {
                 await signOut();
                 setIsOpen(false);
                 toast.success('Signed out successfully');
-                window.location.href = '/';
               }}
               className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-400 hover:bg-void-100 hover:text-danger transition-colors"
             >

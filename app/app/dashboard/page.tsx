@@ -71,47 +71,47 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="pt-4 pb-12 px-4">
+      <div className="pt-4 pb-12 px-3 sm:px-4">
         <div className="max-w-5xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-100">Dashboard</h1>
-            <p className="text-gray-400 mt-2">
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-100">Dashboard</h1>
+            <p className="text-sm sm:text-base text-gray-400 mt-1 sm:mt-2 truncate">
               Welcome back, {user?.email}
             </p>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid sm:grid-cols-3 gap-4 mb-8">
-            <div className="bg-void-50 rounded-lg border border-void-100 p-6">
-              <div className="text-3xl font-bold text-terminal">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6 sm:mb-8">
+            <div className="bg-void-50 rounded-lg border border-void-100 p-3 sm:p-6">
+              <div className="text-xl sm:text-3xl font-bold text-terminal">
                 {scans.filter(s => s.status === 'completed').length}
               </div>
-              <div className="text-sm text-gray-400">Completed Scans</div>
+              <div className="text-[10px] sm:text-sm text-gray-400">Completed</div>
             </div>
 
-            <div className="bg-void-50 rounded-lg border border-void-100 p-6">
-              <div className="text-3xl font-bold text-neon-cyan">
-                {profile?.tier === 'pro' ? 'Pro' : profile?.tier === 'free' ? 'Free' : 'Anonymous'}
+            <div className="bg-void-50 rounded-lg border border-void-100 p-3 sm:p-6">
+              <div className="text-xl sm:text-3xl font-bold text-neon-cyan">
+                {profile?.tier === 'pro' ? 'Pro' : profile?.tier === 'free' ? 'Free' : 'Anon'}
               </div>
-              <div className="text-sm text-gray-400">Current Plan</div>
+              <div className="text-[10px] sm:text-sm text-gray-400">Plan</div>
             </div>
 
-            <div className="bg-void-50 rounded-lg border border-void-100 p-6">
-              <div className="text-3xl font-bold text-gray-100">
+            <div className="bg-void-50 rounded-lg border border-void-100 p-3 sm:p-6">
+              <div className="text-xl sm:text-3xl font-bold text-gray-100">
                 {scans.length > 0 && scans[0].score_overall !== null
-                  ? `${scans[0].score_overall}/100`
+                  ? scans[0].score_overall
                   : '-'}
               </div>
-              <div className="text-sm text-gray-400">Last Scan Score</div>
+              <div className="text-[10px] sm:text-sm text-gray-400">Last Score</div>
             </div>
           </div>
 
           {/* Quick Actions */}
-          <div className="flex flex-wrap gap-4 mb-8">
+          <div className="flex flex-wrap gap-2 sm:gap-4 mb-6 sm:mb-8">
             <Link
               href="/"
-              className="px-6 py-3 bg-terminal text-void font-bold rounded-lg hover:bg-terminal-bright transition-colors"
+              className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-terminal text-void font-bold rounded-lg hover:bg-terminal-bright transition-colors"
             >
               New Scan
             </Link>
@@ -119,7 +119,7 @@ export default function DashboardPage() {
             {profile?.tier !== 'pro' && (
               <Link
                 href="/pricing"
-                className="px-6 py-3 border border-neon-cyan text-neon-cyan font-bold rounded-lg hover:bg-neon-cyan/10 transition-colors"
+                className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base border border-neon-cyan text-neon-cyan font-bold rounded-lg hover:bg-neon-cyan/10 transition-colors"
               >
                 Upgrade to Pro
               </Link>
@@ -128,14 +128,14 @@ export default function DashboardPage() {
 
           {/* Recent Scans */}
           <div className="bg-void-50 rounded-lg border border-void-100 overflow-hidden">
-            <div className="px-6 py-4 border-b border-void-100">
-              <h2 className="text-xl font-bold text-gray-100">Recent Scans</h2>
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-void-100">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-100">Recent Scans</h2>
             </div>
 
             {loadingScans ? (
-              <div className="p-8 text-center text-gray-500">Loading scans...</div>
+              <div className="p-6 sm:p-8 text-center text-gray-500">Loading scans...</div>
             ) : scans.length === 0 ? (
-              <div className="p-8 text-center">
+              <div className="p-6 sm:p-8 text-center">
                 <p className="text-gray-500 mb-4">No scans yet</p>
                 <Link
                   href="/"
@@ -150,32 +150,28 @@ export default function DashboardPage() {
                   <Link
                     key={scan.id}
                     href={`/scan/${scan.id}`}
-                    className="flex items-center justify-between px-6 py-4 hover:bg-void-100/50 transition-colors"
+                    className="flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4 hover:bg-void-100/50 transition-colors gap-3"
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-gray-200 truncate">{scan.url}</p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {new Date(scan.created_at).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-4 ml-4">
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusBadge(scan.status)}`}>
-                        {scan.status}
-                      </span>
-
-                      {scan.status === 'completed' && scan.score_overall !== null && (
-                        <span className={`text-2xl font-bold ${getScoreColor(scan.score_overall)}`}>
-                          {scan.score_overall}
+                      <p className="text-sm sm:text-base text-gray-200 truncate">{scan.url}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs font-medium ${getStatusBadge(scan.status)}`}>
+                          {scan.status}
                         </span>
-                      )}
+                        <span className="text-[10px] sm:text-xs text-gray-500">
+                          {new Date(scan.created_at).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                          })}
+                        </span>
+                      </div>
                     </div>
+
+                    {scan.status === 'completed' && scan.score_overall !== null && (
+                      <span className={`text-xl sm:text-2xl font-bold ${getScoreColor(scan.score_overall)}`}>
+                        {scan.score_overall}
+                      </span>
+                    )}
                   </Link>
                 ))}
               </div>

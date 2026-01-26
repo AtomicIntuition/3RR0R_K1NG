@@ -1,20 +1,21 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { GlitchText } from '@/components/GlitchText';
 import { toast } from 'sonner';
 
 export default function SignUpPage() {
-  const { signUp } = useAuth();
+  const router = useRouter();
+  const { signUp, refreshProfile } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -41,35 +42,12 @@ export default function SignUpPage() {
       toast.error('Sign up failed', { description: error.message });
       setLoading(false);
     } else {
-      setSuccess(true);
-      toast.success('Check your email!', { description: 'We sent you a confirmation link.' });
-      setLoading(false);
+      // Account created successfully - refresh profile and redirect
+      await refreshProfile();
+      toast.success('Account created!', { description: 'Welcome to 3RROR_K1NG.' });
+      router.push('/');
     }
   };
-
-  if (success) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md text-center">
-          <div className="bg-void-50 rounded-lg border border-terminal/30 p-8">
-            <div className="text-5xl mb-4">✓</div>
-            <h1 className="text-2xl font-bold text-terminal mb-2">Check Your Email</h1>
-            <p className="text-gray-400 mb-6">
-              We&apos;ve sent a confirmation link to <span className="text-gray-200">{email}</span>
-            </p>
-            <p className="text-sm text-gray-500">
-              Click the link in the email to activate your account and start roasting websites.
-            </p>
-          </div>
-          <p className="mt-6 text-gray-400">
-            <Link href="/login" className="text-terminal hover:text-terminal-bright transition-colors">
-              Back to login
-            </Link>
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12">

@@ -102,10 +102,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          setProfileLoading(true);
-          const profileData = await fetchProfile(session.user.id);
-          setProfile(profileData);
-          setProfileLoading(false);
+          // Only refetch and show loading on meaningful auth events
+          // Skip TOKEN_REFRESHED to prevent badge flickering when tabbing back
+          const shouldRefetch = event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'PASSWORD_RECOVERY' || event === 'INITIAL_SESSION';
+
+          if (shouldRefetch) {
+            setProfileLoading(true);
+            const profileData = await fetchProfile(session.user.id);
+            setProfile(profileData);
+            setProfileLoading(false);
+          }
         } else {
           setProfile(null);
         }

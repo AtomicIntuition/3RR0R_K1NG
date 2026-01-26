@@ -10,7 +10,10 @@ export const size = {
 export const contentType = 'image/png';
 
 export default async function Image() {
-  const logoUrl = new URL('/images/logo.png', 'https://3rrork1ng.com').toString();
+  // Fetch logo and convert to base64 for reliable rendering in edge runtime
+  const logoResponse = await fetch(new URL('/images/logo.png', 'https://3rrork1ng.com'));
+  const logoBuffer = await logoResponse.arrayBuffer();
+  const logoBase64 = `data:image/png;base64,${Buffer.from(logoBuffer).toString('base64')}`;
 
   return new ImageResponse(
     (
@@ -91,7 +94,7 @@ export default async function Image() {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={logoUrl}
+                src={logoBase64}
                 alt="3RROR_K1NG Logo"
                 width={120}
                 height={120}

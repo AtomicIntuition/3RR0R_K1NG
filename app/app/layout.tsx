@@ -196,12 +196,12 @@ export default function RootLayout({
                   <a href="/privacy" className="hover:text-terminal transition-colors">Privacy</a>
                   <a href="/terms" className="hover:text-terminal transition-colors">Terms</a>
                   <a
-                    href="https://github.com"
+                    href="https://x.com/3RROR_K1NG"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-terminal transition-colors"
                   >
-                    GitHub
+                    @3RROR_K1NG
                   </a>
                 </div>
               </div>

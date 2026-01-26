@@ -111,25 +111,35 @@ export function ShareableReport({
         </div>
       </div>
 
-      {/* Target URL */}
+      {/* Target URL with attention indicator */}
       <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '8px 16px',
-            backgroundColor: 'rgba(26,26,46,0.5)',
-            border: '1px solid rgba(0,255,65,0.2)',
-            borderRadius: '8px',
-          }}
-        >
-          <span style={{ color: '#00ff41', fontWeight: 'bold', fontSize: '14px', letterSpacing: '2px' }}>
-            TARGET:
-          </span>
-          <span style={{ color: '#ffffff', fontFamily: 'monospace', fontSize: '14px' }}>
-            {url.replace(/^https?:\/\//, '').slice(0, 35)}{url.replace(/^https?:\/\//, '').length > 35 ? '...' : ''}
-          </span>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '12px' }}>
+          {/* Attention arrow */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span style={{ color: '#00ff41', fontSize: '11px', fontWeight: 'bold', letterSpacing: '1px' }}>
+              YOUR SITE
+            </span>
+            <span style={{ color: '#00ff41', fontSize: '16px' }}>→</span>
+          </div>
+          {/* URL badge */}
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 16px',
+              backgroundColor: 'rgba(26,26,46,0.5)',
+              border: '1px solid rgba(0,255,65,0.2)',
+              borderRadius: '8px',
+            }}
+          >
+            <span style={{ color: '#00ff41', fontWeight: 'bold', fontSize: '14px', letterSpacing: '2px' }}>
+              TARGET:
+            </span>
+            <span style={{ color: '#ffffff', fontFamily: 'monospace', fontSize: '14px' }}>
+              {url.replace(/^https?:\/\//, '').slice(0, 30)}{url.replace(/^https?:\/\//, '').length > 30 ? '...' : ''}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -168,19 +178,26 @@ export function ShareableReport({
               transform="rotate(-90 60 60)"
               style={{ filter: `drop-shadow(0 0 8px ${getScoreColor(scoreOverall)})` }}
             />
+            {/* Score text - centered in SVG */}
+            <text
+              x="60"
+              y="56"
+              textAnchor="middle"
+              dominantBaseline="middle"
+              style={{ fontSize: '32px', fontWeight: 'bold', fill: '#ffffff' }}
+            >
+              {scoreOverall}
+            </text>
+            <text
+              x="60"
+              y="76"
+              textAnchor="middle"
+              dominantBaseline="middle"
+              style={{ fontSize: '10px', fill: '#6b7280' }}
+            >
+              /100
+            </text>
           </svg>
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              textAlign: 'center',
-            }}
-          >
-            <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#ffffff' }}>{scoreOverall}</div>
-            <div style={{ fontSize: '10px', color: '#6b7280' }}>/100</div>
-          </div>
         </div>
 
         {/* Letter Grade */}

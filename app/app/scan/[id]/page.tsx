@@ -108,7 +108,7 @@ export default function ScanResultsPage() {
           </div>
 
           {/* Header - Target URL with Screenshot Button */}
-          <header className="flex flex-col items-center gap-4 mb-6 sm:mb-8">
+          <header className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4 mb-6 sm:mb-8">
             <div className="inline-flex items-center gap-1.5 sm:gap-3 px-2 sm:px-4 py-1.5 sm:py-2 bg-void-50/50 border border-terminal/20 rounded-lg">
               <span className="text-terminal font-bold text-xs sm:text-base md:text-lg tracking-widest whitespace-nowrap">TARGET:</span>
               <span className="text-white font-mono text-xs sm:text-base md:text-lg truncate max-w-[200px] sm:max-w-[400px] md:max-w-none">

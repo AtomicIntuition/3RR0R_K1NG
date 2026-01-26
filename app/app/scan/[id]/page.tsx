@@ -25,7 +25,7 @@ export default function ScanResultsPage() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-4">
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 pt-20">
         <div className="text-center max-w-md">
           <span className="text-6xl mb-6 block">💀</span>
           <h1 className="text-2xl font-bold text-danger mb-4">
@@ -43,10 +43,10 @@ export default function ScanResultsPage() {
   // Loading state
   if (isLoading || !scan || scan.status === 'pending' || scan.status === 'processing') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-4">
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 pt-20">
         <div className="text-center mb-8">
-          <p className="text-sm text-gray-500 font-mono mb-2">
-            Scanning: <span className="text-terminal">{scan?.url || 'Loading...'}</span>
+          <p className="text-xs sm:text-sm text-gray-500 font-mono mb-2">
+            <span className="text-terminal">TARGET:</span> <span className="text-white break-all">{scan?.url || 'Loading...'}</span>
           </p>
         </div>
         <LoadingState
@@ -62,7 +62,7 @@ export default function ScanResultsPage() {
   // Failed scan
   if (scan.status === 'failed') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-4">
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 pt-20">
         <div className="text-center max-w-md">
           <span className="text-6xl mb-6 block">⚠️</span>
           <h1 className="text-2xl font-bold text-neon-orange mb-4">
@@ -108,12 +108,12 @@ export default function ScanResultsPage() {
           </div>
 
           {/* Header - Target URL with Screenshot Button */}
-          <header className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 sm:mb-8">
-            <div className="flex-1 flex justify-center sm:justify-start">
-              <div className="inline-flex flex-col sm:flex-row items-center gap-1 sm:gap-3 px-3 sm:px-4 py-2 bg-void-50/50 border border-terminal/20 rounded-lg max-w-full">
-                <span className="text-terminal font-bold text-sm sm:text-base md:text-lg tracking-widest">TARGET:</span>
-                <span className="text-white font-mono text-sm sm:text-base md:text-lg break-all max-w-[280px] sm:max-w-none truncate sm:truncate-none">
-                  {scan.url}
+          <header className="flex flex-row items-center justify-between gap-2 sm:gap-4 mb-6 sm:mb-8">
+            <div className="flex-1 min-w-0">
+              <div className="inline-flex items-center gap-1.5 sm:gap-3 px-2 sm:px-4 py-1.5 sm:py-2 bg-void-50/50 border border-terminal/20 rounded-lg">
+                <span className="text-terminal font-bold text-xs sm:text-base md:text-lg tracking-widest whitespace-nowrap">TARGET:</span>
+                <span className="text-white font-mono text-xs sm:text-base md:text-lg truncate max-w-[120px] sm:max-w-[300px] md:max-w-none">
+                  {scan.url.replace(/^https?:\/\//, '')}
                 </span>
               </div>
             </div>

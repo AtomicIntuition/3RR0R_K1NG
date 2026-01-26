@@ -112,8 +112,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setProfile(profileData);
             setProfileLoading(false);
           }
+          // For other events (TOKEN_REFRESHED), keep existing profile - don't touch it
         } else {
-          setProfile(null);
+          // Only clear profile on explicit sign out, not on transient session states
+          if (event === 'SIGNED_OUT') {
+            setProfile(null);
+          }
+          // For other events where session is null, keep profile if we have one
+          // This prevents flickering on tab visibility changes
         }
 
         setLoading(false);

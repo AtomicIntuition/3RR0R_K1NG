@@ -72,13 +72,13 @@ export function UserMenu() {
           </span>
         </div>
 
-        {/* Tier badge */}
-        {profileLoading ? (
-          <span className="w-8 h-4 bg-void-100 rounded animate-pulse" />
-        ) : profile ? (
+        {/* Tier badge - always show if we have profile data, even during refreshes */}
+        {profile ? (
           <span className={`text-xs font-medium ${tierColors[profile.tier]}`}>
             {tierLabels[profile.tier]}
           </span>
+        ) : profileLoading ? (
+          <span className="w-8 h-4 bg-void-100 rounded animate-pulse" />
         ) : null}
 
         {/* Dropdown arrow */}

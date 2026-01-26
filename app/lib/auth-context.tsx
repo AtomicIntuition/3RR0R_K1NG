@@ -78,24 +78,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user, fetchProfile]);
 
   useEffect(() => {
+    let mounted = true;
+
     // Get initial session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!mounted) return;
+
       setSession(session);
       setUser(session?.user ?? null);
 
       if (session?.user) {
         setProfileLoading(true);
         const profileData = await fetchProfile(session.user.id);
+        if (!mounted) return;
         setProfile(profileData);
         setProfileLoading(false);
       }
 
       setLoading(false);
+    }).catch(() => {
+      // Ignore abort errors during cleanup
+      if (mounted) setLoading(false);
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (!mounted) return;
+
         setAuthEvent(event);
         setSession(session);
         setUser(session?.user ?? null);
@@ -108,6 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (shouldRefetch) {
             setProfileLoading(true);
             const profileData = await fetchProfile(session.user.id);
+            if (!mounted) return;
             setProfile(profileData);
             setProfileLoading(false);
           }
@@ -126,6 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, [fetchProfile]);

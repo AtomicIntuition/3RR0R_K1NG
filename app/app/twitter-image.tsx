@@ -5,7 +5,7 @@ export const runtime = 'edge';
 export const alt = '3RROR_K1NG - Get Your Website Brutally Roasted';
 export const size = {
   width: 1200,
-  height: 630,
+  height: 600, // Twitter summary_large_image optimal ratio
 };
 export const contentType = 'image/png';
 
@@ -68,7 +68,7 @@ export default async function Image() {
             display: 'flex',
             width: '100%',
             height: '100%',
-            padding: '60px 80px',
+            padding: '50px 70px',
             position: 'relative',
           }}
         >
@@ -86,15 +86,15 @@ export default async function Image() {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                marginBottom: 40,
+                marginBottom: 32,
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={logoUrl}
                 alt="3RROR_K1NG Logo"
-                width={140}
-                height={140}
+                width={120}
+                height={120}
                 style={{
                   filter: 'drop-shadow(0 0 30px rgba(0, 255, 65, 0.6)) drop-shadow(0 0 60px rgba(0, 255, 65, 0.3))',
                 }}
@@ -103,12 +103,12 @@ export default async function Image() {
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  marginLeft: 30,
+                  marginLeft: 24,
                 }}
               >
                 <div
                   style={{
-                    fontSize: 56,
+                    fontSize: 48,
                     fontWeight: 'bold',
                     color: '#00ff41',
                     letterSpacing: '-2px',
@@ -119,10 +119,10 @@ export default async function Image() {
                 </div>
                 <div
                   style={{
-                    fontSize: 20,
+                    fontSize: 18,
                     color: '#00ff41',
                     opacity: 0.7,
-                    letterSpacing: '4px',
+                    letterSpacing: '3px',
                     textTransform: 'uppercase',
                     marginTop: 4,
                   }}
@@ -135,12 +135,12 @@ export default async function Image() {
             {/* Main headline */}
             <div
               style={{
-                fontSize: 52,
+                fontSize: 46,
                 fontWeight: 'bold',
                 color: '#ffffff',
                 lineHeight: 1.1,
-                marginBottom: 24,
-                maxWidth: 500,
+                marginBottom: 20,
+                maxWidth: 480,
               }}
             >
               Get Your Website
@@ -150,11 +150,11 @@ export default async function Image() {
             {/* Subheadline */}
             <div
               style={{
-                fontSize: 22,
+                fontSize: 20,
                 color: '#9ca3af',
                 lineHeight: 1.5,
-                maxWidth: 480,
-                marginBottom: 40,
+                maxWidth: 460,
+                marginBottom: 32,
               }}
             >
               AI-powered audits for security, performance, SEO & accessibility.
@@ -166,17 +166,17 @@ export default async function Image() {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 16,
+                gap: 14,
               }}
             >
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  padding: '14px 28px',
+                  padding: '12px 24px',
                   backgroundColor: '#00ff41',
                   borderRadius: 8,
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: 'bold',
                   color: '#050508',
                 }}
@@ -187,10 +187,10 @@ export default async function Image() {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  padding: '14px 24px',
+                  padding: '12px 20px',
                   border: '2px solid rgba(0, 255, 65, 0.5)',
                   borderRadius: 8,
-                  fontSize: 16,
+                  fontSize: 14,
                   color: '#00ff41',
                 }}
               >
@@ -206,7 +206,7 @@ export default async function Image() {
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
-              width: 380,
+              width: 360,
             }}
           >
             {/* Mock score card */}
@@ -217,7 +217,7 @@ export default async function Image() {
                 backgroundColor: 'rgba(10, 10, 20, 0.8)',
                 border: '1px solid rgba(0, 255, 65, 0.3)',
                 borderRadius: 16,
-                padding: '32px',
+                padding: '28px',
                 width: '100%',
                 boxShadow: '0 0 60px rgba(0, 255, 65, 0.1), inset 0 0 60px rgba(0, 255, 65, 0.03)',
               }}
@@ -228,17 +228,17 @@ export default async function Image() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 8,
-                  marginBottom: 24,
+                  marginBottom: 20,
                 }}
               >
-                <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#ff5f56' }} />
-                <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#ffbd2e' }} />
-                <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#27ca40' }} />
-                <span style={{ marginLeft: 12, fontSize: 14, color: '#6b7280' }}>scan_results.exe</span>
+                <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#ff5f56' }} />
+                <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#ffbd2e' }} />
+                <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#27ca40' }} />
+                <span style={{ marginLeft: 10, fontSize: 12, color: '#6b7280' }}>scan_results.exe</span>
               </div>
 
               {/* Score items */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 {[
                   { label: 'Security', score: 'C+', color: '#ffbd2e' },
                   { label: 'Performance', score: 'B-', color: '#00ff41' },
@@ -253,20 +253,20 @@ export default async function Image() {
                       justifyContent: 'space-between',
                     }}
                   >
-                    <span style={{ fontSize: 18, color: '#9ca3af' }}>{item.label}</span>
+                    <span style={{ fontSize: 16, color: '#9ca3af' }}>{item.label}</span>
                     <div
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 12,
+                        gap: 10,
                       }}
                     >
                       <div
                         style={{
-                          width: 120,
-                          height: 8,
+                          width: 100,
+                          height: 6,
                           backgroundColor: 'rgba(255,255,255,0.1)',
-                          borderRadius: 4,
+                          borderRadius: 3,
                           overflow: 'hidden',
                         }}
                       >
@@ -275,16 +275,16 @@ export default async function Image() {
                             width: `${item.score === 'D' ? 40 : item.score === 'C+' ? 60 : item.score === 'B-' ? 70 : 75}%`,
                             height: '100%',
                             backgroundColor: item.color,
-                            borderRadius: 4,
+                            borderRadius: 3,
                           }}
                         />
                       </div>
                       <span
                         style={{
-                          fontSize: 20,
+                          fontSize: 18,
                           fontWeight: 'bold',
                           color: item.color,
-                          width: 36,
+                          width: 32,
                           textAlign: 'right',
                         }}
                       >
@@ -301,15 +301,15 @@ export default async function Image() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  marginTop: 24,
-                  paddingTop: 20,
+                  marginTop: 20,
+                  paddingTop: 16,
                   borderTop: '1px solid rgba(255,255,255,0.1)',
                 }}
               >
-                <span style={{ fontSize: 20, color: '#ffffff', fontWeight: 'bold' }}>Overall</span>
+                <span style={{ fontSize: 18, color: '#ffffff', fontWeight: 'bold' }}>Overall</span>
                 <span
                   style={{
-                    fontSize: 36,
+                    fontSize: 32,
                     fontWeight: 'bold',
                     color: '#ffbd2e',
                     textShadow: '0 0 20px rgba(255, 189, 46, 0.5)',

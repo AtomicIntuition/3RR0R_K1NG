@@ -57,8 +57,8 @@ export const metadata: Metadata = {
     title: '3RROR_K1NG',
   },
   openGraph: {
-    title: '3RROR_K1NG | Website Roast Machine',
-    description: 'Get your website brutally roasted with actionable fixes',
+    title: '3RROR_K1NG | Get Your Website Brutally Roasted',
+    description: 'AI-powered security, performance, SEO & accessibility audits. Savage truths with actionable fixes. Try free - 3 scans/day.',
     type: 'website',
     locale: 'en_US',
     siteName: '3RROR_K1NG',
@@ -66,8 +66,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: '3RROR_K1NG | Website Roast Machine',
-    description: 'Get your website brutally roasted with actionable fixes',
+    title: '3RROR_K1NG | Get Your Website Brutally Roasted',
+    description: 'AI-powered security, performance, SEO & accessibility audits. Savage truths with actionable fixes. Try free - 3 scans/day.',
+    creator: '@3rrork1ng',
   },
   robots: {
     index: true,

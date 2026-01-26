@@ -2,12 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { toast } from 'sonner';
 
 export function UserMenu() {
-  const router = useRouter();
   const { user, profile, loading, profileLoading, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -165,7 +163,7 @@ export function UserMenu() {
                 await signOut();
                 setIsOpen(false);
                 toast.success('Signed out successfully');
-                router.push('/');
+                window.location.href = '/';
               }}
               className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-400 hover:bg-void-100 hover:text-danger transition-colors"
             >

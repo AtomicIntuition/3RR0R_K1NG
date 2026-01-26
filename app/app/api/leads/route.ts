@@ -1,17 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 
+// Email regex for basic validation
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_EMAIL_LENGTH = 254; // RFC 5321
+const VALID_SOURCES = ['scan_gate', 'signup', 'newsletter', 'unknown'];
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { email, source } = body;
 
-    if (!email || typeof email !== 'string' || !email.includes('@')) {
+    // Validate email format and length
+    if (
+      !email ||
+      typeof email !== 'string' ||
+      email.length > MAX_EMAIL_LENGTH ||
+      !EMAIL_REGEX.test(email)
+    ) {
       return NextResponse.json(
         { error: 'Valid email is required' },
         { status: 400 }
       );
     }
+
+    // Sanitize source to allowlist
+    const sanitizedSource = VALID_SOURCES.includes(source) ? source : 'unknown';
 
     const supabase = createServiceClient();
 
@@ -21,7 +35,7 @@ export async function POST(request: NextRequest) {
       .upsert(
         {
           email: email.toLowerCase().trim(),
-          source: source || 'unknown',
+          source: sanitizedSource,
           created_at: new Date().toISOString(),
         },
         {

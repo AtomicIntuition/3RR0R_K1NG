@@ -100,6 +100,11 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ whitelist: data });
 }
 
+// Email regex for validation
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_EMAIL_LENGTH = 254;
+const MAX_NOTE_LENGTH = 500;
+
 // POST - Add email to whitelist
 export async function POST(request: NextRequest) {
   const auth = await verifyAdmin(request);
@@ -110,14 +115,25 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const { email, granted_tier, expires_at, note } = body;
 
-  if (!email) {
-    return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+  // Validate email format and length
+  if (
+    !email ||
+    typeof email !== 'string' ||
+    email.length > MAX_EMAIL_LENGTH ||
+    !EMAIL_REGEX.test(email)
+  ) {
+    return NextResponse.json({ error: 'Valid email is required' }, { status: 400 });
   }
 
   const validTiers = ['free', 'pro'];
   if (granted_tier && !validTiers.includes(granted_tier)) {
     return NextResponse.json({ error: 'Invalid tier' }, { status: 400 });
   }
+
+  // Sanitize note length
+  const sanitizedNote = note && typeof note === 'string'
+    ? note.slice(0, MAX_NOTE_LENGTH)
+    : null;
 
   const supabase = createServiceClient();
 
@@ -127,7 +143,7 @@ export async function POST(request: NextRequest) {
       email: email.toLowerCase().trim(),
       granted_tier: granted_tier || 'pro',
       expires_at: expires_at || null,
-      note: note || null,
+      note: sanitizedNote,
     })
     .select()
     .single();

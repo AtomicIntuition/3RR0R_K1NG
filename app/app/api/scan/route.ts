@@ -43,9 +43,9 @@ export async function POST(request: NextRequest) {
     const shouldSkipRoast = Boolean(skipRoast);
 
     // Validate URL
-    if (!url || typeof url !== 'string') {
+    if (!url || typeof url !== 'string' || url.length > 2048) {
       return NextResponse.json(
-        { error: 'URL is required' },
+        { error: 'URL is required and must be under 2048 characters' },
         { status: 400 }
       );
     }
@@ -64,13 +64,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Sanitize fingerprint (optional, used for rate limiting)
+    const sanitizedFingerprint = fingerprint && typeof fingerprint === 'string'
+      ? fingerprint.slice(0, 64).replace(/[^a-zA-Z0-9-_]/g, '')
+      : null;
+
     // Get client IP for rate limiting
     const forwardedFor = request.headers.get('x-forwarded-for');
     const realIp = request.headers.get('x-real-ip');
     const ip = forwardedFor?.split(',')[0] ?? realIp ?? 'unknown';
 
     // Create identifier for anonymous rate limiting (IP + fingerprint)
-    const identifier = `${ip}:${fingerprint || 'none'}`;
+    const identifier = `${ip}:${sanitizedFingerprint || 'none'}`;
 
     const supabase = createServiceClient();
 
@@ -230,7 +235,7 @@ export async function POST(request: NextRequest) {
         url: parsedUrl.href,
         status: 'pending',
         ip_address: ip,
-        fingerprint: fingerprint || null,
+        fingerprint: sanitizedFingerprint,
         user_id: userId || null,
         roast_persona: selectedPersona,
       })

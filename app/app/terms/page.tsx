@@ -39,20 +39,20 @@ export default function TermsPage() {
               <h2 className="text-xl font-bold text-gray-100 mb-3">3. Acceptable Use</h2>
               <p className="mb-3 text-gray-400">You agree NOT to:</p>
               <ul className="list-disc list-inside space-y-2 text-gray-400">
-                <li>Scan websites you do not own or have permission to test</li>
-                <li>Use the service for malicious purposes or to plan attacks</li>
+                <li>Use the service for malicious purposes or to plan actual attacks</li>
                 <li>Attempt to overload or abuse the scanning infrastructure</li>
-                <li>Resell or redistribute scan results without permission</li>
+                <li>Use scan results to harass or stalk individuals</li>
                 <li>Circumvent rate limits or access restrictions</li>
               </ul>
             </section>
 
             <section>
-              <h2 className="text-xl font-bold text-gray-100 mb-3">4. Scanning Permission</h2>
+              <h2 className="text-xl font-bold text-gray-100 mb-3">4. About Our Scanning</h2>
               <p className="text-gray-400">
-                By submitting a URL for scanning, you confirm that you have authorization to test
-                that website. You are responsible for ensuring you have proper permission before
-                scanning any website.
+                3RROR_K1NG performs passive analysis of publicly accessible websites, similar to
+                services like Google PageSpeed Insights or SSL Labs. Our scans only access publicly
+                available information and do not perform penetration testing or exploit vulnerabilities.
+                You may scan any publicly accessible website for educational or informational purposes.
               </p>
             </section>
 
@@ -103,8 +103,8 @@ export default function TermsPage() {
               <h2 className="text-xl font-bold text-gray-100 mb-3">10. Contact</h2>
               <p className="text-gray-400">
                 For questions about these terms, contact us at{' '}
-                <a href="mailto:legal@3rrork1ng.com" className="text-terminal hover:text-terminal-bright">
-                  legal@3rrork1ng.com
+                <a href="mailto:chaptera@yahoo.com" className="text-terminal hover:text-terminal-bright">
+                  chaptera@yahoo.com
                 </a>
               </p>
             </section>

@@ -80,8 +80,8 @@ export default function PrivacyPage() {
               <h2 className="text-xl font-bold text-gray-100 mb-3">7. Contact</h2>
               <p className="text-gray-400">
                 For privacy-related questions, contact us at{' '}
-                <a href="mailto:privacy@3rrork1ng.com" className="text-terminal hover:text-terminal-bright">
-                  privacy@3rrork1ng.com
+                <a href="mailto:chaptera@yahoo.com" className="text-terminal hover:text-terminal-bright">
+                  chaptera@yahoo.com
                 </a>
               </p>
             </section>

@@ -48,6 +48,22 @@ export function ShareableReport({
     return '#ef4444';
   };
 
+  // Match RoastText intensity logic exactly
+  const getIntensityInfo = (score: number) => {
+    if (score >= 85) {
+      return { label: 'ACCEPTABLE', emoji: '🙄', color: '#00ff41' };
+    }
+    if (score >= 65) {
+      return { label: 'NEEDS WORK', emoji: '😬', color: '#facc15' };
+    }
+    if (score >= 40) {
+      return { label: 'BRUTAL', emoji: '🔥', color: '#fb923c' };
+    }
+    return { label: 'NUCLEAR', emoji: '☢️', color: '#ef4444' };
+  };
+
+  const intensity = getIntensityInfo(scoreOverall);
+
   const gradeColor = getGradeHexColor(grade);
 
   return (
@@ -96,24 +112,25 @@ export function ShareableReport({
       </div>
 
       {/* Target URL */}
-      <div
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '8px 16px',
-          backgroundColor: 'rgba(26,26,46,0.5)',
-          border: '1px solid rgba(0,255,65,0.2)',
-          borderRadius: '8px',
-          marginBottom: '24px',
-        }}
-      >
-        <span style={{ color: '#00ff41', fontWeight: 'bold', fontSize: '14px', letterSpacing: '2px' }}>
-          TARGET:
-        </span>
-        <span style={{ color: '#ffffff', fontFamily: 'monospace', fontSize: '14px' }}>
-          {url.replace(/^https?:\/\//, '').slice(0, 35)}{url.replace(/^https?:\/\//, '').length > 35 ? '...' : ''}
-        </span>
+      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px 16px',
+            backgroundColor: 'rgba(26,26,46,0.5)',
+            border: '1px solid rgba(0,255,65,0.2)',
+            borderRadius: '8px',
+          }}
+        >
+          <span style={{ color: '#00ff41', fontWeight: 'bold', fontSize: '14px', letterSpacing: '2px' }}>
+            TARGET:
+          </span>
+          <span style={{ color: '#ffffff', fontFamily: 'monospace', fontSize: '14px' }}>
+            {url.replace(/^https?:\/\//, '').slice(0, 35)}{url.replace(/^https?:\/\//, '').length > 35 ? '...' : ''}
+          </span>
+        </div>
       </div>
 
       {/* Score Section */}
@@ -179,7 +196,7 @@ export function ShareableReport({
           >
             {grade}
           </div>
-          <div style={{ fontSize: '14px', color: '#9ca3af', marginTop: '8px', letterSpacing: '2px' }}>
+          <div style={{ fontSize: '14px', color: '#9ca3af', marginTop: '16px', letterSpacing: '2px' }}>
             GRADE
           </div>
         </div>
@@ -240,10 +257,11 @@ export function ShareableReport({
         <div
           style={{
             backgroundColor: 'rgba(26,26,46,0.5)',
-            border: '1px solid #2d2d44',
+            border: `2px solid ${intensity.color}`,
             borderRadius: '12px',
             padding: '20px',
             marginBottom: '20px',
+            boxShadow: `0 0 20px ${intensity.color}20`,
           }}
         >
           {/* Verdict Badge */}
@@ -255,21 +273,21 @@ export function ShareableReport({
                 gap: '8px',
                 padding: '6px 12px',
                 backgroundColor: 'rgba(0,0,0,0.3)',
-                borderRadius: '6px',
-                border: `1px solid ${gradeColor}30`,
+                borderRadius: '20px',
+                border: `1px solid ${intensity.color}50`,
               }}
             >
-              <span style={{ fontSize: '16px' }}>💀</span>
+              <span style={{ fontSize: '14px' }}>{intensity.emoji}</span>
               <span
                 style={{
                   fontSize: '11px',
                   fontWeight: 'bold',
-                  color: gradeColor,
+                  color: intensity.color,
                   letterSpacing: '1px',
                   textTransform: 'uppercase',
                 }}
               >
-                {scoreOverall >= 80 ? 'IMPRESSIVE' : scoreOverall >= 60 ? 'ACCEPTABLE' : scoreOverall >= 40 ? 'NEEDS WORK' : 'BRUTAL'}
+                {intensity.label}
               </span>
             </div>
             {roastId && (
@@ -284,7 +302,7 @@ export function ShareableReport({
             style={{
               fontSize: '20px',
               fontWeight: 'bold',
-              color: '#00ff41',
+              color: intensity.color,
               marginBottom: '12px',
               lineHeight: 1.3,
             }}
@@ -292,20 +310,17 @@ export function ShareableReport({
             {roastTitle}
           </h3>
 
-          {/* Body - truncated for share card */}
+          {/* Body - full text */}
           <p
             style={{
               fontSize: '13px',
               color: '#d1d5db',
               lineHeight: 1.6,
               margin: 0,
-              display: '-webkit-box',
-              WebkitLineClamp: 6,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
+              whiteSpace: 'pre-wrap',
             }}
           >
-            {roastBody.slice(0, 400)}{roastBody.length > 400 ? '...' : ''}
+            {roastBody}
           </p>
         </div>
       )}

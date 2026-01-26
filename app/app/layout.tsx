@@ -63,12 +63,21 @@ export const metadata: Metadata = {
     locale: 'en_US',
     siteName: '3RROR_K1NG',
     url: siteUrl,
+    images: [
+      {
+        url: `${siteUrl}/images/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: '3RROR_K1NG - Website Roast Machine',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: '3RROR_K1NG | Get Your Website Brutally Roasted',
     description: 'AI-powered security, performance, SEO & accessibility audits. Savage truths with actionable fixes. Try free - 3 scans/day.',
     creator: '@3rrork1ng',
+    images: [`${siteUrl}/images/og-image.png`],
   },
   robots: {
     index: true,

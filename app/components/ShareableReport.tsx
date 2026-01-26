@@ -81,33 +81,33 @@ export function ShareableReport({
       <div
         style={{
           textAlign: 'center',
-          padding: '20px 24px',
+          padding: '24px 28px',
           background: 'linear-gradient(90deg, rgba(0,255,65,0.15) 0%, rgba(0,255,65,0.08) 50%, rgba(0,255,65,0.15) 100%)',
           border: '2px solid rgba(0,255,65,0.4)',
           borderRadius: '12px',
           marginBottom: '28px',
         }}
       >
-        <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#ffffff', marginBottom: '4px' }}>
+        <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ffffff', marginBottom: '8px', letterSpacing: '0.5px' }}>
           FREE ROAST + ACTIONABLE FIXES
         </div>
-        <div style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '12px' }}>
+        <div style={{ fontSize: '15px', color: '#9ca3af', marginBottom: '16px', letterSpacing: '1px' }}>
           Security • Performance • SEO • Accessibility
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
-          <div style={{ height: '1px', width: '40px', backgroundColor: 'rgba(0,255,65,0.5)' }} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
+          <div style={{ height: '1px', width: '50px', backgroundColor: 'rgba(0,255,65,0.5)' }} />
           <span
             style={{
               color: '#00ff41',
-              fontSize: '20px',
+              fontSize: '24px',
               fontWeight: 'bold',
-              letterSpacing: '2px',
+              letterSpacing: '3px',
               textShadow: '0 0 20px rgba(0,255,65,0.5)',
             }}
           >
             3RRORK1NG.COM
           </span>
-          <div style={{ height: '1px', width: '40px', backgroundColor: 'rgba(0,255,65,0.5)' }} />
+          <div style={{ height: '1px', width: '50px', backgroundColor: 'rgba(0,255,65,0.5)' }} />
         </div>
       </div>
 
@@ -196,7 +196,7 @@ export function ShareableReport({
           >
             {grade}
           </div>
-          <div style={{ fontSize: '14px', color: '#9ca3af', marginTop: '16px', letterSpacing: '2px' }}>
+          <div style={{ fontSize: '14px', color: '#9ca3af', marginTop: '24px', letterSpacing: '2px' }}>
             GRADE
           </div>
         </div>

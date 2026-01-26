@@ -200,14 +200,8 @@ export function ShareableReport({
           </svg>
         </div>
 
-        {/* Letter Grade - height matches score ring for alignment */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '120px',
-        }}>
+        {/* Letter Grade */}
+        <div style={{ textAlign: 'center' }}>
           <div
             style={{
               fontSize: '72px',
@@ -219,7 +213,7 @@ export function ShareableReport({
           >
             {grade}
           </div>
-          <div style={{ fontSize: '14px', color: '#9ca3af', marginTop: '8px', letterSpacing: '2px' }}>
+          <div style={{ fontSize: '14px', color: '#9ca3af', marginTop: '16px', letterSpacing: '2px' }}>
             GRADE
           </div>
         </div>

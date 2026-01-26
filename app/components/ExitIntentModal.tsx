@@ -107,8 +107,7 @@ export function ExitIntentModal({ discountPriceId }: ExitIntentModalProps) {
       }
 
       window.location.href = data.url;
-    } catch (err) {
-      console.error('Checkout error:', err);
+    } catch {
       setIsLoading(false);
     }
   };

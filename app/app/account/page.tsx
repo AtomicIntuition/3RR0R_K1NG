@@ -52,8 +52,8 @@ export default function AccountPage() {
         const data = await response.json();
         setSubscription(data);
       }
-    } catch (err) {
-      console.error('Failed to fetch subscription:', err);
+    } catch {
+      // Subscription fetch failed - user may not have one
     } finally {
       setLoadingSubscription(false);
     }

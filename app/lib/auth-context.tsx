@@ -58,7 +58,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       if (error) {
-        console.error(`Error fetching profile (attempt ${i + 1}):`, error);
         // Wait a bit before retrying (profile might not exist yet after signup)
         if (i < retries - 1) {
           await new Promise(resolve => setTimeout(resolve, 500));

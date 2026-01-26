@@ -9,6 +9,10 @@ const ALLOWED_ORIGINS = [
   'http://localhost:3000',
 ];
 
+// Rate limiting: max checkout attempts per hour
+const CHECKOUT_RATE_LIMIT = 10;
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
@@ -51,11 +55,11 @@ export async function POST(request: NextRequest) {
       ? requestOrigin
       : ALLOWED_ORIGINS[0]; // Default to production domain
 
-    // Verify user exists in database
+    // Verify user exists in database and check for existing subscription
     const supabase = createServiceClient();
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('id, email')
+      .select('id, email, tier, stripe_subscription_id')
       .eq('id', userId)
       .single();
 
@@ -64,6 +68,52 @@ export async function POST(request: NextRequest) {
         { error: 'Invalid user' },
         { status: 401 }
       );
+    }
+
+    // Check if user already has an active subscription (for subscription purchases only)
+    const isSubscriptionPurchase = mode === 'subscription';
+    if (isSubscriptionPurchase && profile.stripe_subscription_id && profile.tier === 'pro') {
+      return NextResponse.json(
+        { error: 'You already have an active Pro subscription' },
+        { status: 400 }
+      );
+    }
+
+    // Rate limiting by user ID
+    const rateLimitKey = `checkout:${userId}`;
+    const { data: rateLimit } = await supabase
+      .from('rate_limits')
+      .select('*')
+      .eq('identifier', rateLimitKey)
+      .single();
+
+    const now = new Date();
+    if (rateLimit) {
+      const windowStart = new Date(rateLimit.window_start);
+      const windowAge = now.getTime() - windowStart.getTime();
+
+      if (windowAge < RATE_LIMIT_WINDOW_MS) {
+        if (rateLimit.scan_count >= CHECKOUT_RATE_LIMIT) {
+          return NextResponse.json(
+            { error: 'Too many checkout attempts. Please try again later.' },
+            { status: 429 }
+          );
+        }
+        await supabase
+          .from('rate_limits')
+          .update({ scan_count: rateLimit.scan_count + 1 })
+          .eq('id', rateLimit.id);
+      } else {
+        await supabase
+          .from('rate_limits')
+          .update({ scan_count: 1, window_start: now.toISOString() })
+          .eq('id', rateLimit.id);
+      }
+    } else {
+      await supabase.from('rate_limits').insert({
+        identifier: rateLimitKey,
+        scan_count: 1,
+      });
     }
 
     // Use email from profile (more secure than trusting frontend)
@@ -89,8 +139,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ url: session.url });
-  } catch (error) {
-    console.error('Checkout error:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to create checkout session' },
       { status: 500 }

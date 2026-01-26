@@ -42,15 +42,11 @@ export function EmailCaptureModal({
 
       // Even if API fails, we still want to let them continue
       // The lead capture is a nice-to-have, not a blocker
-      if (!response.ok) {
-        console.warn('Lead capture failed, but continuing...');
-      }
 
       setEmailCaptured();
       onSuccess(email);
-    } catch (err) {
+    } catch {
       // Still let them through even on network errors
-      console.warn('Lead capture error:', err);
       setEmailCaptured();
       onSuccess(email);
     } finally {

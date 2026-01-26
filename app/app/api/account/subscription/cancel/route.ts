@@ -59,8 +59,7 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    // Log cancellation for analytics (optional - store in your own table)
-    console.log(`Subscription canceled: ${subscription.id}, reason: ${reason}, user: ${user.id}`);
+    // Subscription canceled successfully
 
     return NextResponse.json({
       success: true,

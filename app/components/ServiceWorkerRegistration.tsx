@@ -9,22 +9,20 @@ export function ServiceWorkerRegistration() {
       navigator.serviceWorker
         .register('/sw.js', { scope: '/' })
         .then((registration) => {
-          console.log('SW registered:', registration.scope);
-
           // Check for updates
           registration.addEventListener('updatefound', () => {
             const newWorker = registration.installing;
             if (newWorker) {
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('New SW available');
+                  // New service worker available - could show update prompt
                 }
               });
             }
           });
         })
-        .catch((error) => {
-          console.log('SW registration failed:', error);
+        .catch(() => {
+          // SW registration failed - not critical for app functionality
         });
     }
   }, []);

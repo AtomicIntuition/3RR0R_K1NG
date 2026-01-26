@@ -93,8 +93,8 @@ export function ScreenshotButton({
       // Cleanup
       root.unmount();
       document.body.removeChild(container);
-    } catch (error) {
-      console.error('Screenshot failed:', error);
+    } catch {
+      // Screenshot generation failed
     } finally {
       setIsCapturing(false);
     }

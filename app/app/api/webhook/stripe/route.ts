@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
                 stripe_customer_id: session.customer as string,
               }).eq('id', userId);
 
-              console.log(`Added ${scanCount} scan credits to user ${userId}. New total: ${currentCredits + scanCount}`);
+              // Scan credits added successfully
             }
           }
         }
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        // Unhandled event type - ignore
     }
 
     return NextResponse.json({ received: true });

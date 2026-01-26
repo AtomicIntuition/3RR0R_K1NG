@@ -11,7 +11,11 @@ function getAdminEmails(): string[] {
     .filter(email => email.length > 0);
 }
 
-// Helper to verify admin access
+// Rate limiting: max admin API requests per minute
+const ADMIN_RATE_LIMIT = 30;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
+
+// Helper to verify admin access and check rate limit
 async function verifyAdmin(request: NextRequest) {
   const authHeader = request.headers.get('authorization');
 
@@ -36,6 +40,40 @@ async function verifyAdmin(request: NextRequest) {
 
   if (!adminEmails.includes((user.email || '').toLowerCase())) {
     return { error: 'Not authorized', status: 403 };
+  }
+
+  // Rate limiting by admin user ID
+  const rateLimitKey = `admin:${user.id}`;
+  const { data: rateLimit } = await supabase
+    .from('rate_limits')
+    .select('*')
+    .eq('identifier', rateLimitKey)
+    .single();
+
+  const now = new Date();
+  if (rateLimit) {
+    const windowStart = new Date(rateLimit.window_start);
+    const windowAge = now.getTime() - windowStart.getTime();
+
+    if (windowAge < RATE_LIMIT_WINDOW_MS) {
+      if (rateLimit.scan_count >= ADMIN_RATE_LIMIT) {
+        return { error: 'Too many requests. Please slow down.', status: 429 };
+      }
+      await supabase
+        .from('rate_limits')
+        .update({ scan_count: rateLimit.scan_count + 1 })
+        .eq('id', rateLimit.id);
+    } else {
+      await supabase
+        .from('rate_limits')
+        .update({ scan_count: 1, window_start: now.toISOString() })
+        .eq('id', rateLimit.id);
+    }
+  } else {
+    await supabase.from('rate_limits').insert({
+      identifier: rateLimitKey,
+      scan_count: 1,
+    });
   }
 
   return { user };

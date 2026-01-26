@@ -42,7 +42,7 @@ export async function DELETE() {
         await stripe.subscriptions.cancel(profile.stripe_subscription_id, {
           prorate: true, // Prorate final invoice
         });
-        console.log(`Canceled subscription ${profile.stripe_subscription_id} for user ${user.id}`);
+        // Subscription canceled successfully
       } catch (stripeError) {
         console.error('Failed to cancel Stripe subscription:', stripeError);
         // Continue with deletion even if Stripe fails
@@ -86,7 +86,7 @@ export async function DELETE() {
       );
     }
 
-    console.log(`Successfully deleted account for user ${user.id}`);
+    // Account deleted successfully
 
     return NextResponse.json({
       success: true,

@@ -6,16 +6,16 @@ const STATIC_CACHE = '3rror-k1ng-static-v1';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
-  '/icons/icon-192x192.svg',
-  '/icons/icon-512x512.svg',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
 ];
 
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) => {
-      return cache.addAll(STATIC_ASSETS).catch((err) => {
-        console.log('Cache addAll error (non-critical):', err);
+      return cache.addAll(STATIC_ASSETS).catch(() => {
+        // Cache error - non-critical, continue
       });
     })
   );

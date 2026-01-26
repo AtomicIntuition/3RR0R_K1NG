@@ -121,7 +121,6 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
 
       window.location.href = data.url;
     } catch (err) {
-      console.error('Checkout error:', err);
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
       setIsLoading(null);

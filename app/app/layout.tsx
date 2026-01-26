@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { JetBrains_Mono, Space_Grotesk } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
 import { Providers } from '@/components/Providers';
 import { Navbar } from '@/components/Navbar';
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration';
@@ -208,6 +209,7 @@ export default function RootLayout({
             </footer>
           </div>
         </Providers>
+        <Analytics />
       </body>
     </html>
   );

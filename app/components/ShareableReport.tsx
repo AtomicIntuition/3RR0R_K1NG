@@ -321,7 +321,10 @@ export function ShareableReport({
               fontWeight: 'bold',
               color: intensity.color,
               marginBottom: '12px',
-              lineHeight: 1.3,
+              lineHeight: 1.4,
+              wordWrap: 'break-word',
+              overflowWrap: 'break-word',
+              whiteSpace: 'normal',
             }}
           >
             {roastTitle}

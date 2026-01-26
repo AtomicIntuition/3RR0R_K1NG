@@ -59,8 +59,8 @@ export function ScreenshotButton({
         />
       );
 
-      // Wait for render to complete
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Wait for render to complete (longer wait for text wrapping)
+      await new Promise(resolve => setTimeout(resolve, 300));
 
       const element = container.querySelector('#shareable-report-fixed');
       if (!element) {

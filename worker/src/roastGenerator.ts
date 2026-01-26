@@ -875,7 +875,7 @@ PERSONA: ${personaConfig.name} (${personaConfig.description})
 Generate a roast in the following JSON format. The roast should be memorable, technically accurate, and include specific references to the actual issues found. STAY IN CHARACTER for your persona throughout. Be creative with the title - it should be punchy and shareable.
 
 {
-  "title": "A devastating one-liner roast title (max 60 chars)",
+  "title": "A devastating one-liner roast title (max 80 chars, complete the thought)",
   "body": "2-3 paragraph roast that references specific findings. Be savage but helpful. End with either praise (if deserved) or a call to action.",
   "twitterRoast": "A punchy 280-char max roast perfect for Twitter. Include the score and 1 devastating observation. Make it viral-worthy.",
   "fixes": [
@@ -890,7 +890,7 @@ Generate a roast in the following JSON format. The roast should be memorable, te
 }
 
 RULES:
-- Title must be under 60 characters
+- Title must be under 80 characters and complete (no cut-off words)
 - twitterRoast must be under 280 characters (for Twitter sharing)
 - Include 3-5 of the most impactful fixes
 - Fixes should be ordered by priority (critical first)
@@ -1022,8 +1022,12 @@ export async function generateRoast(input: RoastInput): Promise<RoastResult> {
     return generateFallbackRoast(input, 'Invalid response format');
   }
 
-  // Ensure title is not too long
-  result.title = result.title.slice(0, 60);
+  // Ensure title is not too long (smart truncate at word boundary)
+  if (result.title.length > 80) {
+    const truncated = result.title.slice(0, 80);
+    const lastSpace = truncated.lastIndexOf(' ');
+    result.title = lastSpace > 40 ? truncated.slice(0, lastSpace) : truncated;
+  }
 
   // Ensure twitterRoast is not too long (280 chars for Twitter)
   if (result.twitterRoast) {
@@ -1394,7 +1398,7 @@ ROAST INTENSITY: ${input.overallScore >= 80 ? 'mild teasing' : input.overallScor
 Generate a roast in the following JSON format. The roast should be memorable, technically accurate, and include specific references to the actual issues found.
 
 {
-  "title": "A devastating one-liner roast title (max 60 chars)",
+  "title": "A devastating one-liner roast title (max 80 chars, complete the thought)",
   "body": "2-3 paragraph roast that references specific findings. Be savage but helpful. Focus on the most critical issues found.",
   "fixes": [
     {
@@ -1408,7 +1412,7 @@ Generate a roast in the following JSON format. The roast should be memorable, te
 }
 
 RULES:
-- Title must be under 60 characters
+- Title must be under 80 characters and complete (no cut-off words)
 - Include 3-5 of the most impactful fixes
 - Fixes should be ordered by priority (critical first)
 - Be specific - reference actual package names, file paths, or secret types found
@@ -1456,8 +1460,12 @@ export async function generateUploadRoast(input: UploadRoastInput): Promise<Roas
     return generateUploadFallbackRoast(input, 'Invalid response format');
   }
 
-  // Ensure title is not too long
-  result.title = result.title.slice(0, 60);
+  // Ensure title is not too long (smart truncate at word boundary)
+  if (result.title.length > 80) {
+    const truncated = result.title.slice(0, 80);
+    const lastSpace = truncated.lastIndexOf(' ');
+    result.title = lastSpace > 40 ? truncated.slice(0, lastSpace) : truncated;
+  }
 
   // Validate fixes
   result.fixes = result.fixes.slice(0, 5).map(fix => ({

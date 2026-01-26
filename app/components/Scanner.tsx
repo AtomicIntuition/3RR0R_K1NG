@@ -272,7 +272,7 @@ export function Scanner({ className }: ScannerProps) {
       {!showAuthWall && <div className="mt-6 text-center">
         <p className="text-xs text-gray-400 mb-2">Try scanning:</p>
         <div className="flex flex-wrap justify-center gap-2">
-          {['github.com', 'stripe.com', 'vercel.com'].map((example) => (
+          {['github.com', 'notion.com', 'vercel.com'].map((example) => (
             <button
               key={example}
               type="button"

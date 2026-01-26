@@ -270,9 +270,9 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
     );
   }
 
-  // Regular paywall view
+  // Regular paywall view - use handleDecline for close to trigger exit intent discount
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} className="max-w-lg max-h-[90vh] overflow-y-auto">
+    <Modal isOpen={isOpen} onClose={handleDecline} className="max-w-lg max-h-[90vh] overflow-y-auto">
       <div className="p-6 sm:p-8">
         {/* Header */}
         <div className="text-center mb-6">

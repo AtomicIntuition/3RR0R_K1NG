@@ -119,7 +119,15 @@ export default function ScanResultsPage() {
             </div>
             <div className="screenshot-ignore flex-shrink-0">
               <ScreenshotButton
-                targetId="shareable-results"
+                scanData={{
+                  url: scan.url,
+                  scoreOverall: scan.scoreOverall || 0,
+                  letterGrade: scan.letterGrade,
+                  scoringBreakdown: scan.scoringBreakdown,
+                  roastTitle: scan.roastTitle,
+                  roastBody: scan.roastBody,
+                  id: scan.id,
+                }}
                 filename={`3rror-k1ng-${scan.url.replace(/https?:\/\//, '').replace(/[^a-z0-9]/gi, '-').slice(0, 30)}`}
               />
             </div>

@@ -1,44 +1,79 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { createRoot } from 'react-dom/client';
 import html2canvas from 'html2canvas';
+import { ShareableReport } from './ShareableReport';
+
+interface ScanData {
+  url: string;
+  scoreOverall: number;
+  letterGrade?: string;
+  scoringBreakdown?: {
+    breakdown: Array<{
+      category: string;
+      score: number;
+      weight: number;
+    }>;
+  };
+  roastTitle?: string;
+  roastBody?: string;
+  id?: string;
+}
 
 interface ScreenshotButtonProps {
-  targetId: string;
+  scanData: ScanData;
   filename?: string;
   className?: string;
 }
 
 export function ScreenshotButton({
-  targetId,
+  scanData,
   filename = 'roast',
   className,
 }: ScreenshotButtonProps) {
   const [isCapturing, setIsCapturing] = useState(false);
 
   const captureScreenshot = useCallback(async () => {
-    const element = document.getElementById(targetId);
-    if (!element) {
-      console.error('Target element not found:', targetId);
-      return;
-    }
-
     setIsCapturing(true);
 
-    // Add class to disable animations during capture
-    document.body.classList.add('screenshot-mode');
-
-    // Small delay to let animations stop
-    await new Promise(resolve => setTimeout(resolve, 100));
-
     try {
-      const canvas = await html2canvas(element, {
+      // Create a container for the fixed-width report
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.left = '-9999px';
+      container.style.top = '0';
+      document.body.appendChild(container);
+
+      // Render the ShareableReport component into the container
+      const root = createRoot(container);
+      root.render(
+        <ShareableReport
+          url={scanData.url}
+          scoreOverall={scanData.scoreOverall}
+          letterGrade={scanData.letterGrade}
+          scoringBreakdown={scanData.scoringBreakdown}
+          roastTitle={scanData.roastTitle}
+          roastBody={scanData.roastBody}
+          roastId={scanData.id}
+        />
+      );
+
+      // Wait for render to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const element = container.querySelector('#shareable-report-fixed');
+      if (!element) {
+        throw new Error('Report element not found');
+      }
+
+      const canvas = await html2canvas(element as HTMLElement, {
         backgroundColor: '#0a0a0f',
-        scale: 2, // Higher quality
+        scale: 2, // 2x for high quality (1200px output)
         useCORS: true,
         logging: false,
-        // Ignore elements with this class
-        ignoreElements: (el) => el.classList?.contains('screenshot-ignore'),
+        width: 600,
+        height: element.scrollHeight,
       });
 
       // Convert to blob and download
@@ -54,21 +89,23 @@ export function ScreenshotButton({
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
       }, 'image/png');
+
+      // Cleanup
+      root.unmount();
+      document.body.removeChild(container);
     } catch (error) {
       console.error('Screenshot failed:', error);
     } finally {
-      // Remove the class
-      document.body.classList.remove('screenshot-mode');
       setIsCapturing(false);
     }
-  }, [targetId, filename]);
+  }, [scanData, filename]);
 
   return (
     <button
       onClick={captureScreenshot}
       disabled={isCapturing}
-      className={`screenshot-ignore flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 bg-terminal/10 border border-terminal/30 text-terminal rounded-lg hover:bg-terminal/20 transition-all disabled:opacity-50 ${className || ''}`}
-      title="Screenshot this roast"
+      className={`screenshot-ignore flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-terminal/10 border border-terminal/30 text-terminal rounded-lg hover:bg-terminal/20 transition-all disabled:opacity-50 ${className || ''}`}
+      title="Download shareable screenshot"
     >
       {isCapturing ? (
         <svg className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -77,12 +114,11 @@ export function ScreenshotButton({
         </svg>
       ) : (
         <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
         </svg>
       )}
       <span className="text-xs sm:text-sm font-medium whitespace-nowrap">
-        {isCapturing ? 'Capturing...' : 'Screenshot'}
+        {isCapturing ? 'Generating...' : 'Download'}
       </span>
     </button>
   );

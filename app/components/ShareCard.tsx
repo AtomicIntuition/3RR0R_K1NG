@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import clsx from 'clsx';
 import { getGrade } from '@/lib/scoring';
-import { ScreenshotButton } from './ScreenshotButton';
 
 interface ShareCardProps {
   scanId: string;
@@ -108,12 +107,6 @@ export function ShareCard({ scanId, url, score, twitterRoast, className }: Share
           </svg>
           <span>Share on LinkedIn</span>
         </button>
-
-        {/* Screenshot button - captures the roast section */}
-        <ScreenshotButton
-          targetId="roast-container"
-          filename={`3rror-k1ng-roast-${scanId.slice(0, 8)}`}
-        />
       </div>
 
       {/* Twitter roast text */}

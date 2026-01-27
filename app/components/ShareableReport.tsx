@@ -440,6 +440,159 @@ export function ShareableReport({
         </div>
       )}
 
+      {/* Search CTA Banner */}
+      <div
+        style={{
+          background: 'linear-gradient(135deg, rgba(0,255,65,0.12) 0%, rgba(34,211,238,0.08) 50%, rgba(0,255,65,0.12) 100%)',
+          border: '2px solid rgba(0,255,65,0.35)',
+          borderRadius: '12px',
+          padding: '20px 24px',
+          marginBottom: '20px',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Decorative corner accents */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '20px',
+            height: '20px',
+            borderTop: '3px solid #00ff41',
+            borderLeft: '3px solid #00ff41',
+            borderRadius: '2px 0 0 0',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            width: '20px',
+            height: '20px',
+            borderTop: '3px solid #00ff41',
+            borderRight: '3px solid #00ff41',
+            borderRadius: '0 2px 0 0',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            width: '20px',
+            height: '20px',
+            borderBottom: '3px solid #00ff41',
+            borderLeft: '3px solid #00ff41',
+            borderRadius: '0 0 0 2px',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            right: 0,
+            width: '20px',
+            height: '20px',
+            borderBottom: '3px solid #00ff41',
+            borderRight: '3px solid #00ff41',
+            borderRadius: '0 0 2px 0',
+          }}
+        />
+
+        <div style={{ textAlign: 'center' }}>
+          {/* Icon and title row */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '12px' }}>
+            <span style={{ fontSize: '24px' }}>🔍</span>
+            <span
+              style={{
+                fontSize: '18px',
+                fontWeight: 'bold',
+                color: '#ffffff',
+                letterSpacing: '2px',
+                textTransform: 'uppercase',
+              }}
+            >
+              Already Been Roasted?
+            </span>
+          </div>
+
+          {/* Subtitle */}
+          <p
+            style={{
+              fontSize: '13px',
+              color: '#d1d5db',
+              marginBottom: '16px',
+              lineHeight: 1.5,
+            }}
+          >
+            Search for your website on our homepage to view your{' '}
+            <span style={{ color: '#00ff41', fontWeight: 'bold' }}>full detailed report</span>
+            {' '}with all fixes and recommendations
+          </p>
+
+          {/* Search bar mockup */}
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '12px 20px',
+              backgroundColor: 'rgba(10,10,15,0.8)',
+              border: '1px solid rgba(0,255,65,0.4)',
+              borderRadius: '8px',
+              boxShadow: '0 0 15px rgba(0,255,65,0.1)',
+            }}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#00ff41"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+            <span style={{ fontSize: '13px', color: '#6b7280' }}>Search for your site...</span>
+            <span
+              style={{
+                fontSize: '11px',
+                color: '#00ff41',
+                fontWeight: 'bold',
+                padding: '4px 8px',
+                backgroundColor: 'rgba(0,255,65,0.15)',
+                borderRadius: '4px',
+              }}
+            >
+              FREE
+            </span>
+          </div>
+
+          {/* URL callout */}
+          <div style={{ marginTop: '14px' }}>
+            <span style={{ fontSize: '11px', color: '#9ca3af' }}>Visit </span>
+            <span
+              style={{
+                fontSize: '13px',
+                fontWeight: 'bold',
+                color: '#00ff41',
+                letterSpacing: '1px',
+                textShadow: '0 0 10px rgba(0,255,65,0.3)',
+              }}
+            >
+              3RRORK1NG.COM
+            </span>
+            <span style={{ fontSize: '11px', color: '#9ca3af' }}> to find your report</span>
+          </div>
+        </div>
+      </div>
+
       {/* Footer */}
       <div
         style={{

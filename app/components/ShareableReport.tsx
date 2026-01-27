@@ -66,6 +66,19 @@ export function ShareableReport({
 
   const gradeColor = getGradeHexColor(grade);
 
+  // Shorter labels for the compact shareable image
+  const getShortLabel = (category: string): string => {
+    const labels: Record<string, string> = {
+      'security': 'SECURITY',
+      'performance': 'PERF',
+      'user experience': 'UX',
+      'accessibility': 'A11Y',
+      'seo': 'SEO',
+      'code quality': 'CODE',
+    };
+    return labels[category.toLowerCase()] || category.toUpperCase();
+  };
+
   return (
     <div
       id="shareable-report-fixed"
@@ -242,17 +255,14 @@ export function ShareableReport({
             >
               <div
                 style={{
-                  fontSize: '9px',
+                  fontSize: '10px',
                   color: '#6b7280',
-                  textTransform: 'uppercase',
                   letterSpacing: '0.5px',
                   marginBottom: '4px',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
+                  fontWeight: '600',
                 }}
               >
-                {cat.category}
+                {getShortLabel(cat.category)}
               </div>
               <div
                 style={{

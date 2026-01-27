@@ -2,15 +2,19 @@ import Link from 'next/link';
 import { Scanner } from '@/components/Scanner';
 import { GlitchText } from '@/components/GlitchText';
 import { Stats } from '@/components/Stats';
+import { LiveActivity } from '@/components/LiveActivity';
 import { ExampleRoasts } from '@/components/ExampleRoasts';
+import { ExitIntentScan } from '@/components/ExitIntentScan';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
-      {/* Hero Section */}
-      <div className="text-center mb-12 mt-4">
+    <div className="min-h-screen flex flex-col">
+      {/* Exit Intent Modal for anonymous users */}
+      <ExitIntentScan />
+      {/* Hero Section - Mobile optimized */}
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12">
         {/* Logo/Title */}
-        <h1 className="text-5xl sm:text-7xl font-bold mb-4">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-3 sm:mb-4 text-center">
           <GlitchText
             text="3RROR_K1NG"
             className="text-terminal neon-glow-green"
@@ -20,147 +24,147 @@ export default function HomePage() {
         </h1>
 
         {/* Subtitle */}
-        <p className="text-xl sm:text-2xl text-gray-400 mb-2">
+        <p className="text-lg sm:text-xl md:text-2xl text-gray-400 mb-2 text-center">
           Website Roast Machine
         </p>
 
-        {/* Description */}
-        <p className="max-w-lg mx-auto text-gray-500 text-sm sm:text-base">
-          Drop a URL. Get brutally roasted. Security, performance, SEO, and
-          accessibility audits delivered as savage truths with actionable fixes.
-        </p>
-      </div>
+        {/* Social proof - inline stats */}
+        <div className="mb-6 sm:mb-8">
+          <Stats variant="inline" />
+        </div>
 
-      {/* Scanner Input */}
-      <Scanner className="w-full max-w-2xl" />
+        {/* Scanner Input */}
+        <Scanner className="w-full max-w-2xl mb-6" />
 
-      {/* Features Grid */}
-      <div className="mt-16 grid grid-cols-2 sm:grid-cols-5 gap-4 max-w-4xl w-full">
-        {[
-          { icon: '⚡', label: 'Performance', desc: 'Core Web Vitals' },
-          { icon: '🛡️', label: 'Security', desc: 'Headers & HTTPS' },
-          { icon: '🔍', label: 'SEO', desc: 'Meta & Structure' },
-          { icon: '♿', label: 'Accessibility', desc: 'WCAG Compliance' },
-          { icon: '🧹', label: 'Code Quality', desc: 'Errors & Issues' },
-        ].map((feature) => (
-          <div
-            key={feature.label}
-            className="p-4 bg-void-50/50 rounded-lg border border-void-100 text-center hover:border-terminal/30 transition-colors"
-          >
-            <span className="text-2xl mb-2 block">{feature.icon}</span>
-            <p className="font-bold text-terminal text-sm">{feature.label}</p>
-            <p className="text-xs text-gray-500 mt-1">{feature.desc}</p>
-          </div>
-        ))}
-      </div>
+        {/* Live Activity Feed */}
+        <LiveActivity compact className="mb-8 sm:mb-12" />
 
-      {/* Stats/Social Proof */}
-      <div className="mt-16">
-        <Stats />
-      </div>
-
-      {/* Example Roasts Carousel */}
-      <div className="mt-16 w-full">
-        <ExampleRoasts />
-      </div>
-
-      {/* How it works */}
-      <div className="mt-20 max-w-3xl w-full">
-        <h2 className="text-2xl font-bold text-center mb-8">
-          <span className="text-terminal">&gt;</span> How it works
-        </h2>
-
-        <div className="grid sm:grid-cols-3 gap-6">
+        {/* Value Props - Mobile-friendly grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-4 max-w-4xl w-full mb-12 sm:mb-16">
           {[
-            {
-              step: '01',
-              title: 'Enter URL',
-              desc: 'Paste any website URL you want to audit',
-            },
-            {
-              step: '02',
-              title: 'Deep Scan',
-              desc: 'We analyze 50+ metrics across 5 categories',
-            },
-            {
-              step: '03',
-              title: 'Get Roasted',
-              desc: 'Receive your brutal report with fixes',
-            },
-          ].map((item) => (
-            <div key={item.step} className="text-center">
-              <div className="text-5xl font-bold text-terminal/20 mb-3 select-none">
-                {item.step}
-              </div>
-              <div className="bg-void-50/50 p-6 rounded-lg border border-void-100">
-                <h3 className="font-bold text-terminal mb-2">{item.title}</h3>
-                <p className="text-sm text-gray-500">{item.desc}</p>
-              </div>
+            { icon: '🛡️', label: 'Security', desc: 'Headers & HTTPS' },
+            { icon: '⚡', label: 'Performance', desc: 'Core Web Vitals' },
+            { icon: '🔍', label: 'SEO', desc: 'Meta & Structure' },
+            { icon: '♿', label: 'Accessibility', desc: 'WCAG Checks' },
+            { icon: '🧹', label: 'Code', desc: 'Quality & Errors' },
+          ].map((feature) => (
+            <div
+              key={feature.label}
+              className="p-3 sm:p-4 bg-void-50/50 rounded-lg border border-void-100 text-center hover:border-terminal/30 transition-colors"
+            >
+              <span className="text-xl sm:text-2xl mb-1 sm:mb-2 block">{feature.icon}</span>
+              <p className="font-bold text-terminal text-xs sm:text-sm">{feature.label}</p>
+              <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1 hidden sm:block">{feature.desc}</p>
             </div>
           ))}
         </div>
-      </div>
 
-      {/* Upgrade CTA */}
-      <div className="mt-20 w-full max-w-2xl p-8 bg-gradient-to-r from-terminal/10 to-neon-cyan/10 rounded-lg border border-terminal/30">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-100 mb-2">
-            Need more roasting power?
+        {/* How it works - Simplified for mobile */}
+        <div className="max-w-3xl w-full mb-12 sm:mb-16">
+          <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 sm:mb-8">
+            <span className="text-terminal">&gt;</span> How it works
           </h2>
-          <p className="text-gray-400 mb-6">
-            Free users get 3 scans/day. Go Pro for 200 scans/month, priority queue, and full audit reports.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/pricing"
-              className="px-6 py-3 font-bold rounded transition-all duration-200 bg-terminal text-void hover:bg-terminal-bright"
-            >
-              Go Pro — $29/mo
-            </Link>
-            <Link
-              href="/pricing"
-              className="px-6 py-3 font-bold rounded transition-all duration-200 border border-terminal/50 text-terminal hover:bg-terminal/10"
-            >
-              View All Plans
-            </Link>
-          </div>
-        </div>
-      </div>
 
-      {/* Terminal decoration */}
-      <div className="mt-20 w-full max-w-2xl">
-        <div className="bg-void-50 rounded-lg border border-void-100 p-4 font-mono text-xs text-gray-400">
-          <div className="flex items-center gap-2 mb-3 pb-2 border-b border-void-100">
-            <span className="text-terminal">guest@3rror_k1ng</span>
-            <span className="text-gray-400">~</span>
-          </div>
-          <div className="space-y-1">
-            <p><span className="text-terminal">$</span> ./scan --target https://your-site.com</p>
-            <p className="text-gray-400">[*] Initializing security audit...</p>
-            <p className="text-gray-400">[*] Running performance checks...</p>
-            <p className="text-gray-400">[*] Analyzing SEO configuration...</p>
-            <p className="text-neon-yellow">[!] WARNING: 12 vulnerabilities found</p>
-            <p className="text-danger">[X] CRITICAL: Missing security headers</p>
-            <p className="text-terminal">[+] Report generated. Prepare for roast.</p>
-            <p className="cursor-blink text-terminal">$</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+            {[
+              {
+                step: '01',
+                title: 'Drop a URL',
+                desc: 'Paste any website you want to audit',
+              },
+              {
+                step: '02',
+                title: 'Get Roasted',
+                desc: 'AI analyzes 50+ metrics across 5 categories',
+              },
+              {
+                step: '03',
+                title: 'Copy & Fix',
+                desc: 'Paste the report into Cursor or Claude to fix issues',
+              },
+            ].map((item) => (
+              <div key={item.step} className="flex sm:flex-col items-center sm:text-center gap-4 sm:gap-0">
+                <div className="text-3xl sm:text-5xl font-bold text-terminal/20 select-none shrink-0">
+                  {item.step}
+                </div>
+                <div className="bg-void-50/50 p-4 sm:p-6 rounded-lg border border-void-100 flex-1 sm:flex-none sm:mt-3">
+                  <h3 className="font-bold text-terminal mb-1 sm:mb-2 text-sm sm:text-base">{item.title}</h3>
+                  <p className="text-xs sm:text-sm text-gray-500">{item.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+
+        {/* Example Roasts */}
+        <div className="w-full mb-12 sm:mb-16">
+          <ExampleRoasts />
+        </div>
+
+        {/* Upgrade CTA */}
+        <div className="w-full max-w-2xl p-6 sm:p-8 bg-gradient-to-r from-terminal/10 to-neon-cyan/10 rounded-lg border border-terminal/30 mb-12 sm:mb-16">
+          <div className="text-center">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-100 mb-2">
+              Need more roasting power?
+            </h2>
+            <p className="text-gray-400 mb-4 sm:mb-6 text-sm sm:text-base">
+              Free users get 3 scans/day. Go Pro for 200 scans/month and priority queue.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+              <Link
+                href="/pricing"
+                className="px-6 py-3 font-bold rounded transition-all duration-200 bg-terminal text-void hover:bg-terminal-bright active:scale-95 text-center"
+              >
+                Go Pro — $29/mo
+              </Link>
+              <Link
+                href="/pricing"
+                className="px-6 py-3 font-bold rounded transition-all duration-200 border border-terminal/50 text-terminal hover:bg-terminal/10 active:scale-95 text-center"
+              >
+                View All Plans
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Terminal decoration - Hidden on mobile */}
+        <div className="hidden sm:block w-full max-w-2xl mb-16">
+          <div className="bg-void-50 rounded-lg border border-void-100 p-4 font-mono text-xs text-gray-400">
+            <div className="flex items-center gap-2 mb-3 pb-2 border-b border-void-100">
+              <span className="text-terminal">guest@3rror_k1ng</span>
+              <span className="text-gray-400">~</span>
+            </div>
+            <div className="space-y-1">
+              <p><span className="text-terminal">$</span> ./scan --target https://your-site.com</p>
+              <p className="text-gray-400">[*] Initializing security audit...</p>
+              <p className="text-gray-400">[*] Running performance checks...</p>
+              <p className="text-neon-yellow">[!] WARNING: 12 vulnerabilities found</p>
+              <p className="text-danger">[X] CRITICAL: Missing security headers</p>
+              <p className="text-terminal">[+] Report generated. Prepare for roast.</p>
+            </div>
+          </div>
+        </div>
+      </main>
 
       {/* Footer */}
-      <footer className="mt-20 w-full max-w-4xl border-t border-void-100 pt-8 pb-4">
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-500">
-          <div className="flex items-center gap-4">
-            <span className="text-terminal font-bold">3RROR_K1NG</span>
-            <span>Website Roast Machine</span>
-          </div>
-          <div className="flex items-center gap-6">
-            <Link href="/pricing" className="hover:text-terminal transition-colors">
-              Pricing
-            </Link>
-            <a href="mailto:support@3rrork1ng.com" className="hover:text-terminal transition-colors">
-              Support
-            </a>
+      <footer className="w-full border-t border-void-100 px-4">
+        <div className="max-w-4xl mx-auto py-6 sm:py-8">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-500">
+            <div className="flex items-center gap-4">
+              <span className="text-terminal font-bold">3RROR_K1NG</span>
+              <span className="hidden sm:inline">Website Roast Machine</span>
+            </div>
+            <div className="flex items-center gap-6">
+              <Link href="/pricing" className="hover:text-terminal transition-colors">
+                Pricing
+              </Link>
+              <Link href="/terms" className="hover:text-terminal transition-colors">
+                Terms
+              </Link>
+              <Link href="/privacy" className="hover:text-terminal transition-colors">
+                Privacy
+              </Link>
+            </div>
           </div>
         </div>
       </footer>

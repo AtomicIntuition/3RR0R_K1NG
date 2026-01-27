@@ -54,11 +54,8 @@ export function Scanner({ className }: ScannerProps) {
       return;
     }
 
-    // Check if user is signed in
-    if (!user) {
-      setShowAuthWall(true);
-      return;
-    }
+    // Allow anonymous users to scan - API handles rate limiting (2/hour)
+    // Auth wall only shows after rate limit hit
 
     setIsLoading(true);
     setScanPhase('Initializing scan...');
@@ -82,8 +79,14 @@ export function Scanner({ className }: ScannerProps) {
       if (!response.ok) {
         // Check if it's a rate limit error
         if (response.status === 429 && data.requiresUpgrade) {
-          toast.error('Scan limit reached', { description: data.message || 'Upgrade for more scans' });
-          setShowPaywall(true);
+          // For anonymous users, show auth wall instead of paywall
+          if (!user) {
+            toast.error('Free scans used', { description: 'Create a free account to continue scanning' });
+            setShowAuthWall(true);
+          } else {
+            toast.error('Scan limit reached', { description: data.message || 'Upgrade for more scans' });
+            setShowPaywall(true);
+          }
           setIsLoading(false);
           setScanPhase('');
           return;
@@ -219,27 +222,27 @@ export function Scanner({ className }: ScannerProps) {
           </div>
         )}
 
-        {/* Auth Wall */}
+        {/* Auth Wall - shows after rate limit or when encouraged to sign up */}
         {showAuthWall && (
           <div className="mt-4 p-6 bg-gradient-to-b from-terminal/10 to-terminal/5 border border-terminal/30 rounded-lg">
             <div className="text-center">
-              <div className="text-4xl mb-3">🔒</div>
+              <div className="text-4xl mb-3">🔥</div>
               <h3 className="text-xl font-bold text-white mb-2">
-                Free Account Required
+                Want More Roasts?
               </h3>
               <p className="text-gray-400 text-sm mb-4">
-                Create a free account to scan websites and get brutal roasts with actionable fixes.
+                Create a free account to get <span className="text-terminal font-bold">3 scans per day</span>, save your results, and track improvements over time.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
-                  href="/signup"
-                  className="px-6 py-3 bg-terminal text-void font-bold rounded hover:bg-terminal-bright transition-colors"
+                  href={`/signup?redirect=${encodeURIComponent(`/?url=${encodeURIComponent(url)}`)}`}
+                  className="px-6 py-3 bg-terminal text-void font-bold rounded hover:bg-terminal-bright transition-colors active:scale-95"
                 >
                   Create Free Account
                 </Link>
                 <Link
-                  href="/login"
-                  className="px-6 py-3 bg-void-100 text-gray-300 font-bold rounded border border-void-200 hover:border-terminal/50 hover:text-terminal transition-colors"
+                  href={`/login?redirect=${encodeURIComponent(`/?url=${encodeURIComponent(url)}`)}`}
+                  className="px-6 py-3 bg-void-100 text-gray-300 font-bold rounded border border-void-200 hover:border-terminal/50 hover:text-terminal transition-colors active:scale-95"
                 >
                   Sign In
                 </Link>
@@ -249,19 +252,19 @@ export function Scanner({ className }: ScannerProps) {
                 onClick={() => setShowAuthWall(false)}
                 className="mt-4 text-xs text-gray-500 hover:text-gray-400 transition-colors"
               >
-                Cancel
+                Maybe later
               </button>
             </div>
           </div>
         )}
 
-        {/* Persona Selector - hide when auth wall is showing */}
-        {!showAuthWall && (
-          <div className="mt-4">
+        {/* Persona Selector - only show when URL is entered and auth wall not showing */}
+        {!showAuthWall && url.trim().length > 0 && (
+          <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
             <PersonaSelector
               selected={persona}
               onSelect={setPersona}
-              compact={false}
+              compact={true}
               disabled={skipRoast}
             />
           </div>

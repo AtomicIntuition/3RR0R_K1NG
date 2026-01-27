@@ -8,7 +8,12 @@ interface StatsData {
   brutality: number;
 }
 
-export function Stats() {
+interface StatsProps {
+  variant?: 'default' | 'compact' | 'inline';
+  className?: string;
+}
+
+export function Stats({ variant = 'default', className = '' }: StatsProps) {
   const [stats, setStats] = useState<StatsData>({
     totalScans: 0,
     checksPerScan: 50,
@@ -49,8 +54,47 @@ export function Stats() {
     return num.toString();
   };
 
+  // Inline variant - single line of text
+  if (variant === 'inline') {
+    return (
+      <div className={`text-sm text-gray-500 ${className}`}>
+        <span className="text-terminal font-bold">
+          {isLoading ? '...' : formatNumber(stats.totalScans)}
+        </span>
+        {' '}sites roasted with{' '}
+        <span className="text-neon-cyan font-bold">{stats.checksPerScan}+</span>
+        {' '}checks each
+      </div>
+    );
+  }
+
+  // Compact variant - smaller, horizontal
+  if (variant === 'compact') {
+    return (
+      <div className={`flex items-center justify-center gap-6 text-center ${className}`}>
+        <div className="flex items-center gap-2">
+          <span className="text-xl font-bold text-terminal">
+            {isLoading ? '...' : formatNumber(stats.totalScans)}
+          </span>
+          <span className="text-xs text-gray-500">roasted</span>
+        </div>
+        <div className="w-px h-4 bg-void-200" />
+        <div className="flex items-center gap-2">
+          <span className="text-xl font-bold text-neon-cyan">{stats.checksPerScan}+</span>
+          <span className="text-xs text-gray-500">checks</span>
+        </div>
+        <div className="w-px h-4 bg-void-200" />
+        <div className="flex items-center gap-2">
+          <span className="text-xl font-bold text-neon-purple">{stats.brutality}%</span>
+          <span className="text-xs text-gray-500">brutal</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Default variant
   return (
-    <div className="flex flex-wrap justify-center gap-8 text-center">
+    <div className={`flex flex-wrap justify-center gap-8 text-center ${className}`}>
       <div>
         <div className="text-3xl font-bold text-terminal">
           {isLoading ? (

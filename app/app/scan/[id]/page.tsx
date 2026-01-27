@@ -125,6 +125,7 @@ export default function ScanResultsPage() {
                   roastTitle: scan.roastTitle,
                   roastBody: scan.roastBody,
                   id: scan.id,
+                  fixes: scan.roastFixes,
                 }}
                 filename={`3rror-k1ng-${scan.url.replace(/https?:\/\//, '').replace(/[^a-z0-9]/gi, '-').slice(0, 30)}`}
               />

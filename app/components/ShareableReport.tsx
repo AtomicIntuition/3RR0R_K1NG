@@ -2,6 +2,14 @@
 
 import { getGrade, getGradeColor } from '@/lib/scoring';
 
+interface RoastFix {
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  category: 'performance' | 'security' | 'seo' | 'accessibility' | 'code_quality';
+  title: string;
+  description: string;
+  effort: 'quick' | 'medium' | 'significant';
+}
+
 interface ShareableReportProps {
   url: string;
   scoreOverall: number;
@@ -16,6 +24,7 @@ interface ShareableReportProps {
   roastTitle?: string;
   roastBody?: string;
   roastId?: string;
+  fixes?: RoastFix[];
 }
 
 // Fixed-width component designed specifically for screenshots
@@ -28,6 +37,7 @@ export function ShareableReport({
   roastTitle,
   roastBody,
   roastId,
+  fixes,
 }: ShareableReportProps) {
   const grade = letterGrade || getGrade(scoreOverall);
   const gradeColorClass = getGradeColor(grade);
@@ -352,6 +362,81 @@ export function ShareableReport({
           >
             {roastBody}
           </p>
+        </div>
+      )}
+
+      {/* Top 3 Quick Fixes */}
+      {fixes && fixes.length > 0 && (
+        <div
+          style={{
+            backgroundColor: 'rgba(26,26,46,0.5)',
+            border: '1px solid rgba(0,255,65,0.3)',
+            borderRadius: '12px',
+            padding: '16px 20px',
+            marginBottom: '20px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+            <span style={{ fontSize: '14px' }}>🔧</span>
+            <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#00ff41', letterSpacing: '1px' }}>
+              TOP FIXES TO IMPROVE YOUR SCORE
+            </span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {fixes.slice(0, 3).map((fix, index) => {
+              const priorityColors: Record<string, string> = {
+                critical: '#ef4444',
+                high: '#fb923c',
+                medium: '#facc15',
+                low: '#22d3ee',
+              };
+              const priorityColor = priorityColors[fix.priority] || '#9ca3af';
+
+              return (
+                <div
+                  key={index}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '10px',
+                    padding: '8px 12px',
+                    backgroundColor: 'rgba(0,0,0,0.3)',
+                    borderRadius: '6px',
+                    borderLeft: `3px solid ${priorityColor}`,
+                  }}
+                >
+                  <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: 'bold', minWidth: '18px' }}>
+                    {index + 1}.
+                  </span>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '12px', fontWeight: '600', color: '#e5e7eb', marginBottom: '2px' }}>
+                      {fix.title}
+                    </div>
+                    <div style={{ fontSize: '10px', color: '#9ca3af', lineHeight: 1.4 }}>
+                      {fix.description.length > 80 ? fix.description.slice(0, 80) + '...' : fix.description}
+                    </div>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '9px',
+                      fontWeight: 'bold',
+                      color: priorityColor,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                    }}
+                  >
+                    {fix.priority}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ marginTop: '12px', textAlign: 'center' }}>
+            <span style={{ fontSize: '10px', color: '#6b7280' }}>
+              Full report + {fixes.length > 3 ? `${fixes.length - 3} more fixes` : 'all fixes'} at{' '}
+              <span style={{ color: '#00ff41', fontWeight: 'bold' }}>3RRORK1NG.COM</span>
+            </span>
+          </div>
         </div>
       )}
 

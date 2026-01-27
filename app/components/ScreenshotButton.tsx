@@ -5,6 +5,14 @@ import { createRoot } from 'react-dom/client';
 import html2canvas from 'html2canvas';
 import { ShareableReport } from './ShareableReport';
 
+interface RoastFix {
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  category: 'performance' | 'security' | 'seo' | 'accessibility' | 'code_quality';
+  title: string;
+  description: string;
+  effort: 'quick' | 'medium' | 'significant';
+}
+
 interface ScanData {
   url: string;
   scoreOverall: number;
@@ -19,6 +27,7 @@ interface ScanData {
   roastTitle?: string;
   roastBody?: string;
   id?: string;
+  fixes?: RoastFix[];
 }
 
 interface ScreenshotButtonProps {
@@ -56,6 +65,7 @@ export function ScreenshotButton({
           roastTitle={scanData.roastTitle}
           roastBody={scanData.roastBody}
           roastId={scanData.id}
+          fixes={scanData.fixes}
         />
       );
 

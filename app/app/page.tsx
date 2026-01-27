@@ -5,6 +5,7 @@ import { Stats } from '@/components/Stats';
 import { LiveActivity } from '@/components/LiveActivity';
 import { ExampleRoasts } from '@/components/ExampleRoasts';
 import { ExitIntentScan } from '@/components/ExitIntentScan';
+import { SiteSearch } from '@/components/SiteSearch';
 
 export default function HomePage() {
   return (
@@ -37,7 +38,13 @@ export default function HomePage() {
         <Scanner className="w-full max-w-2xl mb-6" />
 
         {/* Live Activity Feed */}
-        <LiveActivity compact className="mb-8 sm:mb-12" />
+        <LiveActivity compact className="mb-4 sm:mb-6" />
+
+        {/* Search for existing roasts */}
+        <div className="w-full max-w-md mb-8 sm:mb-12">
+          <p className="text-xs text-gray-500 text-center mb-2">Already been roasted? Find your report:</p>
+          <SiteSearch />
+        </div>
 
         {/* Value Props - Mobile-friendly grid */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-4 max-w-4xl w-full mb-12 sm:mb-16">

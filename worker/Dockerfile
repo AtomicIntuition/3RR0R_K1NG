@@ -18,6 +18,8 @@ RUN npm run build
 
 # Set environment
 ENV NODE_ENV=production
+# Increase Node.js memory limit for Playwright + Lighthouse
+ENV NODE_OPTIONS="--max-old-space-size=1024"
 
 # Run the worker
 CMD ["node", "dist/index.js"]

@@ -188,7 +188,7 @@ export default function RootLayout({
               <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
                 <div className="flex items-center gap-3">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/images/logo.png" alt="3RROR_K1NG" className="w-6 h-6" />
+                  <img src="/images/logo.png" alt="" aria-hidden="true" className="w-6 h-6" />
                   <span className="text-terminal font-bold">3RROR_K1NG</span>
                   <span className="text-gray-400">|</span>
                   <span>Website Roast Machine</span>

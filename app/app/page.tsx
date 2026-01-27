@@ -13,7 +13,7 @@ export default function HomePage() {
       {/* Exit Intent Modal for anonymous users */}
       <ExitIntentScan />
       {/* Hero Section - Mobile optimized */}
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12">
+      <section className="flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12">
         {/* Logo/Title */}
         <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-3 sm:mb-4 text-center">
           <GlitchText
@@ -151,7 +151,7 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-      </main>
+      </section>
 
       {/* Footer */}
       <footer className="w-full border-t border-void-100 px-4">

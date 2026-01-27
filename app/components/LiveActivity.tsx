@@ -76,34 +76,33 @@ export function LiveActivity({ className = '', compact = false }: LiveActivityPr
     };
   }, []);
 
-  if (activities.length === 0) return null;
-
   const current = activities[currentIndex];
-  if (!current) return null;
 
   if (compact) {
     return (
-      <div className={`flex items-center justify-center gap-2 text-sm ${className}`}>
+      <div className={`flex items-center justify-center gap-2 text-sm min-h-[24px] ${className}`}>
         <span className="relative flex h-2 w-2">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-terminal opacity-75"></span>
           <span className="relative inline-flex rounded-full h-2 w-2 bg-terminal"></span>
         </span>
-        <span
-          className={`transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
-        >
-          <span className="text-gray-500">
-            <span className="text-gray-300 font-medium">{current.domain}</span>
-            {' '}scored{' '}
-            <span className={`font-bold ${getScoreColor(current.score)}`}>{current.score}</span>
-            {' '}{current.timeAgo}
+        {current && (
+          <span
+            className={`transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+          >
+            <span className="text-gray-500">
+              <span className="text-gray-300 font-medium">{current.domain}</span>
+              {' '}scored{' '}
+              <span className={`font-bold ${getScoreColor(current.score)}`}>{current.score}</span>
+              {' '}{current.timeAgo}
+            </span>
           </span>
-        </span>
+        )}
       </div>
     );
   }
 
   return (
-    <div className={`bg-void-50/50 border border-void-100 rounded-lg p-3 ${className}`}>
+    <div className={`bg-void-50/50 border border-void-100 rounded-lg p-3 min-h-[52px] ${className}`}>
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
@@ -113,19 +112,21 @@ export function LiveActivity({ className = '', compact = false }: LiveActivityPr
           <span className="text-xs text-gray-500 uppercase tracking-wider">Live</span>
         </div>
 
-        <div
-          className={`flex-1 transition-all duration-300 ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
-          }`}
-        >
-          <span className="text-sm text-gray-400">
-            <span className="text-gray-200 font-medium">{current.domain}</span>
-            {' '}just got roasted —{' '}
-            <span className={`font-bold ${getScoreColor(current.score)}`}>
-              {current.score}/100
+        {current && (
+          <div
+            className={`flex-1 transition-all duration-300 ${
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
+            }`}
+          >
+            <span className="text-sm text-gray-400">
+              <span className="text-gray-200 font-medium">{current.domain}</span>
+              {' '}just got roasted —{' '}
+              <span className={`font-bold ${getScoreColor(current.score)}`}>
+                {current.score}/100
+              </span>
             </span>
-          </span>
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -10,10 +10,11 @@ export function Navbar() {
       <Link href="/" className="flex items-center gap-3 text-xl font-bold text-terminal hover:text-terminal-bright transition-colors">
         <Image
           src="/images/logo.png"
-          alt="3RROR_K1NG"
+          alt=""
           width={32}
           height={32}
           className="w-8 h-8"
+          aria-hidden="true"
         />
         <span className="hidden sm:inline">3RROR_K1NG</span>
       </Link>

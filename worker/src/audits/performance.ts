@@ -33,6 +33,16 @@ async function getAvailablePort(): Promise<number> {
   });
 }
 
+// Timeout helper
+function withTimeout<T>(promise: Promise<T>, ms: number, errorMessage: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(errorMessage)), ms)
+    ),
+  ]);
+}
+
 // Run a single Lighthouse attempt
 async function runLighthouseAttempt(url: string, debuggingPort: number): Promise<PerformanceAuditResult | null> {
   const browser = await chromium.launch({
@@ -42,32 +52,50 @@ async function runLighthouseAttempt(url: string, debuggingPort: number): Promise
       '--disable-setuid-sandbox',
       '--disable-dev-shm-usage',
       '--disable-gpu',
+      '--disable-extensions',
+      '--disable-background-networking',
+      '--disable-default-apps',
+      '--disable-sync',
+      '--no-first-run',
       `--remote-debugging-port=${debuggingPort}`,
     ],
   });
 
   try {
     // Small delay to ensure browser is ready
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 300));
 
-    const result = await lighthouse(url, {
-      port: debuggingPort,
-      output: 'json',
-      onlyCategories: ['performance'],
-      formFactor: 'desktop',
-      screenEmulation: {
-        mobile: false,
-        width: 1920,
-        height: 1080,
-        deviceScaleFactor: 1,
-        disabled: false,
-      },
-      throttling: {
-        rttMs: 40,
-        throughputKbps: 10240,
-        cpuSlowdownMultiplier: 1,
-      },
-    });
+    // Run Lighthouse with a 60 second timeout
+    const result = await withTimeout(
+      lighthouse(url, {
+        port: debuggingPort,
+        output: 'json',
+        onlyCategories: ['performance'],
+        formFactor: 'desktop',
+        screenEmulation: {
+          mobile: false,
+          width: 1920,
+          height: 1080,
+          deviceScaleFactor: 1,
+          disabled: false,
+        },
+        throttling: {
+          rttMs: 40,
+          throughputKbps: 10240,
+          cpuSlowdownMultiplier: 1,
+        },
+        // Limit how long Lighthouse waits for page load
+        maxWaitForFcp: 15000,      // 15s max for First Contentful Paint
+        maxWaitForLoad: 25000,     // 25s max for full page load
+        skipAudits: [
+          'screenshot-thumbnails',  // Skip expensive screenshot generation
+          'final-screenshot',
+          'full-page-screenshot',
+        ],
+      }),
+      60000,  // 60 second total timeout
+      'Lighthouse audit timed out after 60 seconds'
+    );
 
     if (!result || !result.lhr) {
       return null;
@@ -108,6 +136,7 @@ async function runLighthouseAttempt(url: string, debuggingPort: number): Promise
 
 export async function runPerformanceAudit(url: string): Promise<PerformanceAuditResult> {
   const maxRetries = 2;
+  const startTime = Date.now();
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -116,15 +145,20 @@ export async function runPerformanceAudit(url: string): Promise<PerformanceAudit
       // Add delay between retries to let resources clean up
       if (attempt > 1) {
         console.log(`Lighthouse retry attempt ${attempt}/${maxRetries}...`);
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
 
+      console.log(`Lighthouse attempt ${attempt}: starting on port ${debuggingPort}...`);
       const result = await runLighthouseAttempt(url, debuggingPort);
+
       if (result) {
+        const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+        console.log(`Lighthouse completed in ${duration}s (attempt ${attempt})`);
         return result;
       }
     } catch (error) {
-      console.error(`Lighthouse attempt ${attempt} failed:`, error);
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      console.error(`Lighthouse attempt ${attempt} failed: ${errorMsg}`);
 
       // If this was the last attempt, fall through to return default
       if (attempt === maxRetries) {
@@ -132,6 +166,9 @@ export async function runPerformanceAudit(url: string): Promise<PerformanceAudit
       }
     }
   }
+
+  const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+  console.warn(`Lighthouse fallback after ${duration}s`);
 
   // Return default scores if all retries fail
   return {

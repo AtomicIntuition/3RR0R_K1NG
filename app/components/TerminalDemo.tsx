@@ -62,6 +62,7 @@ export function TerminalDemo() {
   const [visibleLines, setVisibleLines] = useState<number>(0);
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -103,6 +104,16 @@ export function TerminalDemo() {
     return () => timeouts.forEach(clearTimeout);
   }, [isVisible]);
 
+  // Auto-scroll to bottom when new lines appear
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, [visibleLines]);
+
   return (
     <div ref={containerRef} className="w-full max-w-2xl mx-auto">
       <motion.div
@@ -122,7 +133,10 @@ export function TerminalDemo() {
         </div>
 
         {/* Terminal content */}
-        <div className="p-5 font-mono text-[13px] h-[420px] overflow-hidden leading-relaxed">
+        <div
+          ref={scrollRef}
+          className="p-5 font-mono text-[13px] h-[420px] overflow-y-auto leading-relaxed scrollbar-thin scrollbar-track-transparent scrollbar-thumb-void-100"
+        >
           <div className="space-y-0.5">
             {demoLines.slice(0, visibleLines).map((line, index) => (
               <motion.div

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateApiKey, getApiKeyFromRequest } from '@/lib/api-key';
 
+export const dynamic = 'force-dynamic';
+
 // GET - Verify API key and return user info
 export async function GET(request: NextRequest) {
   try {

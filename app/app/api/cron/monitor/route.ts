@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user profiles for priority
-    const userIds = [...new Set(sites.map(s => s.user_id))];
+    const userIds = Array.from(new Set(sites.map(s => s.user_id)));
     const { data: profiles } = await supabase
       .from('profiles')
       .select('id, tier, email')

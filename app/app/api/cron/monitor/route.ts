@@ -1,7 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { Queue } from 'bullmq';
-import { redis } from '@/lib/redis';
+import Redis from 'ioredis';
+
+// Initialize Redis connection for BullMQ
+function getRedisConnection() {
+  const redisUrl = process.env.REDIS_URL;
+  if (!redisUrl) {
+    throw new Error('REDIS_URL not configured');
+  }
+  return new Redis(redisUrl, {
+    maxRetriesPerRequest: null,
+  });
+}
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60; // Allow up to 60 seconds for this endpoint
@@ -64,7 +75,8 @@ export async function GET(request: NextRequest) {
     const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
 
     // Initialize queue
-    const queue = new Queue('scans', { connection: redis });
+    const connection = getRedisConnection();
+    const queue = new Queue('scans', { connection });
 
     const results = [];
 
@@ -134,6 +146,7 @@ export async function GET(request: NextRequest) {
     }
 
     await queue.close();
+    await connection.quit();
 
     return NextResponse.json({
       message: `Queued ${results.length} monitoring scans`,

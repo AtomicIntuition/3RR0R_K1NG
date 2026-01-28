@@ -2,12 +2,31 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter, usePathname } from 'next/navigation';
 import { UserMenu } from './UserMenu';
 
 export function Navbar() {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (pathname === '/') {
+      // Already on home, just scroll to top
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    } else {
+      // Full page navigation to home - guarantees scroll to top
+      window.location.href = '/';
+    }
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 py-4 bg-void/80 backdrop-blur-sm border-b border-void-100">
-      <Link href="/" className="flex items-center gap-3 text-xl font-bold text-terminal hover:text-terminal-bright transition-colors">
+      <a
+        href="/"
+        onClick={handleLogoClick}
+        className="flex items-center gap-3 text-xl font-bold text-terminal hover:text-terminal-bright transition-colors"
+      >
         <Image
           src="/images/logo.png"
           alt=""
@@ -17,7 +36,7 @@ export function Navbar() {
           aria-hidden="true"
         />
         <span className="hidden sm:inline">3RROR_K1NG</span>
-      </Link>
+      </a>
       <div className="flex items-center gap-6">
         <Link
           href="/pricing"

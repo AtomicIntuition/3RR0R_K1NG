@@ -1,0 +1,40 @@
+{
+  "name": "error-king",
+  "version": "0.1.0",
+  "description": "CLI for 3RROR_K1NG - Website Roast Machine. AI-powered security, performance, SEO & accessibility audits.",
+  "bin": {
+    "3rror": "./bin/cli.js",
+    "error-king": "./bin/cli.js"
+  },
+  "scripts": {
+    "postinstall": "node ./scripts/install.js"
+  },
+  "keywords": [
+    "website",
+    "audit",
+    "security",
+    "performance",
+    "seo",
+    "accessibility",
+    "cli",
+    "roast"
+  ],
+  "author": "3RROR_K1NG",
+  "license": "MIT",
+  "homepage": "https://3rrork1ng.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AtomicIntuition/3RR0R_K1NG.git"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "os": [
+    "darwin",
+    "linux"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ]
+}

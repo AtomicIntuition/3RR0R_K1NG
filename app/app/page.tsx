@@ -6,48 +6,78 @@ import { LiveActivity } from '@/components/LiveActivity';
 import { ExampleRoasts } from '@/components/ExampleRoasts';
 import { ExitIntentScan } from '@/components/ExitIntentScan';
 import { SiteSearch } from '@/components/SiteSearch';
+import { HeroBackground } from '@/components/HeroBackground';
+import { ScrollReveal, StaggerChildren, StaggerItem } from '@/components/ScrollReveal';
+import { FAQ } from '@/components/FAQ';
+import { Testimonials } from '@/components/Testimonials';
+import { TerminalDemo } from '@/components/TerminalDemo';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative">
+      {/* Animated Background */}
+      <HeroBackground />
+
       {/* Exit Intent Modal for anonymous users */}
       <ExitIntentScan />
-      {/* Hero Section - Mobile optimized */}
-      <section className="flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12">
-        {/* Logo/Title */}
-        <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-3 sm:mb-4 text-center">
-          <GlitchText
-            text="3RROR_K1NG"
-            className="text-terminal neon-glow-green"
-            glitchIntensity="medium"
-            as="span"
-          />
-        </h1>
 
-        {/* Subtitle */}
-        <p className="text-lg sm:text-xl md:text-2xl text-gray-400 mb-2 text-center">
-          Website Roast Machine
-        </p>
+      {/* Hero Section */}
+      <section className="flex-1 flex flex-col items-center justify-center px-4 py-12 sm:py-16 relative z-10">
+        {/* Badge */}
+        <ScrollReveal delay={0} className="mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-terminal/10 border border-terminal/30 rounded-full text-sm">
+            <span className="w-2 h-2 bg-terminal rounded-full animate-pulse" />
+            <span className="text-terminal font-medium">Free website audits</span>
+          </div>
+        </ScrollReveal>
+
+        {/* Logo/Title */}
+        <ScrollReveal delay={0.1}>
+          <h1 className="text-5xl sm:text-6xl md:text-8xl font-bold mb-4 text-center">
+            <GlitchText
+              text="3RROR_K1NG"
+              className="text-terminal neon-glow-green"
+              glitchIntensity="medium"
+              as="span"
+            />
+          </h1>
+        </ScrollReveal>
+
+        {/* Headline - Pain point focused */}
+        <ScrollReveal delay={0.2}>
+          <p className="text-xl sm:text-2xl md:text-3xl text-gray-200 mb-2 text-center font-medium max-w-3xl">
+            Your website has problems.
+          </p>
+        </ScrollReveal>
+        <ScrollReveal delay={0.3}>
+          <p className="text-lg sm:text-xl text-gray-400 mb-6 text-center max-w-2xl">
+            We find them. AI tells you exactly how to fix them.
+          </p>
+        </ScrollReveal>
 
         {/* Social proof - inline stats */}
-        <div className="mb-6 sm:mb-8">
+        <ScrollReveal delay={0.4} className="mb-8">
           <Stats variant="inline" />
-        </div>
+        </ScrollReveal>
 
         {/* Scanner Input */}
-        <Scanner className="w-full max-w-2xl mb-6" />
+        <ScrollReveal delay={0.5} className="w-full max-w-2xl mb-8">
+          <Scanner className="w-full" />
+        </ScrollReveal>
 
         {/* Live Activity Feed */}
-        <LiveActivity compact className="mb-4 sm:mb-6" />
+        <ScrollReveal delay={0.6}>
+          <LiveActivity compact className="mb-6" />
+        </ScrollReveal>
 
         {/* Search for existing roasts */}
-        <div className="w-full max-w-md mb-8 sm:mb-12">
+        <ScrollReveal delay={0.7} className="w-full max-w-md mb-12">
           <p className="text-xs text-gray-500 text-center mb-2">Already been roasted? Find your report:</p>
           <SiteSearch />
-        </div>
+        </ScrollReveal>
 
-        {/* Value Props - Mobile-friendly grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-4 max-w-4xl w-full mb-12 sm:mb-16">
+        {/* Value Props */}
+        <StaggerChildren className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4 max-w-4xl w-full mb-16" staggerDelay={0.08}>
           {[
             { icon: '🛡️', label: 'Security', desc: 'Headers & HTTPS' },
             { icon: '⚡', label: 'Performance', desc: 'Core Web Vitals' },
@@ -55,123 +85,180 @@ export default function HomePage() {
             { icon: '♿', label: 'Accessibility', desc: 'WCAG Checks' },
             { icon: '🧹', label: 'Code', desc: 'Quality & Errors' },
           ].map((feature) => (
-            <div
-              key={feature.label}
-              className="p-3 sm:p-4 bg-void-50/50 rounded-lg border border-void-100 text-center hover:border-terminal/30 transition-colors"
-            >
-              <span className="text-xl sm:text-2xl mb-1 sm:mb-2 block">{feature.icon}</span>
-              <p className="font-bold text-terminal text-xs sm:text-sm">{feature.label}</p>
-              <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1 hidden sm:block">{feature.desc}</p>
-            </div>
+            <StaggerItem key={feature.label}>
+              <div className="p-4 sm:p-5 bg-void-50/80 backdrop-blur rounded-xl border border-void-100 text-center hover:border-terminal/50 hover:bg-void-50 transition-all duration-300 group cursor-default">
+                <span className="text-2xl sm:text-3xl mb-2 block group-hover:scale-110 transition-transform duration-300">{feature.icon}</span>
+                <p className="font-bold text-terminal text-sm">{feature.label}</p>
+                <p className="text-xs text-gray-500 mt-1 hidden sm:block">{feature.desc}</p>
+              </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerChildren>
+      </section>
 
-        {/* How it works - Simplified for mobile */}
-        <div className="max-w-3xl w-full mb-12 sm:mb-16">
-          <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 sm:mb-8">
-            <span className="text-terminal">&gt;</span> How it works
-          </h2>
+      {/* Terminal Demo Section */}
+      <section className="py-16 sm:py-24 px-4 relative z-10">
+        <ScrollReveal>
+          <div className="text-center mb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-3">
+              <span className="text-terminal">&gt;</span> See it in action
+            </h2>
+            <p className="text-gray-400 max-w-xl mx-auto">
+              50+ checks across security, performance, SEO, accessibility, and code quality.
+            </p>
+          </div>
+        </ScrollReveal>
+        <ScrollReveal delay={0.2}>
+          <TerminalDemo />
+        </ScrollReveal>
+      </section>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+      {/* How it works */}
+      <section className="py-16 sm:py-24 px-4 relative z-10">
+        <div className="max-w-4xl mx-auto">
+          <ScrollReveal>
+            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">
+              <span className="text-terminal">&gt;</span> How it works
+            </h2>
+          </ScrollReveal>
+
+          <StaggerChildren className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8" staggerDelay={0.15}>
             {[
               {
                 step: '01',
                 title: 'Drop a URL',
-                desc: 'Paste any website you want to audit',
+                desc: 'Paste any website you want to audit. Public pages only.',
+                icon: '🎯',
               },
               {
                 step: '02',
                 title: 'Get Roasted',
-                desc: 'AI analyzes 50+ metrics across 5 categories',
+                desc: 'AI analyzes 50+ metrics and generates brutally honest feedback.',
+                icon: '🔥',
               },
               {
                 step: '03',
-                title: 'Copy & Fix',
-                desc: 'Paste the report into Cursor or Claude to fix issues',
+                title: 'Fix & Ship',
+                desc: 'Copy the report into Cursor, Claude, or ChatGPT. Watch issues vanish.',
+                icon: '🚀',
               },
             ].map((item) => (
-              <div key={item.step} className="flex sm:flex-col items-center sm:text-center gap-4 sm:gap-0">
-                <div className="text-3xl sm:text-5xl font-bold text-terminal/20 select-none shrink-0">
-                  {item.step}
+              <StaggerItem key={item.step}>
+                <div className="relative group">
+                  <div className="absolute -top-4 -left-2 text-6xl sm:text-7xl font-bold text-terminal/10 select-none group-hover:text-terminal/20 transition-colors">
+                    {item.step}
+                  </div>
+                  <div className="bg-void-50/80 backdrop-blur p-6 sm:p-8 rounded-xl border border-void-100 hover:border-terminal/30 transition-all duration-300 relative">
+                    <span className="text-3xl mb-4 block">{item.icon}</span>
+                    <h3 className="font-bold text-lg text-gray-100 mb-2">{item.title}</h3>
+                    <p className="text-sm text-gray-400 leading-relaxed">{item.desc}</p>
+                  </div>
                 </div>
-                <div className="bg-void-50/50 p-4 sm:p-6 rounded-lg border border-void-100 flex-1 sm:flex-none sm:mt-3">
-                  <h3 className="font-bold text-terminal mb-1 sm:mb-2 text-sm sm:text-base">{item.title}</h3>
-                  <p className="text-xs sm:text-sm text-gray-500">{item.desc}</p>
-                </div>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
-        </div>
-
-        {/* Example Roasts */}
-        <div className="w-full mb-12 sm:mb-16">
-          <ExampleRoasts />
-        </div>
-
-        {/* Upgrade CTA */}
-        <div className="w-full max-w-2xl p-6 sm:p-8 bg-gradient-to-r from-terminal/10 to-neon-cyan/10 rounded-lg border border-terminal/30 mb-12 sm:mb-16">
-          <div className="text-center">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-100 mb-2">
-              Need more roasting power?
-            </h2>
-            <p className="text-gray-400 mb-4 sm:mb-6 text-sm sm:text-base">
-              Free users get 3 scans/day. Go Pro for 200 scans/month and priority queue.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-              <Link
-                href="/pricing"
-                className="px-6 py-3 font-bold rounded transition-all duration-200 bg-terminal text-void hover:bg-terminal-bright active:scale-95 text-center"
-              >
-                Go Pro — $29/mo
-              </Link>
-              <Link
-                href="/pricing"
-                className="px-6 py-3 font-bold rounded transition-all duration-200 border border-terminal/50 text-terminal hover:bg-terminal/10 active:scale-95 text-center"
-              >
-                View All Plans
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Terminal decoration - Hidden on mobile */}
-        <div className="hidden sm:block w-full max-w-2xl mb-16">
-          <div className="bg-void-50 rounded-lg border border-void-100 p-4 font-mono text-xs text-gray-400">
-            <div className="flex items-center gap-2 mb-3 pb-2 border-b border-void-100">
-              <span className="text-terminal">guest@3rror_k1ng</span>
-              <span className="text-gray-400">~</span>
-            </div>
-            <div className="space-y-1">
-              <p><span className="text-terminal">$</span> ./scan --target https://your-site.com</p>
-              <p className="text-gray-400">[*] Initializing security audit...</p>
-              <p className="text-gray-400">[*] Running performance checks...</p>
-              <p className="text-neon-yellow">[!] WARNING: 12 vulnerabilities found</p>
-              <p className="text-danger">[X] CRITICAL: Missing security headers</p>
-              <p className="text-terminal">[+] Report generated. Prepare for roast.</p>
-            </div>
-          </div>
+          </StaggerChildren>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="w-full border-t border-void-100 px-4">
-        <div className="max-w-4xl mx-auto py-6 sm:py-8">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-500">
-            <div className="flex items-center gap-4">
-              <span className="text-terminal font-bold">3RROR_K1NG</span>
-              <span className="hidden sm:inline">Website Roast Machine</span>
+      {/* Example Roasts */}
+      <section className="py-16 sm:py-24 px-4 relative z-10">
+        <ScrollReveal>
+          <ExampleRoasts />
+        </ScrollReveal>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-16 sm:py-24 px-4 relative z-10">
+        <ScrollReveal>
+          <Testimonials />
+        </ScrollReveal>
+      </section>
+
+      {/* Upgrade CTA */}
+      <section className="py-16 sm:py-24 px-4 relative z-10">
+        <ScrollReveal>
+          <div className="max-w-3xl mx-auto">
+            <div className="relative p-8 sm:p-12 bg-gradient-to-br from-terminal/10 via-void-50 to-neon-cyan/10 rounded-2xl border border-terminal/30 overflow-hidden">
+              {/* Decorative elements */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-terminal/5 rounded-full blur-3xl" />
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-neon-cyan/5 rounded-full blur-3xl" />
+
+              <div className="relative text-center">
+                <h2 className="text-2xl sm:text-4xl font-bold text-gray-100 mb-4">
+                  Ready to ship better code?
+                </h2>
+                <p className="text-gray-400 mb-8 max-w-lg mx-auto">
+                  Free users get 3 scans/day. Go Pro for 200 scans/month, priority queue, site monitoring, and API access.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link
+                    href="/pricing"
+                    className="group px-8 py-4 font-bold rounded-lg transition-all duration-300 bg-terminal text-void hover:bg-terminal-bright hover:shadow-lg hover:shadow-terminal/25 active:scale-95 text-center"
+                  >
+                    Go Pro — $29/mo
+                    <span className="inline-block ml-2 group-hover:translate-x-1 transition-transform">→</span>
+                  </Link>
+                  <Link
+                    href="/pricing"
+                    className="px-8 py-4 font-bold rounded-lg transition-all duration-300 border border-terminal/50 text-terminal hover:bg-terminal/10 active:scale-95 text-center"
+                  >
+                    View All Plans
+                  </Link>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-6">
-              <Link href="/pricing" className="hover:text-terminal transition-colors">
+          </div>
+        </ScrollReveal>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-16 sm:py-24 px-4 relative z-10">
+        <ScrollReveal>
+          <FAQ />
+        </ScrollReveal>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-16 sm:py-24 px-4 relative z-10">
+        <ScrollReveal>
+          <div className="text-center max-w-2xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4">
+              Still reading? Just scan something.
+            </h2>
+            <p className="text-gray-400 mb-8">
+              It&apos;s free. Takes 30 seconds. You might learn something.
+            </p>
+            <Scanner className="max-w-xl mx-auto" />
+          </div>
+        </ScrollReveal>
+      </section>
+
+      {/* Footer */}
+      <footer className="w-full border-t border-void-100 px-4 relative z-10 bg-void/80 backdrop-blur">
+        <div className="max-w-5xl mx-auto py-8 sm:py-12">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+              <span className="text-terminal font-bold text-lg">3RROR_K1NG</span>
+              <span className="text-gray-500 text-sm hidden sm:inline">|</span>
+              <span className="text-gray-500 text-sm">The website roast machine</span>
+            </div>
+            <div className="flex items-center gap-6 text-sm">
+              <Link href="/pricing" className="text-gray-400 hover:text-terminal transition-colors">
                 Pricing
               </Link>
-              <Link href="/terms" className="hover:text-terminal transition-colors">
+              <Link href="/dashboard" className="text-gray-400 hover:text-terminal transition-colors">
+                Dashboard
+              </Link>
+              <Link href="/terms" className="text-gray-400 hover:text-terminal transition-colors">
                 Terms
               </Link>
-              <Link href="/privacy" className="hover:text-terminal transition-colors">
+              <Link href="/privacy" className="text-gray-400 hover:text-terminal transition-colors">
                 Privacy
               </Link>
             </div>
+          </div>
+          <div className="mt-8 pt-6 border-t border-void-100 text-center text-xs text-gray-500">
+            Built with obsessive attention to detail. We score 95+ on our own scanner.
           </div>
         </div>
       </footer>

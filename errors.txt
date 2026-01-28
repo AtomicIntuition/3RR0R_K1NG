@@ -1,15 +1,30 @@
-3rror-k1ng-app:build:    Generating static pages (0/28) ...
-3rror-k1ng-app:build: Error fetching subscription: n [Error]: Dynamic server usage: Route /api/account/subscription couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
-3rror-k1ng-app:build:     at l (/vercel/path0/app/.next/server/chunks/916.js:1:56328)
-3rror-k1ng-app:build:     at f (/vercel/path0/app/.next/server/chunks/769.js:5:9239)
-3rror-k1ng-app:build:     at d (/vercel/path0/app/.next/server/app/api/account/subscription/route.js:1:1098)
-3rror-k1ng-app:build:     at /vercel/path0/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
-3rror-k1ng-app:build:     at /vercel/path0/node_modules/next/dist/server/lib/trace/tracer.js:140:36
-3rror-k1ng-app:build:     at NoopContextManager.with (/vercel/path0/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
-3rror-k1ng-app:build:     at ContextAPI.with (/vercel/path0/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
-3rror-k1ng-app:build:     at NoopTracer.startActiveSpan (/vercel/path0/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
-3rror-k1ng-app:build:     at ProxyTracer.startActiveSpan (/vercel/path0/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24)
-3rror-k1ng-app:build:     at /vercel/path0/node_modules/next/dist/server/lib/trace/tracer.js:122:103 {
-3rror-k1ng-app:build:   description: "Route /api/account/subscription couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
-3rror-k1ng-app:build:   digest: 'DYNAMIC_SERVER_USAGE'
-3rror-k1ng-app:build: }
+3rror-k1ng-app:build:   68 |     // Get user profiles for priority
+3rror-k1ng-app:build: > 69 |     const userIds = [...new Set(sites.map(s => s.user_id))];
+3rror-k1ng-app:build:      |                         ^
+3rror-k1ng-app:build:   70 |     const { data: profiles } = await supabase
+3rror-k1ng-app:build:   71 |       .from('profiles')
+3rror-k1ng-app:build:   72 |       .select('id, tier, email')
+3rror-k1ng-app:build: Next.js build worker exited with code: 1 and signal: null
+3rror-k1ng-app:build: npm error Lifecycle script `build` failed with error:
+3rror-k1ng-app:build: npm error code 1
+3rror-k1ng-app:build: npm error path /vercel/path0/app
+3rror-k1ng-app:build: npm error workspace 3rror-k1ng-app@1.0.0
+3rror-k1ng-app:build: npm error location /vercel/path0/app
+3rror-k1ng-app:build: npm error command failed
+3rror-k1ng-app:build: npm error command sh -c next build
+3rror-k1ng-app:build: ERROR: command finished with error: command (/vercel/path0/app) /node24/bin/npm run build exited (1)
+3rror-k1ng-app#build: command (/vercel/path0/app) /node24/bin/npm run build exited (1)
+
+
+
+ WARNING  finished with warnings
+Warning - the following environment variables are set on your Vercel project, but missing from "turbo.json". These variables WILL NOT be available to your application and may cause your build to fail. Learn more at https://turborepo.dev/docs/crafting-your-repository/using-environment-variables#platform-environment-variables
+[warn] 3rror-k1ng-app#build
+[warn]   - CRON_SECRET 
+  Tasks:    0 successful, 1 total
+ Cached:    0 cached, 1 total
+   Time:    21.771s 
+Summary:    /vercel/path0/.turbo/runs/38ti4l7nGw6TQDC0bqGdHQrSE8c.json
+ Failed:    3rror-k1ng-app#build
+ ERROR  run failed: command  exited (1)
+Error: Command "turbo run build" exited with 1

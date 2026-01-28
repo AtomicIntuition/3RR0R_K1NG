@@ -147,11 +147,16 @@ export default function HomePage() {
               },
             ].map((item) => (
               <StaggerItem key={item.step}>
-                <div className="relative group">
-                  <div className="absolute -top-4 -left-2 text-6xl sm:text-7xl font-bold text-terminal/10 select-none group-hover:text-terminal/20 transition-colors">
-                    {item.step}
+                <div className="group">
+                  {/* Step number - now prominently above the card */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="text-4xl sm:text-5xl font-bold text-terminal/30 group-hover:text-terminal/50 transition-colors">
+                      {item.step}
+                    </span>
+                    <div className="h-px flex-1 bg-gradient-to-r from-terminal/20 to-transparent" />
                   </div>
-                  <div className="bg-void-50/80 backdrop-blur p-6 sm:p-8 rounded-xl border border-void-100 hover:border-terminal/30 transition-all duration-300 relative">
+                  {/* Card */}
+                  <div className="bg-void-50/80 backdrop-blur p-6 sm:p-8 rounded-xl border border-void-100 hover:border-terminal/30 transition-all duration-300">
                     <span className="text-3xl mb-4 block">{item.icon}</span>
                     <h3 className="font-bold text-lg text-gray-100 mb-2">{item.title}</h3>
                     <p className="text-sm text-gray-400 leading-relaxed">{item.desc}</p>

@@ -1,26 +1,33 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback, memo } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
-import { toast } from 'sonner';
 
-export function UserMenu() {
+// Lazy load toast to reduce initial bundle
+const showToast = (message: string) => {
+  import('sonner').then(({ toast }) => toast.success(message));
+};
+
+function UserMenuComponent() {
   const { user, profile, loading, profileLoading, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  // Memoized click outside handler
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      setIsOpen(false);
+    }
+  }, []);
+
   // Close menu when clicking outside
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
+    if (!isOpen) return; // Only listen when menu is open
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [isOpen, handleClickOutside]);
 
   if (loading) {
     return (
@@ -173,7 +180,7 @@ export function UserMenu() {
               onClick={async () => {
                 await signOut();
                 setIsOpen(false);
-                toast.success('Signed out successfully');
+                showToast('Signed out successfully');
               }}
               className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-400 hover:bg-void-100 hover:text-danger transition-colors"
             >
@@ -188,3 +195,5 @@ export function UserMenu() {
     </div>
   );
 }
+
+export const UserMenu = memo(UserMenuComponent);

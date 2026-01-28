@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
@@ -24,6 +24,7 @@ export default function SettingsPage() {
   const [newKey, setNewKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -36,19 +37,21 @@ export default function SettingsPage() {
     }
   }, [loading, user, router]);
 
-  const fetchApiKeys = async () => {
+  const fetchApiKeys = useCallback(async () => {
     if (!user) return;
     try {
       const res = await fetch(`/api/keys?userId=${user.id}`);
       const data = await res.json();
       if (data.keys) {
-        setApiKeys(data.keys);
+        startTransition(() => {
+          setApiKeys(data.keys);
+        });
       }
     } catch {
       console.error('Failed to fetch API keys');
     }
     setLoadingKeys(false);
-  };
+  }, [user]);
 
   const createApiKey = async () => {
     if (!user) return;

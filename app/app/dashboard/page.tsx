@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
@@ -26,6 +26,7 @@ export default function DashboardPage() {
   const [loadingScans, setLoadingScans] = useState(true);
   const [filter, setFilter] = useState<FilterType>('all');
   const [visibleCount, setVisibleCount] = useState(SCANS_PER_PAGE);
+  const [, startTransition] = useTransition();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -43,7 +44,9 @@ export default function DashboardPage() {
         .limit(100)
         .then(({ data, error }) => {
           if (!error && data) {
-            setScans(data);
+            startTransition(() => {
+              setScans(data);
+            });
           }
           setLoadingScans(false);
         });

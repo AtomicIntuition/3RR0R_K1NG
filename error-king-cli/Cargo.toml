@@ -1,6 +1,6 @@
 [package]
 name = "error_king"
-version = "0.1.0"
+version = "0.1.3"
 edition = "2021"
 description = "CLI for 3RROR_K1NG - Website Roast Machine. Get your website brutally roasted with AI-powered security, performance, SEO & accessibility audits."
 authors = ["3RROR_K1NG"]

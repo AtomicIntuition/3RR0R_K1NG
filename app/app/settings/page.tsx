@@ -253,16 +253,42 @@ export default function SettingsPage() {
             )}
           </div>
 
-          {/* CLI Usage */}
+          {/* CLI Installation */}
           <div className="mt-6 bg-void-50 rounded-lg border border-void-100 p-4 sm:p-6">
-            <h2 className="text-lg font-bold text-gray-100 mb-4">CLI Usage</h2>
-            <div className="space-y-4">
+            <h2 className="text-lg font-bold text-gray-100 mb-4">Install the CLI</h2>
+            <p className="text-sm text-gray-400 mb-4">Choose your preferred installation method:</p>
+            <div className="space-y-3">
               <div>
-                <p className="text-sm text-gray-400 mb-2">Install the CLI:</p>
+                <p className="text-xs text-gray-500 mb-1">npm (Node.js)</p>
+                <code className="block bg-void px-4 py-3 rounded font-mono text-sm text-terminal overflow-x-auto">
+                  npm install -g error-king
+                </code>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 mb-1">npx (no install)</p>
+                <code className="block bg-void px-4 py-3 rounded font-mono text-sm text-terminal overflow-x-auto">
+                  npx error-king scan https://example.com
+                </code>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Homebrew (macOS/Linux)</p>
+                <code className="block bg-void px-4 py-3 rounded font-mono text-sm text-terminal overflow-x-auto">
+                  brew tap AtomicIntuition/tap && brew install error-king
+                </code>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Cargo (Rust)</p>
                 <code className="block bg-void px-4 py-3 rounded font-mono text-sm text-terminal overflow-x-auto">
                   cargo install error_king
                 </code>
               </div>
+            </div>
+          </div>
+
+          {/* CLI Usage */}
+          <div className="mt-6 bg-void-50 rounded-lg border border-void-100 p-4 sm:p-6">
+            <h2 className="text-lg font-bold text-gray-100 mb-4">Usage</h2>
+            <div className="space-y-4">
               <div>
                 <p className="text-sm text-gray-400 mb-2">Set your API key:</p>
                 <code className="block bg-void px-4 py-3 rounded font-mono text-sm text-terminal overflow-x-auto">
@@ -270,15 +296,21 @@ export default function SettingsPage() {
                 </code>
               </div>
               <div>
-                <p className="text-sm text-gray-400 mb-2">Run a scan:</p>
+                <p className="text-sm text-gray-400 mb-2">Verify your key:</p>
+                <code className="block bg-void px-4 py-3 rounded font-mono text-sm text-terminal overflow-x-auto">
+                  3rror auth
+                </code>
+              </div>
+              <div>
+                <p className="text-sm text-gray-400 mb-2">Scan a website:</p>
                 <code className="block bg-void px-4 py-3 rounded font-mono text-sm text-terminal overflow-x-auto">
                   3rror scan https://example.com
                 </code>
               </div>
               <div>
-                <p className="text-sm text-gray-400 mb-2">Verify your key:</p>
+                <p className="text-sm text-gray-400 mb-2">Search previous scans:</p>
                 <code className="block bg-void px-4 py-3 rounded font-mono text-sm text-terminal overflow-x-auto">
-                  3rror auth
+                  3rror search stripe.com
                 </code>
               </div>
             </div>

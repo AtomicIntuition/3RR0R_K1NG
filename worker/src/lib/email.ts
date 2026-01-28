@@ -35,10 +35,10 @@ export async function sendScoreDropAlert({
   try {
     const resend = getResendClient();
     const scoreDrop = oldScore - newScore;
-    const appUrl = process.env.APP_URL || 'https://3rror.dev';
+    const appUrl = process.env.APP_URL || 'https://3rrork1ng.com';
 
     const { error } = await resend.emails.send({
-      from: '3RROR_K1NG <alerts@3rror.dev>',
+      from: '3RROR_K1NG <alerts@3rrork1ng.com>',
       to: [to],
       subject: `Score Drop Alert: ${siteName || siteUrl} dropped ${scoreDrop} points`,
       html: `

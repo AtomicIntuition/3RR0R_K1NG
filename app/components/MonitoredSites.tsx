@@ -114,7 +114,7 @@ export function MonitoredSites() {
         <div>
           <h2 className="text-lg font-bold text-gray-100">Monitored Sites</h2>
           <p className="text-sm text-gray-400 mt-1">
-            We scan these sites weekly and alert you when scores drop.
+            We scan these sites daily and alert you when scores drop.
           </p>
         </div>
         {isPro && activeSites.length < maxSites && (
@@ -133,7 +133,7 @@ export function MonitoredSites() {
           <div className="text-4xl mb-3">📊</div>
           <h3 className="text-lg font-bold text-gray-100 mb-2">Monitor Your Sites</h3>
           <p className="text-gray-400 mb-4 max-w-md mx-auto">
-            Pro users can monitor up to 5 sites. We&apos;ll scan them weekly and email you when scores drop.
+            Pro users can monitor up to 5 sites. We&apos;ll scan them daily and email you when scores drop.
           </p>
           <Link
             href="/pricing"

@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({}));
-    const { userId, url, name, frequency = 'weekly' } = body;
+    const { userId, url, name, frequency = 'daily' } = body;
 
     if (!userId) {
       return NextResponse.json({ error: 'User ID required' }, { status: 401 });

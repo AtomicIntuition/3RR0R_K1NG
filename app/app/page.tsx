@@ -1,16 +1,19 @@
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { Scanner } from '@/components/Scanner';
 import { GlitchText } from '@/components/GlitchText';
 import { Stats } from '@/components/Stats';
 import { LiveActivity } from '@/components/LiveActivity';
-import { ExampleRoasts } from '@/components/ExampleRoasts';
-import { ExitIntentScan } from '@/components/ExitIntentScan';
 import { SiteSearch } from '@/components/SiteSearch';
-import { HeroBackground } from '@/components/HeroBackground';
 import { ScrollReveal, StaggerChildren, StaggerItem } from '@/components/ScrollReveal';
-import { FAQ } from '@/components/FAQ';
-import { Testimonials } from '@/components/Testimonials';
-import { TerminalDemo } from '@/components/TerminalDemo';
+
+// Lazy load heavy components below the fold
+const HeroBackground = dynamic(() => import('@/components/HeroBackground').then(m => ({ default: m.HeroBackground })), { ssr: false });
+const ExampleRoasts = dynamic(() => import('@/components/ExampleRoasts').then(m => ({ default: m.ExampleRoasts })));
+const ExitIntentScan = dynamic(() => import('@/components/ExitIntentScan').then(m => ({ default: m.ExitIntentScan })), { ssr: false });
+const FAQ = dynamic(() => import('@/components/FAQ').then(m => ({ default: m.FAQ })));
+const Testimonials = dynamic(() => import('@/components/Testimonials').then(m => ({ default: m.Testimonials })));
+const TerminalDemo = dynamic(() => import('@/components/TerminalDemo').then(m => ({ default: m.TerminalDemo })), { ssr: false });
 
 export default function HomePage() {
   return (

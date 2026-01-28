@@ -57,33 +57,31 @@ export default function PricingPage() {
 
           {/* Billing Toggle */}
           <div className="flex justify-center mb-12">
-            <div className="inline-flex items-center gap-1 p-1 bg-void-50 rounded-xl border border-void-100">
+            <div className="inline-flex items-center p-1 bg-void-50 rounded-xl border border-void-100">
               <button
                 onClick={() => setBillingPeriod('monthly')}
-                className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-6 py-2.5 rounded-lg text-sm font-bold ${
                   billingPeriod === 'monthly'
                     ? 'bg-terminal text-void'
-                    : 'text-gray-400 hover:text-gray-200'
+                    : 'text-gray-400'
                 }`}
               >
                 Monthly
               </button>
               <button
                 onClick={() => setBillingPeriod('yearly')}
-                className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+                className={`px-6 py-2.5 rounded-lg text-sm font-bold ${
                   billingPeriod === 'yearly'
                     ? 'bg-terminal text-void'
-                    : 'text-gray-400 hover:text-gray-200'
+                    : 'text-gray-400'
                 }`}
               >
                 Yearly
-                <span className={`px-2 py-0.5 text-xs font-bold rounded ${
-                  billingPeriod === 'yearly'
-                    ? 'bg-void/30 text-void'
-                    : 'bg-neon-cyan/20 text-neon-cyan'
-                }`}>
-                  -43%
-                </span>
+                {billingPeriod !== 'yearly' && (
+                  <span className="ml-2 px-2 py-0.5 text-xs bg-neon-cyan/20 text-neon-cyan rounded">
+                    -43%
+                  </span>
+                )}
               </button>
             </div>
           </div>

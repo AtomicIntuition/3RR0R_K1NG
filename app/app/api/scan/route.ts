@@ -3,6 +3,7 @@ import { createServiceClient } from '@/lib/supabase';
 import { Queue } from 'bullmq';
 import Redis from 'ioredis';
 import { RATE_LIMITS } from '@/lib/constants';
+import { validateApiKey, getApiKeyFromRequest } from '@/lib/api-key';
 
 // Initialize Redis connection for BullMQ
 function getRedisConnection() {
@@ -32,8 +33,24 @@ const PRIORITY_ANONYMOUS = 10;
 
 export async function POST(request: NextRequest) {
   try {
+    // Check for API key authentication first
+    const apiKey = getApiKeyFromRequest(request);
+    let apiKeyUser = null;
+    if (apiKey) {
+      apiKeyUser = await validateApiKey(apiKey);
+      if (!apiKeyUser) {
+        return NextResponse.json(
+          { error: 'Invalid API key' },
+          { status: 401 }
+        );
+      }
+    }
+
     const body = await request.json();
-    const { url, fingerprint, userId, persona = 'hacker', skipRoast = false } = body;
+    const { url, fingerprint, userId: bodyUserId, persona = 'hacker', skipRoast = false } = body;
+
+    // Use API key user ID if authenticated via API key, otherwise use body userId
+    const userId = apiKeyUser?.id || bodyUserId;
 
     // Validate persona
     const validPersonas = ['hacker', 'gordon', 'parent', 'interviewer', 'drill', 'meme', 'therapist'];
@@ -83,6 +100,11 @@ export async function POST(request: NextRequest) {
     let userTier: 'anonymous' | 'free' | 'pro' = 'anonymous';
     let canScan = true;
     let rateLimitMessage = '';
+
+    // If authenticated via API key, use the tier from API key validation
+    if (apiKeyUser) {
+      userTier = apiKeyUser.tier;
+    }
 
     if (userId) {
       // Get user profile

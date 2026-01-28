@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/lib/supabase';
+import { MonitoredSites } from '@/components/MonitoredSites';
 
 interface Scan {
   id: string;
@@ -124,6 +125,11 @@ export default function DashboardPage() {
                 Upgrade to Pro
               </Link>
             )}
+          </div>
+
+          {/* Monitored Sites */}
+          <div className="mb-6 sm:mb-8">
+            <MonitoredSites />
           </div>
 
           {/* Recent Scans */}

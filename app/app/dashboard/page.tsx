@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useTransition } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
@@ -26,32 +26,47 @@ export default function DashboardPage() {
   const [loadingScans, setLoadingScans] = useState(true);
   const [filter, setFilter] = useState<FilterType>('all');
   const [visibleCount, setVisibleCount] = useState(SCANS_PER_PAGE);
-  const [, startTransition] = useTransition();
 
+  const fetchScans = useCallback(async (userId: string) => {
+    setLoadingScans(true);
+    const { data, error } = await supabase
+      .from('scans')
+      .select('id, url, status, score_overall, letter_grade, created_at')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(100);
+
+    if (!error && data) {
+      setScans(data);
+    }
+    setLoadingScans(false);
+  }, []);
+
+  // Redirect if not logged in
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login');
-      return;
-    }
-
-    if (user) {
-      // Fetch user's scans
-      supabase
-        .from('scans')
-        .select('id, url, status, score_overall, letter_grade, created_at')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(100)
-        .then(({ data, error }) => {
-          if (!error && data) {
-            startTransition(() => {
-              setScans(data);
-            });
-          }
-          setLoadingScans(false);
-        });
     }
   }, [loading, user, router]);
+
+  // Fetch scans when user is available
+  useEffect(() => {
+    if (user) {
+      fetchScans(user.id);
+    }
+  }, [user, fetchScans]);
+
+  // Re-fetch when page becomes visible (user navigates back)
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible' && user) {
+        fetchScans(user.id);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, [user, fetchScans]);
 
   if (loading) {
     return (

@@ -111,3 +111,64 @@ export async function getScan(scanId: string) {
 
   return data;
 }
+
+export interface MonitoredSiteUpdate {
+  last_scan_id?: string;
+  last_score?: number;
+  last_grade?: string;
+  last_scanned_at?: string;
+}
+
+export async function updateMonitoredSite(
+  siteId: string,
+  update: MonitoredSiteUpdate
+): Promise<void> {
+  const supabase = getSupabaseClient();
+
+  const { error } = await supabase
+    .from('monitored_sites')
+    .update(update)
+    .eq('id', siteId);
+
+  if (error) {
+    console.error(`Failed to update monitored site ${siteId}:`, error);
+    throw error;
+  }
+}
+
+export interface AlertRecord {
+  monitored_site_id: string;
+  user_id: string;
+  scan_id: string;
+  old_score: number;
+  new_score: number;
+  score_change: number;
+  alert_type: 'score_drop' | 'score_improve' | 'site_down';
+}
+
+export async function recordAlert(alert: AlertRecord): Promise<void> {
+  const supabase = getSupabaseClient();
+
+  const { error } = await supabase.from('monitor_alerts').insert(alert);
+
+  if (error) {
+    console.error('Failed to record alert:', error);
+    throw error;
+  }
+}
+
+export async function getMonitoredSite(siteId: string) {
+  const supabase = getSupabaseClient();
+
+  const { data, error } = await supabase
+    .from('monitored_sites')
+    .select('*, profiles!inner(id)')
+    .eq('id', siteId)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}

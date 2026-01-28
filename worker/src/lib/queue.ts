@@ -38,6 +38,13 @@ export interface ScanJobData {
   // Phase 2: File upload support
   scanType?: 'url' | 'upload';
   files?: Array<{ path: string; content: string }>;
+  // Monitoring fields (from cron job)
+  isMonitoredScan?: boolean;
+  monitoredSiteId?: string;
+  previousScore?: number | null;
+  alertOnDrop?: boolean;
+  alertThreshold?: number;
+  userEmail?: string;
 }
 
 export function createScanWorker(

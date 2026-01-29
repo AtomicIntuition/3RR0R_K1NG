@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import clsx from 'clsx';
 import { getScoreColor, getGrade } from '@/lib/scoring';
 
@@ -29,14 +29,35 @@ export function ScoreRing({
   className,
 }: ScoreRingProps) {
   const [displayScore, setDisplayScore] = useState(animate ? 0 : score);
-  const [hasAnimated, setHasAnimated] = useState(false);
+  const [hasAnimated, setHasAnimated] = useState(!animate);
   const ref = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<number | null>(null);
 
   const { ring, stroke, text, label: labelSize } = SIZES[size];
   const radius = (ring - stroke) / 2;
   const circumference = radius * 2 * Math.PI;
   const progress = (displayScore / 100) * circumference;
   const offset = circumference - progress;
+
+  // Animate using requestAnimationFrame for smooth 60fps
+  const animateScore = useCallback((startTime: number, duration: number, targetScore: number) => {
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+
+      // Ease out cubic for smooth deceleration
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      const currentScore = Math.round(easeOut * targetScore);
+
+      setDisplayScore(currentScore);
+
+      if (progress < 1) {
+        animationRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+  }, []);
 
   useEffect(() => {
     if (!animate || hasAnimated) return;
@@ -45,31 +66,35 @@ export function ScoreRing({
       (entries) => {
         if (entries[0].isIntersecting) {
           setHasAnimated(true);
-          // Animate score counting up
-          const duration = 1500;
-          const steps = 60;
-          const increment = score / steps;
-          let current = 0;
-          const interval = setInterval(() => {
-            current += increment;
-            if (current >= score) {
-              setDisplayScore(score);
-              clearInterval(interval);
-            } else {
-              setDisplayScore(Math.round(current));
-            }
-          }, duration / steps);
+          observer.disconnect();
+
+          // Start animation with requestAnimationFrame
+          requestAnimationFrame((startTime) => {
+            animateScore(startTime, 1200, score);
+          });
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.3 }
     );
 
     if (ref.current) {
       observer.observe(ref.current);
     }
 
-    return () => observer.disconnect();
-  }, [animate, score, hasAnimated]);
+    return () => {
+      observer.disconnect();
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [animate, score, hasAnimated, animateScore]);
+
+  // Update score if prop changes after animation
+  useEffect(() => {
+    if (hasAnimated && !animate) {
+      setDisplayScore(score);
+    }
+  }, [score, hasAnimated, animate]);
 
   const colorClass = getScoreColor(displayScore);
   const grade = getGrade(displayScore);
@@ -99,9 +124,10 @@ export function ScoreRing({
             strokeDasharray={circumference}
             strokeDashoffset={offset}
             strokeLinecap="round"
-            className={clsx(colorClass, 'transition-all duration-1000 ease-out')}
+            className={clsx(colorClass, 'transition-[stroke-dashoffset] duration-300 ease-out')}
             style={{
               filter: `drop-shadow(0 0 6px currentColor)`,
+              willChange: 'stroke-dashoffset',
             }}
           />
         </svg>

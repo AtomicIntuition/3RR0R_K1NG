@@ -17,23 +17,23 @@ import { ScrollReveal, StaggerChildren, StaggerItem } from '@/components/ScrollR
 import { useScanRealtime } from '@/lib/useScanRealtime';
 import { getGrade, getGradeColor } from '@/lib/scoring';
 
-// Animation variants for staggered results
+// Optimized animation variants - reduced motion for performance
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
+      staggerChildren: 0.05,
     },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 10 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: 'easeOut' },
+    transition: { duration: 0.3, ease: 'easeOut' },
   },
 };
 
@@ -168,10 +168,10 @@ export default function ScanResultsPage() {
   // Results view
   return (
     <div className="min-h-screen py-8 px-4 relative">
-      {/* Background gradients */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[800px] h-[800px] bg-terminal/3 rounded-full blur-[200px]" />
-        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-neon-cyan/3 rounded-full blur-[200px]" />
+      {/* Subtle background gradients - absolute not fixed for better performance */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-terminal/5 rounded-full blur-[100px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-neon-cyan/5 rounded-full blur-[100px]" />
       </div>
 
       <div className="max-w-4xl mx-auto relative z-10">

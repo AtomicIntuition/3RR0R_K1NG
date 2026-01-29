@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ReactNode } from 'react';
+import { ReactNode, memo } from 'react';
 
 interface ScrollRevealProps {
   children: ReactNode;
@@ -11,18 +11,19 @@ interface ScrollRevealProps {
   duration?: number;
 }
 
-export function ScrollReveal({
+// Memoized to prevent unnecessary re-renders
+export const ScrollReveal = memo(function ScrollReveal({
   children,
   className = '',
   delay = 0,
   direction = 'up',
-  duration = 0.6,
+  duration = 0.4,
 }: ScrollRevealProps) {
   const directions = {
-    up: { y: 40, x: 0 },
-    down: { y: -40, x: 0 },
-    left: { y: 0, x: 40 },
-    right: { y: 0, x: -40 },
+    up: { y: 20, x: 0 },
+    down: { y: -20, x: 0 },
+    left: { y: 0, x: 20 },
+    right: { y: 0, x: -20 },
     none: { y: 0, x: 0 },
   };
 
@@ -36,17 +37,17 @@ export function ScrollReveal({
       className={className}
       initial={initial}
       whileInView={{ opacity: 1, y: 0, x: 0 }}
-      viewport={{ once: true, margin: '-50px' }}
+      viewport={{ once: true, amount: 0.1 }}
       transition={{
         duration,
         delay,
-        ease: [0.25, 0.4, 0.25, 1],
+        ease: 'easeOut',
       }}
     >
       {children}
     </motion.div>
   );
-}
+});
 
 interface StaggerChildrenProps {
   children: ReactNode;
@@ -54,17 +55,17 @@ interface StaggerChildrenProps {
   staggerDelay?: number;
 }
 
-export function StaggerChildren({
+export const StaggerChildren = memo(function StaggerChildren({
   children,
   className = '',
-  staggerDelay = 0.1,
+  staggerDelay = 0.05,
 }: StaggerChildrenProps) {
   return (
     <motion.div
       className={className}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: '-50px' }}
+      viewport={{ once: true, amount: 0.1 }}
       variants={{
         visible: {
           transition: {
@@ -76,9 +77,9 @@ export function StaggerChildren({
       {children}
     </motion.div>
   );
-}
+});
 
-export function StaggerItem({
+export const StaggerItem = memo(function StaggerItem({
   children,
   className = '',
 }: {
@@ -89,13 +90,13 @@ export function StaggerItem({
     <motion.div
       className={className}
       variants={{
-        hidden: { opacity: 0, y: 30 },
+        hidden: { opacity: 0, y: 15 },
         visible: {
           opacity: 1,
           y: 0,
           transition: {
-            duration: 0.5,
-            ease: [0.25, 0.4, 0.25, 1],
+            duration: 0.3,
+            ease: 'easeOut',
           },
         },
       }}
@@ -103,4 +104,4 @@ export function StaggerItem({
       {children}
     </motion.div>
   );
-}
+});

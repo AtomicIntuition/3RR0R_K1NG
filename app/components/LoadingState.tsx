@@ -222,25 +222,16 @@ export function LoadingState({ phase, percentage = 0, completedAudits = [], curr
                 <div className="flex gap-2 text-neon-cyan">
                   <span className="text-gray-600">[{getTimestamp()}]</span>
                   <span className="flex items-center gap-1">
-                    <motion.span
-                      animate={{ opacity: [1, 0.3, 1] }}
-                      transition={{ duration: 1, repeat: Infinity }}
-                    >
-                      ●
-                    </motion.span>
+                    <span className="animate-pulse">●</span>
                     <span>Processing...</span>
                   </span>
                 </div>
               )}
 
-              {/* Cursor */}
+              {/* Cursor - CSS animation instead of Framer Motion */}
               <div className="flex items-center gap-1 text-gray-400 mt-1">
                 <span className="text-terminal">$</span>
-                <motion.span
-                  className="w-2 h-4 bg-terminal"
-                  animate={{ opacity: [1, 0] }}
-                  transition={{ duration: 0.8, repeat: Infinity }}
-                />
+                <span className="w-2 h-4 bg-terminal cursor-blink" />
               </div>
             </div>
           </div>
@@ -280,13 +271,7 @@ export function LoadingState({ phase, percentage = 0, completedAudits = [], curr
                 </span>
                 {isComplete && <span className="text-terminal text-[10px]">✓</span>}
                 {isCurrent && (
-                  <motion.span
-                    className="text-neon-cyan text-[10px]"
-                    animate={{ opacity: [1, 0.3, 1] }}
-                    transition={{ duration: 0.6, repeat: Infinity }}
-                  >
-                    ●
-                  </motion.span>
+                  <span className="text-neon-cyan text-[10px] animate-pulse">●</span>
                 )}
               </div>
             );

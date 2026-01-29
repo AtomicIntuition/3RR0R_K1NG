@@ -3,25 +3,30 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
+import { useCallback } from 'react';
 import { UserMenu } from './UserMenu';
 
 export function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const handleLogoClick = (e: React.MouseEvent) => {
+  const handleLogoClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     if (pathname === '/') {
-      // Already on home, just scroll to top
-      window.scrollTo({ top: 0, behavior: 'instant' });
+      // Already on home, scroll to top instantly
+      window.scrollTo({ top: 0, behavior: 'auto' });
     } else {
-      // Full page navigation to home - guarantees scroll to top
-      window.location.href = '/';
+      // Use Next.js router for smooth client-side navigation
+      router.push('/');
+      // Scroll to top after navigation
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      });
     }
-  };
+  }, [pathname, router]);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 py-4 bg-void/80 backdrop-blur-sm border-b border-void-100">
+    <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 py-4 bg-void/95 border-b border-void-100">
       <a
         href="/"
         onClick={handleLogoClick}
@@ -34,6 +39,7 @@ export function Navbar() {
           height={32}
           className="w-8 h-8"
           aria-hidden="true"
+          priority
         />
         <span className="hidden sm:inline">3RROR_K1NG</span>
       </a>

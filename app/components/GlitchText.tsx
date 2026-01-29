@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef, memo } from 'react';
 import clsx from 'clsx';
 
 interface GlitchTextProps {
@@ -12,76 +12,97 @@ interface GlitchTextProps {
 
 const GLITCH_CHARS = '!<>-_\\/[]{}—=+*^?#';
 
-export function GlitchText({
+export const GlitchText = memo(function GlitchText({
   text,
   className = '',
   glitchIntensity = 'medium',
   as: Component = 'span',
 }: GlitchTextProps) {
   const [displayText, setDisplayText] = useState(text);
-  const [isGlitching, setIsGlitching] = useState(false);
+  const isGlitchingRef = useRef(false);
+  const animationRef = useRef<number | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Smooth text scramble effect
+  // Optimized glitch using requestAnimationFrame
   const triggerGlitch = useCallback(() => {
-    if (isGlitching) return;
-    setIsGlitching(true);
+    if (isGlitchingRef.current) return;
+    isGlitchingRef.current = true;
 
     const iterations = glitchIntensity === 'high' ? 4 : glitchIntensity === 'medium' ? 3 : 2;
-    const frameTime = 50;
+    const frameDuration = 50;
     let frame = 0;
+    let lastFrameTime = 0;
 
-    const animate = () => {
+    const animate = (currentTime: number) => {
       if (frame >= iterations) {
         setDisplayText(text);
-        setIsGlitching(false);
+        isGlitchingRef.current = false;
         return;
       }
 
-      // Only glitch 20-40% of characters for subtle effect
+      // Throttle to ~20fps for glitch effect (50ms between frames)
+      if (currentTime - lastFrameTime < frameDuration) {
+        animationRef.current = requestAnimationFrame(animate);
+        return;
+      }
+      lastFrameTime = currentTime;
+
+      // Pre-compute glitch probability
       const glitchProbability = 0.2 + (frame / iterations) * 0.2;
-      const glitched = text
-        .split('')
-        .map((char) => {
-          if (char === ' ') return ' ';
-          if (Math.random() < glitchProbability) {
-            return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
-          }
-          return char;
-        })
-        .join('');
+
+      // Build glitched string more efficiently
+      let glitched = '';
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        if (char === ' ') {
+          glitched += ' ';
+        } else if (Math.random() < glitchProbability) {
+          glitched += GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+        } else {
+          glitched += char;
+        }
+      }
 
       setDisplayText(glitched);
       frame++;
-      setTimeout(animate, frameTime);
+      animationRef.current = requestAnimationFrame(animate);
     };
 
-    animate();
-  }, [text, glitchIntensity, isGlitching]);
+    animationRef.current = requestAnimationFrame(animate);
+  }, [text, glitchIntensity]);
 
   useEffect(() => {
     // Intervals between glitches - less frequent for smoother experience
     const intervals = {
-      low: 12000,    // Every 12 seconds
-      medium: 8000,  // Every 8 seconds
-      high: 5000,    // Every 5 seconds
+      low: 15000,   // Every 15 seconds
+      medium: 10000, // Every 10 seconds
+      high: 6000,   // Every 6 seconds
     };
 
-    const interval = setInterval(() => {
-      // Only 30% chance to actually glitch when interval fires
-      if (Math.random() < 0.3) {
-        triggerGlitch();
-      }
-    }, intervals[glitchIntensity]);
+    const scheduleGlitch = () => {
+      timeoutRef.current = setTimeout(() => {
+        // 25% chance to actually glitch when interval fires
+        if (Math.random() < 0.25) {
+          triggerGlitch();
+        }
+        scheduleGlitch();
+      }, intervals[glitchIntensity]);
+    };
 
-    return () => clearInterval(interval);
+    scheduleGlitch();
+
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    };
   }, [glitchIntensity, triggerGlitch]);
 
   // Update display text when prop changes
   useEffect(() => {
-    if (!isGlitching) {
+    if (!isGlitchingRef.current) {
       setDisplayText(text);
     }
-  }, [text, isGlitching]);
+  }, [text]);
 
   return (
     <Component
@@ -95,7 +116,7 @@ export function GlitchText({
       {displayText}
     </Component>
   );
-}
+});
 
 // Static version without animation for SSR
 export function StaticGlitchText({

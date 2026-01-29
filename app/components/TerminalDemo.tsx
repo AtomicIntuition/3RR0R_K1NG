@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useState, useRef, memo } from 'react';
 
 interface TerminalLine {
   text: string;
@@ -58,7 +57,7 @@ const typeColors: Record<string, string> = {
   fix: 'text-gray-400',
 };
 
-export function TerminalDemo() {
+export const TerminalDemo = memo(function TerminalDemo() {
   const [visibleLines, setVisibleLines] = useState<number>(0);
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -71,7 +70,7 @@ export function TerminalDemo() {
           setIsVisible(true);
         }
       },
-      { threshold: 0.3 }
+      { threshold: 0.2 }
     );
 
     if (containerRef.current) {
@@ -104,24 +103,16 @@ export function TerminalDemo() {
     return () => timeouts.forEach(clearTimeout);
   }, [isVisible]);
 
-  // Auto-scroll to bottom when new lines appear
+  // Auto-scroll to bottom when new lines appear - use auto behavior for performance
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTo({
-        top: scrollRef.current.scrollHeight,
-        behavior: 'smooth',
-      });
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [visibleLines]);
 
   return (
     <div ref={containerRef} className="w-full max-w-2xl mx-auto">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="bg-[#0d0d0d] border border-void-100 rounded-xl overflow-hidden shadow-2xl shadow-terminal/10"
-      >
+      <div className="bg-[#0d0d0d] border border-void-100 rounded-xl overflow-hidden shadow-2xl shadow-terminal/10">
         {/* Terminal header */}
         <div className="flex items-center gap-2 px-4 py-3 bg-[#1a1a1a] border-b border-void-100">
           <div className="flex gap-2">
@@ -132,29 +123,27 @@ export function TerminalDemo() {
           <span className="text-xs text-gray-500 ml-3 font-mono">terminal — 3rror_k1ng</span>
         </div>
 
-        {/* Terminal content */}
+        {/* Terminal content - CSS animation instead of Framer Motion */}
         <div
           ref={scrollRef}
           className="p-5 font-mono text-[13px] h-[420px] overflow-y-auto leading-relaxed scrollbar-thin scrollbar-track-transparent scrollbar-thumb-void-100"
         >
           <div className="space-y-0.5">
             {demoLines.slice(0, visibleLines).map((line, index) => (
-              <motion.div
+              <div
                 key={index}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.15 }}
-                className={`${typeColors[line.type]} whitespace-pre`}
+                className={`${typeColors[line.type]} whitespace-pre animate-fade-in`}
+                style={{ animationDelay: '0ms' }}
               >
                 {line.text}
-              </motion.div>
+              </div>
             ))}
             {visibleLines > 0 && visibleLines < demoLines.length && (
               <span className="inline-block w-2 h-4 bg-terminal animate-pulse ml-1" />
             )}
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
-}
+});

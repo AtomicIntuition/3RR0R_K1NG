@@ -13,9 +13,7 @@
     @apply border-void-100;
   }
 
-  html {
-    @apply scroll-smooth;
-  }
+  /* Removed global scroll-smooth - causes layout thrashing */
 
   body {
     @apply bg-void text-gray-100 font-mono antialiased;
@@ -23,10 +21,11 @@
       linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
       linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
     background-size: 50px 50px;
+    background-attachment: fixed;
   }
 
-  /* CRT Scanline effect */
-  body::before {
+  /* Subtle CRT scanline effect - optimized with will-change and reduced opacity */
+  body::after {
     content: '';
     position: fixed;
     top: 0;
@@ -36,12 +35,13 @@
     pointer-events: none;
     background: repeating-linear-gradient(
       0deg,
-      rgba(0, 0, 0, 0.15),
-      rgba(0, 0, 0, 0.15) 1px,
+      rgba(0, 0, 0, 0.08),
+      rgba(0, 0, 0, 0.08) 1px,
       transparent 1px,
       transparent 2px
     );
     z-index: 9999;
+    will-change: transform;
   }
 
   ::selection {
@@ -247,6 +247,10 @@
     animation: blink 1s step-end infinite;
   }
 
+  .cursor-blink {
+    animation: blink 0.8s step-end infinite;
+  }
+
   @keyframes blink {
     50% { opacity: 0; }
   }
@@ -379,6 +383,16 @@
 
   .animate-shimmer {
     animation: shimmer 3s infinite;
+  }
+
+  /* Fade in animation for terminal lines */
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.15s ease-out forwards;
   }
 }
 

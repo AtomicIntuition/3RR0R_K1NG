@@ -176,9 +176,6 @@ export default function RootLayout({
             {/* Navbar */}
             <Navbar />
 
-            {/* Gradient overlay */}
-            <div className="fixed inset-0 bg-gradient-to-b from-void via-transparent to-void/80 pointer-events-none" />
-
             {/* Content - add top padding for fixed navbar */}
             <main className="relative z-10 flex-1 pt-16">
               {children}

@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useMemo, memo } from 'react';
 import Link from 'next/link';
-import { GlitchText } from '@/components/GlitchText';
 import { PaymentButton } from '@/components/PaymentButton';
 import { PRICING } from '@/lib/constants';
 
@@ -12,9 +11,83 @@ const PRICE_IDS = {
   proYearly: process.env.NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID || '',
 };
 
+// Memoized FAQ Item to prevent re-renders
+const FAQItem = memo(function FAQItem({
+  question,
+  answer,
+  isOpen,
+  onToggle,
+}: {
+  question: string;
+  answer: string;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div className="rounded-xl border border-void-100 bg-void-50">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full flex items-center justify-between p-5 text-left"
+      >
+        <span className="font-medium text-gray-100">{question}</span>
+        <span className={`text-terminal transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>▼</span>
+      </button>
+      <div
+        className="overflow-hidden transition-[max-height] duration-200"
+        style={{ maxHeight: isOpen ? '200px' : '0' }}
+      >
+        <p className="px-5 pb-5 text-sm text-gray-400">{answer}</p>
+      </div>
+    </div>
+  );
+});
+
+// Memoized Feature Card
+const FeatureCard = memo(function FeatureCard({ icon, title, desc }: { icon: string; title: string; desc: string }) {
+  return (
+    <div className="p-5 rounded-xl bg-void-50 border border-void-100">
+      <span className="text-2xl mb-3 block">{icon}</span>
+      <h3 className="font-bold text-gray-100 mb-1">{title}</h3>
+      <p className="text-sm text-gray-500">{desc}</p>
+    </div>
+  );
+});
+
+const FAQ_DATA = [
+  { q: 'What counts as a scan?', a: 'Each URL you submit counts as one scan. Monitored sites use scans from your monthly allocation.' },
+  { q: 'How does site monitoring work?', a: 'Pro users can add up to 5 websites for automated daily scans. We email you if your score drops.' },
+  { q: 'Can I cancel anytime?', a: 'Yes. Cancel from your account settings and keep Pro access until the end of your billing period.' },
+  { q: 'Do scan packs expire?', a: 'Never. Scan packs are yours forever and stack if you buy multiple.' },
+  { q: 'Can I use the CLI without Pro?', a: 'Yes! The CLI (npm, Homebrew, Cargo) works for everyone. Pro gives you more scans and priority processing.' },
+];
+
+const PRO_FEATURES = [
+  { icon: '⚡', title: '200 Scans/Month', desc: 'Audit your entire portfolio' },
+  { icon: '🚀', title: 'Priority Queue', desc: '2x faster results' },
+  { icon: '📊', title: 'Site Monitoring', desc: '5 sites with daily scans' },
+  { icon: '📧', title: 'Score Alerts', desc: 'Email when scores drop' },
+  { icon: '🔑', title: 'API Access', desc: 'Integrate into your workflow' },
+  { icon: '📜', title: 'Scan History', desc: 'Track progress over time' },
+];
+
 export default function PricingPage() {
   const [isYearly, setIsYearly] = useState(true);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  // Memoized toggle handler
+  const handleToggle = useCallback((isYear: boolean) => {
+    setIsYearly(isYear);
+  }, []);
+
+  // Memoized FAQ toggle
+  const handleFaqToggle = useCallback((index: number) => {
+    setOpenFaq(prev => prev === index ? null : index);
+  }, []);
+
+  // Memoized price calculation
+  const proPrice = useMemo(() => isYearly ? PRICING.PRO_YEARLY : PRICING.PRO_MONTHLY, [isYearly]);
+  const monthlyEquivalent = useMemo(() => Math.round(PRICING.PRO_YEARLY / 12), []);
 
   return (
     <div className="min-h-screen pt-8 pb-20 px-4">
@@ -26,8 +99,8 @@ export default function PricingPage() {
             <span className="text-terminal font-medium">Trusted by 1,000+ developers</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4">
-            <GlitchText text="Level Up Your Stack" className="text-gray-100" glitchIntensity="low" as="span" />
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-gray-100">
+            Level Up Your Stack
           </h1>
 
           <p className="text-lg text-gray-400 max-w-xl mx-auto">
@@ -35,13 +108,13 @@ export default function PricingPage() {
           </p>
         </div>
 
-        {/* Billing Toggle - Dead Simple */}
+        {/* Billing Toggle - Instant with CSS */}
         <div className="flex justify-center mb-12">
           <div className="inline-flex bg-void-50 rounded-xl border border-void-100 p-1">
             <button
               type="button"
-              onClick={() => setIsYearly(false)}
-              className={`px-6 py-2.5 rounded-lg text-sm font-bold ${
+              onClick={() => handleToggle(false)}
+              className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-colors ${
                 !isYearly ? 'bg-terminal text-void' : 'text-gray-400'
               }`}
             >
@@ -49,8 +122,8 @@ export default function PricingPage() {
             </button>
             <button
               type="button"
-              onClick={() => setIsYearly(true)}
-              className={`px-6 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 ${
+              onClick={() => handleToggle(true)}
+              className={`px-6 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors ${
                 isYearly ? 'bg-terminal text-void' : 'text-gray-400'
               }`}
             >
@@ -101,7 +174,7 @@ export default function PricingPage() {
 
             <Link
               href="/"
-              className="block w-full py-4 font-bold rounded-xl text-center bg-void-100 text-gray-300 hover:bg-void-200 hover:text-gray-100"
+              className="block w-full py-4 font-bold rounded-xl text-center bg-void-100 text-gray-300 hover:bg-void-200 hover:text-gray-100 transition-colors"
             >
               Start Free
             </Link>
@@ -120,12 +193,12 @@ export default function PricingPage() {
 
             <div className="mb-8">
               <span className="text-5xl font-bold text-terminal">
-                ${isYearly ? PRICING.PRO_YEARLY : PRICING.PRO_MONTHLY}
+                ${proPrice}
               </span>
               <span className="text-gray-500 ml-2">/{isYearly ? 'yr' : 'mo'}</span>
               {isYearly && (
                 <p className="text-sm text-neon-cyan mt-1">
-                  ${Math.round(PRICING.PRO_YEARLY / 12)}/mo billed yearly
+                  ${monthlyEquivalent}/mo billed yearly
                 </p>
               )}
             </div>
@@ -218,19 +291,8 @@ export default function PricingPage() {
           </h2>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[
-              { icon: '⚡', title: '200 Scans/Month', desc: 'Audit your entire portfolio' },
-              { icon: '🚀', title: 'Priority Queue', desc: '2x faster results' },
-              { icon: '📊', title: 'Site Monitoring', desc: '5 sites with daily scans' },
-              { icon: '📧', title: 'Score Alerts', desc: 'Email when scores drop' },
-              { icon: '🔑', title: 'API Access', desc: 'Integrate into your workflow' },
-              { icon: '📜', title: 'Scan History', desc: 'Track progress over time' },
-            ].map((f) => (
-              <div key={f.title} className="p-5 rounded-xl bg-void-50 border border-void-100">
-                <span className="text-2xl mb-3 block">{f.icon}</span>
-                <h3 className="font-bold text-gray-100 mb-1">{f.title}</h3>
-                <p className="text-sm text-gray-500">{f.desc}</p>
-              </div>
+            {PRO_FEATURES.map((f) => (
+              <FeatureCard key={f.title} icon={f.icon} title={f.title} desc={f.desc} />
             ))}
           </div>
         </div>
@@ -293,26 +355,14 @@ export default function PricingPage() {
           </h2>
 
           <div className="max-w-2xl mx-auto space-y-2">
-            {[
-              { q: 'What counts as a scan?', a: 'Each URL you submit counts as one scan. Monitored sites use scans from your monthly allocation.' },
-              { q: 'How does site monitoring work?', a: 'Pro users can add up to 5 websites for automated daily scans. We email you if your score drops.' },
-              { q: 'Can I cancel anytime?', a: 'Yes. Cancel from your account settings and keep Pro access until the end of your billing period.' },
-              { q: 'Do scan packs expire?', a: 'Never. Scan packs are yours forever and stack if you buy multiple.' },
-              { q: 'Can I use the CLI without Pro?', a: 'Yes! The CLI (npm, Homebrew, Cargo) works for everyone. Pro gives you more scans and priority processing.' },
-            ].map((item, i) => (
-              <div key={i} className="rounded-xl border border-void-100 bg-void-50">
-                <button
-                  type="button"
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full flex items-center justify-between p-5 text-left"
-                >
-                  <span className="font-medium text-gray-100">{item.q}</span>
-                  <span className={`text-terminal ${openFaq === i ? 'rotate-180' : ''}`}>▼</span>
-                </button>
-                {openFaq === i && (
-                  <p className="px-5 pb-5 text-sm text-gray-400">{item.a}</p>
-                )}
-              </div>
+            {FAQ_DATA.map((item, i) => (
+              <FAQItem
+                key={i}
+                question={item.q}
+                answer={item.a}
+                isOpen={openFaq === i}
+                onToggle={() => handleFaqToggle(i)}
+              />
             ))}
           </div>
         </div>

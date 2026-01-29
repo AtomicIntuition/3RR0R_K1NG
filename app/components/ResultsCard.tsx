@@ -50,61 +50,67 @@ export const ResultsCard = memo(function ResultsCard({
     }
   }, [findings, metrics, seoFindings, violations, issues]);
 
+  // Count items for display
+  const itemCount = findings?.filter(f => !f.passed).length ||
+    metrics?.length ||
+    seoFindings?.filter(f => !f.passed).length ||
+    violations?.length ||
+    issues?.length || 0;
+
   return (
     <div className={clsx('card overflow-hidden max-w-full', className)}>
       {/* Header */}
       <button
         onClick={() => hasDetails && setIsExpanded(!isExpanded)}
         className={clsx(
-          'w-full p-3 sm:p-4 flex items-center justify-between gap-2',
-          hasDetails && 'cursor-pointer hover:bg-void-100/50 transition-colors',
+          'w-full p-3 sm:p-4 flex items-center gap-3',
+          hasDetails && 'cursor-pointer hover:bg-void-100/50 active:bg-void-100/70 transition-colors',
           !hasDetails && 'cursor-default'
         )}
       >
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+        {/* Left side: Icon + Info */}
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
           <span className="text-xl sm:text-2xl shrink-0">{icon}</span>
-          <div className="text-left min-w-0">
-            <h3 className="font-bold text-gray-100 text-sm sm:text-base truncate">{displayName}</h3>
-            <p className="text-[10px] sm:text-xs text-gray-500">
-              {category === 'security' && findings && (
-                <>{findings.filter(f => !f.passed).length} issues</>
-              )}
-              {category === 'performance' && metrics && (
-                <>{metrics.length} metrics</>
-              )}
-              {category === 'seo' && seoFindings && (
-                <>{seoFindings.filter(f => !f.passed).length} to fix</>
-              )}
-              {category === 'accessibility' && violations && (
-                <>{violations.length} violations</>
-              )}
-              {category === 'codeQuality' && issues && (
-                <>{issues.length} issues</>
-              )}
+          <div className="text-left min-w-0 flex-1">
+            <h3 className="font-bold text-gray-100 text-sm sm:text-base">{displayName}</h3>
+            <p className="text-[11px] sm:text-xs text-gray-500">
+              {itemCount > 0 ? `${itemCount} ${itemCount === 1 ? 'item' : 'items'}` : 'No issues'}
+              {hasDetails && <span className="text-gray-600 ml-1">• Tap to {isExpanded ? 'hide' : 'view'}</span>}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
-          {/* Score display - simplified on mobile */}
-          <div className="hidden sm:block">
-            <ScoreRing score={score} size="sm" animate={false} />
+        {/* Right side: Score + Expand indicator */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Score badge */}
+          <div className={clsx(
+            'flex items-center justify-center rounded-lg font-bold',
+            'w-11 h-11 sm:w-14 sm:h-14 text-base sm:text-xl',
+            'bg-void-100 border border-void-200',
+            colorClass
+          )}>
+            {score}
           </div>
-          <div className="sm:hidden flex items-center justify-center w-10 h-10 rounded-full bg-void-100 border border-void-200">
-            <span className={clsx('text-sm font-bold', colorClass)}>{score}</span>
-          </div>
+
+          {/* Expand/collapse chevron - more prominent */}
           {hasDetails && (
-            <svg
-              className={clsx(
-                'w-4 h-4 sm:w-5 sm:h-5 text-gray-500 transition-transform duration-200',
-                isExpanded && 'rotate-180'
-              )}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
+            <div className={clsx(
+              'flex items-center justify-center w-8 h-8 rounded-lg',
+              'bg-void-100/50 border border-void-200/50',
+              isExpanded ? 'bg-terminal/10 border-terminal/30' : ''
+            )}>
+              <svg
+                className={clsx(
+                  'w-5 h-5 transition-transform duration-200',
+                  isExpanded ? 'rotate-180 text-terminal' : 'text-gray-400'
+                )}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
           )}
         </div>
       </button>

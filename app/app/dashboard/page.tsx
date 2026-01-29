@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo, memo, startTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
@@ -18,6 +18,99 @@ interface Scan {
 
 type FilterType = 'all' | 'completed' | 'failed';
 const SCANS_PER_PAGE = 10;
+
+// Helper functions outside component to avoid recreation
+const getScoreColor = (score: number | null) => {
+  if (score === null) return 'text-gray-500';
+  if (score >= 80) return 'text-terminal';
+  if (score >= 60) return 'text-neon-yellow';
+  if (score >= 40) return 'text-neon-orange';
+  return 'text-danger';
+};
+
+const getStatusBadge = (status: string) => {
+  const styles: Record<string, string> = {
+    pending: 'bg-gray-500/20 text-gray-400',
+    processing: 'bg-neon-yellow/20 text-neon-yellow',
+    completed: 'bg-terminal/20 text-terminal',
+    failed: 'bg-danger/20 text-danger',
+  };
+  return styles[status] || styles.pending;
+};
+
+const getGradeColor = (grade: string | null) => {
+  if (!grade) return 'text-gray-500';
+  switch (grade[0]) {
+    case 'A': return 'text-terminal';
+    case 'B': return 'text-neon-cyan';
+    case 'C': return 'text-yellow-400';
+    case 'D': return 'text-orange-400';
+    default: return 'text-danger';
+  }
+};
+
+// Memoized date formatter
+const formatDate = (dateStr: string) => {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+};
+
+// Memoized scan row component
+const ScanRow = memo(function ScanRow({ scan }: { scan: Scan }) {
+  const formattedDate = useMemo(() => formatDate(scan.created_at), [scan.created_at]);
+
+  return (
+    <Link
+      href={`/scan/${scan.id}`}
+      className="flex items-center px-4 sm:px-6 py-3 sm:py-4 hover:bg-void-100/50 transition-colors gap-4"
+    >
+      {/* Grade Badge */}
+      <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-void flex items-center justify-center">
+        {scan.status === 'completed' && scan.letter_grade ? (
+          <span className={`text-lg sm:text-xl font-bold ${getGradeColor(scan.letter_grade)}`}>
+            {scan.letter_grade}
+          </span>
+        ) : scan.status === 'processing' ? (
+          <span className="text-neon-yellow text-sm">...</span>
+        ) : scan.status === 'failed' ? (
+          <span className="text-danger text-lg">!</span>
+        ) : (
+          <span className="text-gray-500 text-sm">--</span>
+        )}
+      </div>
+
+      {/* URL & Meta */}
+      <div className="flex-1 min-w-0">
+        <p className="text-sm sm:text-base text-gray-200 truncate">{scan.url}</p>
+        <div className="flex items-center gap-2 mt-1">
+          <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${getStatusBadge(scan.status)}`}>
+            {scan.status}
+          </span>
+          <span className="text-[10px] sm:text-xs text-gray-500">{formattedDate}</span>
+        </div>
+      </div>
+
+      {/* Score */}
+      {scan.status === 'completed' && scan.score_overall !== null && (
+        <div className="text-right hidden sm:block">
+          <span className={`text-xl font-bold ${getScoreColor(scan.score_overall)}`}>
+            {scan.score_overall}
+          </span>
+          <p className="text-[10px] text-gray-500">score</p>
+        </div>
+      )}
+
+      {/* Arrow */}
+      <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+      </svg>
+    </Link>
+  );
+});
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -76,51 +169,43 @@ export default function DashboardPage() {
     );
   }
 
-  const getScoreColor = (score: number | null) => {
-    if (score === null) return 'text-gray-500';
-    if (score >= 80) return 'text-terminal';
-    if (score >= 60) return 'text-neon-yellow';
-    if (score >= 40) return 'text-neon-orange';
-    return 'text-danger';
-  };
+  // Memoized filter handler
+  const handleFilterChange = useCallback((newFilter: FilterType) => {
+    startTransition(() => {
+      setFilter(newFilter);
+      setVisibleCount(SCANS_PER_PAGE);
+    });
+  }, []);
 
-  const getStatusBadge = (status: string) => {
-    const styles: Record<string, string> = {
-      pending: 'bg-gray-500/20 text-gray-400',
-      processing: 'bg-neon-yellow/20 text-neon-yellow',
-      completed: 'bg-terminal/20 text-terminal',
-      failed: 'bg-danger/20 text-danger',
+  // Memoized load more handler
+  const handleLoadMore = useCallback(() => {
+    startTransition(() => {
+      setVisibleCount(prev => prev + SCANS_PER_PAGE);
+    });
+  }, []);
+
+  // Memoized calculations
+  const { filteredScans, visibleScans, hasMore, completedCount, failedCount, avgScore } = useMemo(() => {
+    const completed = scans.filter(s => s.status === 'completed');
+    const failed = scans.filter(s => s.status === 'failed');
+
+    const filtered = filter === 'all' ? scans :
+      filter === 'completed' ? completed :
+        failed;
+
+    const avg = completed.length > 0
+      ? Math.round(completed.reduce((sum, s) => sum + (s.score_overall || 0), 0) / completed.length)
+      : null;
+
+    return {
+      filteredScans: filtered,
+      visibleScans: filtered.slice(0, visibleCount),
+      hasMore: filtered.length > visibleCount,
+      completedCount: completed.length,
+      failedCount: failed.length,
+      avgScore: avg,
     };
-    return styles[status] || styles.pending;
-  };
-
-  const getGradeColor = (grade: string | null) => {
-    if (!grade) return 'text-gray-500';
-    switch (grade[0]) {
-      case 'A': return 'text-terminal';
-      case 'B': return 'text-neon-cyan';
-      case 'C': return 'text-yellow-400';
-      case 'D': return 'text-orange-400';
-      default: return 'text-danger';
-    }
-  };
-
-  // Filter scans based on selected filter
-  const filteredScans = scans.filter(scan => {
-    if (filter === 'all') return true;
-    if (filter === 'completed') return scan.status === 'completed';
-    if (filter === 'failed') return scan.status === 'failed';
-    return true;
-  });
-
-  const visibleScans = filteredScans.slice(0, visibleCount);
-  const hasMore = filteredScans.length > visibleCount;
-
-  // Stats
-  const completedScans = scans.filter(s => s.status === 'completed');
-  const avgScore = completedScans.length > 0
-    ? Math.round(completedScans.reduce((sum, s) => sum + (s.score_overall || 0), 0) / completedScans.length)
-    : null;
+  }, [scans, filter, visibleCount]);
 
   return (
     <div className="min-h-screen">
@@ -138,7 +223,7 @@ export default function DashboardPage() {
           <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6 sm:mb-8">
             <div className="bg-void-50 rounded-lg border border-void-100 p-3 sm:p-6">
               <div className="text-xl sm:text-3xl font-bold text-terminal">
-                {scans.filter(s => s.status === 'completed').length}
+                {completedCount}
               </div>
               <div className="text-[10px] sm:text-sm text-gray-400">Completed</div>
             </div>
@@ -193,14 +278,14 @@ export default function DashboardPage() {
                   {(['all', 'completed', 'failed'] as FilterType[]).map((f) => (
                     <button
                       key={f}
-                      onClick={() => { setFilter(f); setVisibleCount(SCANS_PER_PAGE); }}
+                      onClick={() => handleFilterChange(f)}
                       className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors capitalize ${
                         filter === f
                           ? 'bg-void-100 text-gray-100'
                           : 'text-gray-400 hover:text-gray-200'
                       }`}
                     >
-                      {f} {f === 'all' ? `(${scans.length})` : f === 'completed' ? `(${scans.filter(s => s.status === 'completed').length})` : `(${scans.filter(s => s.status === 'failed').length})`}
+                      {f} {f === 'all' ? `(${scans.length})` : f === 'completed' ? `(${completedCount})` : `(${failedCount})`}
                     </button>
                   ))}
                 </div>
@@ -227,59 +312,7 @@ export default function DashboardPage() {
               <>
                 <div className="divide-y divide-void-100">
                   {visibleScans.map((scan) => (
-                    <Link
-                      key={scan.id}
-                      href={`/scan/${scan.id}`}
-                      className="flex items-center px-4 sm:px-6 py-3 sm:py-4 hover:bg-void-100/50 transition-colors gap-4"
-                    >
-                      {/* Grade Badge */}
-                      <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-void flex items-center justify-center">
-                        {scan.status === 'completed' && scan.letter_grade ? (
-                          <span className={`text-lg sm:text-xl font-bold ${getGradeColor(scan.letter_grade)}`}>
-                            {scan.letter_grade}
-                          </span>
-                        ) : scan.status === 'processing' ? (
-                          <span className="text-neon-yellow text-sm">...</span>
-                        ) : scan.status === 'failed' ? (
-                          <span className="text-danger text-lg">!</span>
-                        ) : (
-                          <span className="text-gray-500 text-sm">--</span>
-                        )}
-                      </div>
-
-                      {/* URL & Meta */}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm sm:text-base text-gray-200 truncate">{scan.url}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${getStatusBadge(scan.status)}`}>
-                            {scan.status}
-                          </span>
-                          <span className="text-[10px] sm:text-xs text-gray-500">
-                            {new Date(scan.created_at).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              hour: 'numeric',
-                              minute: '2-digit',
-                            })}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Score */}
-                      {scan.status === 'completed' && scan.score_overall !== null && (
-                        <div className="text-right hidden sm:block">
-                          <span className={`text-xl font-bold ${getScoreColor(scan.score_overall)}`}>
-                            {scan.score_overall}
-                          </span>
-                          <p className="text-[10px] text-gray-500">score</p>
-                        </div>
-                      )}
-
-                      {/* Arrow */}
-                      <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
+                    <ScanRow key={scan.id} scan={scan} />
                   ))}
                 </div>
 
@@ -287,7 +320,7 @@ export default function DashboardPage() {
                 {hasMore && (
                   <div className="px-4 sm:px-6 py-4 border-t border-void-100 text-center">
                     <button
-                      onClick={() => setVisibleCount(prev => prev + SCANS_PER_PAGE)}
+                      onClick={handleLoadMore}
                       className="text-sm text-terminal hover:text-terminal-bright transition-colors"
                     >
                       Load more ({filteredScans.length - visibleCount} remaining)

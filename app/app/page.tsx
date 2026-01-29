@@ -65,7 +65,7 @@ export default function HomePage() {
 
         {/* Scanner Input */}
         <ScrollReveal delay={0.5} className="w-full max-w-2xl mb-8">
-          <Scanner className="w-full" />
+          <Scanner className="w-full" autoFocus />
         </ScrollReveal>
 
         {/* Live Activity Feed */}

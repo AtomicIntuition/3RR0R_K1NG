@@ -16,12 +16,14 @@ export function Navbar() {
       // Already on home, scroll to top instantly
       window.scrollTo({ top: 0, behavior: 'auto' });
     } else {
+      // Scroll to top first to prevent any flash at wrong position
+      window.scrollTo({ top: 0, behavior: 'auto' });
       // Use Next.js router for smooth client-side navigation
       router.push('/');
-      // Scroll to top after navigation
-      requestAnimationFrame(() => {
+      // Ensure scroll stays at top after page renders
+      setTimeout(() => {
         window.scrollTo({ top: 0, behavior: 'auto' });
-      });
+      }, 50);
     }
   }, [pathname, router]);
 

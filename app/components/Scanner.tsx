@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 
 interface ScannerProps {
   className?: string;
+  autoFocus?: boolean;
 }
 
 function isValidUrl(string: string): boolean {
@@ -30,7 +31,7 @@ function normalizeUrl(input: string): string {
   return url;
 }
 
-export function Scanner({ className }: ScannerProps) {
+export function Scanner({ className, autoFocus = false }: ScannerProps) {
   const router = useRouter();
   const { user } = useAuth();
   const [url, setUrl] = useState('');
@@ -165,7 +166,7 @@ export function Scanner({ className }: ScannerProps) {
                 error && 'text-danger'
               )}
               disabled={isLoading}
-              autoFocus
+              autoFocus={autoFocus}
             />
             <button
               type="submit"

@@ -167,14 +167,14 @@ export default function ScanResultsPage() {
 
   // Results view
   return (
-    <div className="min-h-screen py-8 px-4 relative">
+    <div className="min-h-screen py-6 sm:py-8 px-3 sm:px-4 relative overflow-x-hidden">
       {/* Subtle background gradients - absolute not fixed for better performance */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-terminal/5 rounded-full blur-[100px]" />
         <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-neon-cyan/5 rounded-full blur-[100px]" />
       </div>
 
-      <div className="max-w-4xl mx-auto relative z-10">
+      <div className="max-w-4xl mx-auto relative z-10 overflow-hidden">
         {/* Shareable Results Section - This entire area gets captured */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

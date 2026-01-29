@@ -279,7 +279,7 @@
 
   /* Card styles */
   .card {
-    @apply bg-void-50/80 backdrop-blur-sm border border-void-100 rounded-lg;
+    @apply bg-void-50/80 backdrop-blur-sm border border-void-100 rounded-lg overflow-hidden max-w-full;
   }
 
   .card-glow {

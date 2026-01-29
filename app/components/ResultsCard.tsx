@@ -51,46 +51,52 @@ export const ResultsCard = memo(function ResultsCard({
   }, [findings, metrics, seoFindings, violations, issues]);
 
   return (
-    <div className={clsx('card overflow-hidden', className)}>
+    <div className={clsx('card overflow-hidden max-w-full', className)}>
       {/* Header */}
       <button
         onClick={() => hasDetails && setIsExpanded(!isExpanded)}
         className={clsx(
-          'w-full p-4 flex items-center justify-between',
+          'w-full p-3 sm:p-4 flex items-center justify-between gap-2',
           hasDetails && 'cursor-pointer hover:bg-void-100/50 transition-colors',
           !hasDetails && 'cursor-default'
         )}
       >
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">{icon}</span>
-          <div className="text-left">
-            <h3 className="font-bold text-gray-100">{displayName}</h3>
-            <p className="text-xs text-gray-500">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+          <span className="text-xl sm:text-2xl shrink-0">{icon}</span>
+          <div className="text-left min-w-0">
+            <h3 className="font-bold text-gray-100 text-sm sm:text-base truncate">{displayName}</h3>
+            <p className="text-[10px] sm:text-xs text-gray-500">
               {category === 'security' && findings && (
-                <>{findings.filter(f => !f.passed).length} issues found</>
+                <>{findings.filter(f => !f.passed).length} issues</>
               )}
               {category === 'performance' && metrics && (
-                <>{metrics.length} metrics analyzed</>
+                <>{metrics.length} metrics</>
               )}
               {category === 'seo' && seoFindings && (
-                <>{seoFindings.filter(f => !f.passed).length} items to fix</>
+                <>{seoFindings.filter(f => !f.passed).length} to fix</>
               )}
               {category === 'accessibility' && violations && (
                 <>{violations.length} violations</>
               )}
               {category === 'codeQuality' && issues && (
-                <>{issues.length} issues detected</>
+                <>{issues.length} issues</>
               )}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <ScoreRing score={score} size="sm" animate={false} />
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          {/* Score display - simplified on mobile */}
+          <div className="hidden sm:block">
+            <ScoreRing score={score} size="sm" animate={false} />
+          </div>
+          <div className="sm:hidden flex items-center justify-center w-10 h-10 rounded-full bg-void-100 border border-void-200">
+            <span className={clsx('text-sm font-bold', colorClass)}>{score}</span>
+          </div>
           {hasDetails && (
             <svg
               className={clsx(
-                'w-5 h-5 text-gray-500 transition-transform duration-200',
+                'w-4 h-4 sm:w-5 sm:h-5 text-gray-500 transition-transform duration-200',
                 isExpanded && 'rotate-180'
               )}
               fill="none"
@@ -112,7 +118,7 @@ export const ResultsCard = memo(function ResultsCard({
             opacity: isExpanded ? 1 : 0,
           }}
         >
-          <div ref={contentRef} className="px-4 pb-4 pt-2 border-t border-void-100">
+          <div ref={contentRef} className="px-3 sm:px-4 pb-4 pt-2 border-t border-void-100 overflow-x-hidden">
             {/* Security findings */}
             {findings && (
               <ul className="space-y-2">
@@ -120,25 +126,23 @@ export const ResultsCard = memo(function ResultsCard({
                   <li
                     key={finding.id}
                     className={clsx(
-                      'p-3 rounded border text-sm',
+                      'p-2 sm:p-3 rounded border text-xs sm:text-sm overflow-hidden',
                       finding.passed
                         ? 'bg-terminal/5 border-terminal/20'
                         : 'bg-danger/5 border-danger/20'
                     )}
                   >
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <span className={clsx(
-                          'inline-block px-1.5 py-0.5 rounded text-xs font-mono uppercase mr-2',
-                          finding.passed ? 'bg-terminal/20 text-terminal' : 'bg-danger/20 text-danger'
-                        )}>
-                          {finding.passed ? 'PASS' : finding.severity}
-                        </span>
-                        <span className="font-medium text-gray-200">{finding.title}</span>
-                      </div>
+                    <div className="flex flex-wrap items-start gap-1 sm:gap-2">
+                      <span className={clsx(
+                        'inline-block px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-mono uppercase shrink-0',
+                        finding.passed ? 'bg-terminal/20 text-terminal' : 'bg-danger/20 text-danger'
+                      )}>
+                        {finding.passed ? 'PASS' : finding.severity}
+                      </span>
+                      <span className="font-medium text-gray-200 break-words">{finding.title}</span>
                     </div>
-                    {!finding.passed && (
-                      <p className="mt-2 text-xs text-gray-400">{finding.recommendation}</p>
+                    {!finding.passed && finding.recommendation && (
+                      <p className="mt-2 text-[10px] sm:text-xs text-gray-400 break-words">{finding.recommendation}</p>
                     )}
                   </li>
                 ))}
@@ -149,15 +153,15 @@ export const ResultsCard = memo(function ResultsCard({
             {metrics && (
               <ul className="space-y-2">
                 {metrics.map((metric) => (
-                  <li key={metric.id} className="p-3 rounded bg-void-100/50 text-sm">
-                    <div className="flex items-center justify-between">
-                      <span className="text-gray-300">{metric.name}</span>
-                      <div className="flex items-center gap-2">
-                        <span className={clsx('font-mono', getScoreColor(metric.score))}>
+                  <li key={metric.id} className="p-2 sm:p-3 rounded bg-void-100/50 text-xs sm:text-sm">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-gray-300 truncate min-w-0">{metric.name}</span>
+                      <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+                        <span className={clsx('font-mono text-xs sm:text-sm', getScoreColor(metric.score))}>
                           {metric.displayValue}
                         </span>
                         <span className={clsx(
-                          'text-xs px-1.5 py-0.5 rounded',
+                          'text-[10px] sm:text-xs px-1 sm:px-1.5 py-0.5 rounded',
                           getScoreBgColor(metric.score)
                         )}>
                           {metric.score}
@@ -176,21 +180,21 @@ export const ResultsCard = memo(function ResultsCard({
                   <li
                     key={finding.id}
                     className={clsx(
-                      'p-3 rounded border text-sm',
+                      'p-2 sm:p-3 rounded border text-xs sm:text-sm overflow-hidden',
                       finding.passed
                         ? 'bg-terminal/5 border-terminal/20'
                         : 'bg-neon-yellow/5 border-neon-yellow/20'
                     )}
                   >
-                    <div className="flex items-center gap-2">
-                      <span className={finding.passed ? 'text-terminal' : 'text-neon-yellow'}>
+                    <div className="flex items-start gap-2">
+                      <span className={clsx('shrink-0', finding.passed ? 'text-terminal' : 'text-neon-yellow')}>
                         {finding.passed ? '✓' : '!'}
                       </span>
-                      <span className="font-medium text-gray-200">{finding.title}</span>
+                      <span className="font-medium text-gray-200 break-words">{finding.title}</span>
                     </div>
-                    <p className="mt-1 text-xs text-gray-400">{finding.description}</p>
+                    <p className="mt-1 text-[10px] sm:text-xs text-gray-400 break-words">{finding.description}</p>
                     {finding.value && (
-                      <code className="mt-2 block text-xs text-gray-500 bg-void-200 p-2 rounded truncate">
+                      <code className="mt-2 block text-[10px] sm:text-xs text-gray-500 bg-void-200 p-1.5 sm:p-2 rounded overflow-x-auto whitespace-nowrap">
                         {finding.value}
                       </code>
                     )}
@@ -203,25 +207,23 @@ export const ResultsCard = memo(function ResultsCard({
             {violations && (
               <ul className="space-y-2">
                 {violations.map((violation) => (
-                  <li key={violation.id} className="p-3 rounded bg-void-100/50 text-sm">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <span className={clsx(
-                          'inline-block px-1.5 py-0.5 rounded text-xs font-mono uppercase mr-2',
-                          violation.impact === 'critical' && 'bg-danger/20 text-danger',
-                          violation.impact === 'serious' && 'bg-neon-orange/20 text-neon-orange',
-                          violation.impact === 'moderate' && 'bg-neon-yellow/20 text-neon-yellow',
-                          violation.impact === 'minor' && 'bg-gray-500/20 text-gray-400'
-                        )}>
-                          {violation.impact}
-                        </span>
-                        <span className="text-gray-300">{violation.description}</span>
-                      </div>
-                      <span className="text-xs text-gray-500 whitespace-nowrap">
-                        {violation.nodes} element{violation.nodes !== 1 ? 's' : ''}
+                  <li key={violation.id} className="p-2 sm:p-3 rounded bg-void-100/50 text-xs sm:text-sm overflow-hidden">
+                    <div className="flex flex-wrap items-start gap-1 sm:gap-2">
+                      <span className={clsx(
+                        'inline-block px-1 sm:px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-mono uppercase shrink-0',
+                        violation.impact === 'critical' && 'bg-danger/20 text-danger',
+                        violation.impact === 'serious' && 'bg-neon-orange/20 text-neon-orange',
+                        violation.impact === 'moderate' && 'bg-neon-yellow/20 text-neon-yellow',
+                        violation.impact === 'minor' && 'bg-gray-500/20 text-gray-400'
+                      )}>
+                        {violation.impact}
+                      </span>
+                      <span className="text-[10px] sm:text-xs text-gray-500 shrink-0">
+                        {violation.nodes} el.
                       </span>
                     </div>
-                    <p className="mt-2 text-xs text-gray-400">{violation.help}</p>
+                    <p className="mt-1 text-gray-300 break-words">{violation.description}</p>
+                    <p className="mt-1 text-[10px] sm:text-xs text-gray-400 break-words">{violation.help}</p>
                   </li>
                 ))}
               </ul>
@@ -231,26 +233,24 @@ export const ResultsCard = memo(function ResultsCard({
             {issues && (
               <ul className="space-y-2">
                 {issues.map((issue) => (
-                  <li key={issue.id} className="p-3 rounded bg-void-100/50 text-sm">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <span className={clsx(
-                          'inline-block px-1.5 py-0.5 rounded text-xs font-mono mr-2',
-                          issue.type === 'console_error' && 'bg-danger/20 text-danger',
-                          issue.type === 'broken_link' && 'bg-neon-yellow/20 text-neon-yellow',
-                          issue.type === 'deprecated_api' && 'bg-neon-orange/20 text-neon-orange',
-                          issue.type === 'mixed_content' && 'bg-neon-purple/20 text-neon-purple'
-                        )}>
-                          {issue.type.replace('_', ' ')}
-                        </span>
-                      </div>
+                  <li key={issue.id} className="p-2 sm:p-3 rounded bg-void-100/50 text-xs sm:text-sm overflow-hidden">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className={clsx(
+                        'inline-block px-1 sm:px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-mono shrink-0',
+                        issue.type === 'console_error' && 'bg-danger/20 text-danger',
+                        issue.type === 'broken_link' && 'bg-neon-yellow/20 text-neon-yellow',
+                        issue.type === 'deprecated_api' && 'bg-neon-orange/20 text-neon-orange',
+                        issue.type === 'mixed_content' && 'bg-neon-purple/20 text-neon-purple'
+                      )}>
+                        {issue.type.replace('_', ' ')}
+                      </span>
                       {issue.count > 1 && (
-                        <span className="text-xs text-gray-500">x{issue.count}</span>
+                        <span className="text-[10px] sm:text-xs text-gray-500 shrink-0">x{issue.count}</span>
                       )}
                     </div>
-                    <p className="mt-1 text-gray-300 break-all">{issue.message}</p>
+                    <p className="mt-1 text-gray-300 break-words text-xs sm:text-sm">{issue.message}</p>
                     {issue.source && (
-                      <code className="mt-1 block text-xs text-gray-500 truncate">{issue.source}</code>
+                      <code className="mt-1 block text-[10px] sm:text-xs text-gray-500 overflow-x-auto whitespace-nowrap">{issue.source}</code>
                     )}
                   </li>
                 ))}

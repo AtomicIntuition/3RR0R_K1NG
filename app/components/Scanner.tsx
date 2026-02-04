@@ -106,7 +106,7 @@ export function Scanner({ className, autoFocus = false }: ScannerProps) {
           className={clsx(
             'absolute -inset-1 rounded-3xl transition-all duration-300 pointer-events-none',
             isFocused && !error
-              ? 'bg-gray-900/5 blur-xl opacity-100'
+              ? 'bg-emerald-500/5 blur-xl opacity-100'
               : 'opacity-0'
           )}
         />
@@ -114,8 +114,8 @@ export function Scanner({ className, autoFocus = false }: ScannerProps) {
         {/* Card with premium styling */}
         <div
           className={clsx(
-            'relative bg-white rounded-2xl shadow-card border overflow-hidden transition-all duration-200',
-            isFocused && !error ? 'border-primary/30 shadow-card-hover' : 'border-gray-200',
+            'relative bg-gray-900 rounded-2xl shadow-card border overflow-hidden transition-all duration-200',
+            isFocused && !error ? 'border-emerald-500 ring-1 ring-emerald-500/20' : 'border-gray-800',
             error && 'border-danger/30'
           )}
         >
@@ -138,8 +138,8 @@ export function Scanner({ className, autoFocus = false }: ScannerProps) {
               onBlur={() => setIsFocused(false)}
               placeholder="example.com"
               className={clsx(
-                'flex-1 px-3 py-4 bg-transparent text-gray-800',
-                'placeholder:text-gray-400',
+                'flex-1 px-3 py-4 bg-transparent text-gray-50',
+                'placeholder:text-gray-500',
                 'focus:outline-none',
                 'text-lg',
                 error && 'text-danger'
@@ -154,8 +154,8 @@ export function Scanner({ className, autoFocus = false }: ScannerProps) {
                 'px-6 py-4 font-semibold transition-all duration-200 rounded-r-xl',
                 'disabled:opacity-50 disabled:cursor-not-allowed',
                 isLoading
-                  ? 'bg-gray-400 text-white'
-                  : 'bg-gray-900 text-white hover:bg-gray-800 hover:-translate-y-0.5 active:scale-[0.98]'
+                  ? 'bg-gray-700 text-white'
+                  : 'bg-emerald-500 text-white hover:bg-emerald-400 active:scale-[0.98]'
               )}
             >
               {isLoading ? (
@@ -187,7 +187,7 @@ export function Scanner({ className, autoFocus = false }: ScannerProps) {
           {/* Premium shimmer loading bar */}
           {isLoading && (
             <div className="px-4 pb-4">
-              <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
+              <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
                 <div className="h-full loading-bar-premium rounded-full" />
               </div>
               <p className="text-xs text-gray-500 mt-2">{scanPhase}</p>
@@ -204,18 +204,18 @@ export function Scanner({ className, autoFocus = false }: ScannerProps) {
 
         {/* Auth Wall */}
         {showAuthWall && (
-          <div className="mt-4 p-6 bg-white border border-gray-200 rounded-2xl shadow-card animate-slide-up">
+          <div className="mt-4 p-6 bg-gray-900 border border-gray-800 rounded-2xl shadow-card animate-slide-up">
             <div className="text-center">
-              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
+              <h3 className="text-xl font-bold text-gray-50 mb-2">
                 Want More Scans?
               </h3>
-              <p className="text-gray-500 text-sm mb-6">
-                Create a free account to get <span className="text-primary font-semibold">3 scans per day</span>, save your results, and track improvements over time.
+              <p className="text-gray-400 text-sm mb-6">
+                Create a free account to get <span className="text-emerald-500 font-semibold">3 scans per day</span>, save your results, and track improvements over time.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
@@ -253,7 +253,7 @@ export function Scanner({ className, autoFocus = false }: ScannerProps) {
                 key={example}
                 type="button"
                 onClick={() => setUrl(example)}
-                className="px-3 py-1.5 text-xs text-gray-500 bg-white rounded-lg border border-gray-200 hover:border-primary/30 hover:text-primary hover:-translate-y-0.5 transition-all duration-200"
+                className="px-3 py-1.5 text-xs text-gray-400 bg-gray-800 rounded-lg border border-gray-700 hover:border-gray-600 hover:text-gray-200 transition-all duration-200"
                 disabled={isLoading}
               >
                 {example}

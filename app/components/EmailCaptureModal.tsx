@@ -61,7 +61,7 @@ export function EmailCaptureModal({
       closeOnOutsideClick={false}
       closeOnEscape={false}
     >
-      <div className="p-8 bg-white">
+      <div className="p-8 bg-gray-900">
         {/* Header */}
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 border border-primary/30 mb-4">
@@ -80,11 +80,11 @@ export function EmailCaptureModal({
             </svg>
           </div>
 
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          <h2 className="text-2xl font-bold text-gray-50 mb-2">
             One more thing...
           </h2>
 
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-400 text-sm">
             Enter your email to continue scanning. We&apos;ll save your results and
             send you security alerts if we find critical issues.
           </p>
@@ -106,11 +106,11 @@ export function EmailCaptureModal({
               }}
               placeholder="you@example.com"
               className={clsx(
-                'w-full px-4 py-3 bg-gray-50 border rounded-xl',
-                'text-gray-800 placeholder:text-gray-400',
-                'focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10',
+                'w-full px-4 py-3 bg-gray-800 border rounded-xl',
+                'text-gray-50 placeholder-gray-500',
+                'focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20',
                 'transition-colors',
-                error ? 'border-danger' : 'border-gray-200'
+                error ? 'border-danger' : 'border-gray-700'
               )}
               autoFocus
               disabled={isLoading}
@@ -158,7 +158,7 @@ export function EmailCaptureModal({
         </form>
 
         {/* Privacy note */}
-        <p className="mt-4 text-xs text-gray-500 text-center">
+        <p className="mt-4 text-xs text-gray-400 text-center">
           No spam, ever. We only email about critical security issues.
         </p>
       </div>

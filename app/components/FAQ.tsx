@@ -42,7 +42,7 @@ export function FAQ() {
 
   return (
     <div className="w-full max-w-3xl mx-auto">
-      <h2 className="text-display-sm sm:text-display-md text-center mb-8 text-gray-900 text-shadow-heading">
+      <h2 className="text-display-sm sm:text-display-md text-center mb-8 text-gray-50 text-shadow-heading">
         Frequently Asked Questions
       </h2>
 
@@ -51,21 +51,21 @@ export function FAQ() {
           <div
             key={index}
             className={clsx(
-              'bg-white border rounded-xl overflow-hidden shadow-card transition-all duration-200',
-              openIndex === index ? 'border-primary/30' : 'border-gray-200'
+              'bg-gray-900 border rounded-xl overflow-hidden transition-all duration-200',
+              openIndex === index ? 'border-emerald-500/30' : 'border-gray-800'
             )}
           >
             <button
               onClick={() => setOpenIndex(openIndex === index ? null : index)}
-              className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-gray-50/50 transition-colors"
+              className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-gray-800/50 transition-colors"
             >
-              <span className="font-medium text-gray-900 pr-4">{faq.question}</span>
+              <span className="font-medium text-gray-50 pr-4">{faq.question}</span>
               <motion.div
                 animate={{ rotate: openIndex === index ? 180 : 0 }}
                 transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                 className={clsx(
                   'flex-shrink-0 transition-colors',
-                  openIndex === index ? 'text-primary' : 'text-gray-400'
+                  openIndex === index ? 'text-emerald-500' : 'text-gray-400'
                 )}
               >
                 <ChevronDown size={20} />
@@ -80,7 +80,7 @@ export function FAQ() {
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  <div className="px-5 pb-4 text-gray-600 text-sm leading-relaxed border-t border-gray-100 pt-4">
+                  <div className="px-5 pb-4 text-gray-400 text-sm leading-relaxed border-t border-gray-800 pt-4">
                     {faq.answer}
                   </div>
                 </motion.div>

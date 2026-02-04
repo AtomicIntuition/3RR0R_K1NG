@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex bg-gray-900 relative overflow-hidden">
+    <div className="min-h-screen flex bg-gray-950 relative overflow-hidden">
       {/* Background decorations */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gray-600/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
       <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-gray-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
@@ -20,23 +20,23 @@ export default function NotFound() {
 
           {/* 404 Display */}
           <div className="mb-8">
-            <span className="text-[120px] sm:text-[160px] font-black text-gray-900 leading-none block">
+            <span className="text-[120px] sm:text-[160px] font-black text-gray-800 leading-none block">
               404
             </span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-black text-white mb-4">
+          <h1 className="text-3xl sm:text-4xl font-black text-gray-50 mb-4">
             Page not found
           </h1>
 
-          <p className="text-xl text-white/60 mb-10">
+          <p className="text-xl text-gray-400 mb-10">
             The page you&apos;re looking for doesn&apos;t exist or has been moved.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/"
-              className="px-8 py-4 bg-gray-900 text-white font-bold text-lg rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all"
+              className="px-8 py-4 bg-emerald-500 text-white font-bold text-lg rounded-xl shadow-xl hover:bg-emerald-400 transition-all"
             >
               Go to Homepage
             </Link>

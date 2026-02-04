@@ -57,7 +57,7 @@ export function Stats({ variant = 'default', className = '' }: StatsProps) {
   // Inline variant - single line of text
   if (variant === 'inline') {
     return (
-      <div className={`text-sm text-gray-500 ${className}`}>
+      <div className={`text-sm text-gray-400 ${className}`}>
         <span className="text-primary font-semibold">
           {isLoading ? '...' : formatNumber(stats.totalScans)}
         </span>
@@ -73,20 +73,20 @@ export function Stats({ variant = 'default', className = '' }: StatsProps) {
     return (
       <div className={`flex items-center justify-center gap-6 text-center ${className}`}>
         <div className="flex items-center gap-2">
-          <span className="text-xl font-bold text-primary">
+          <span className="text-xl font-bold font-mono text-primary">
             {isLoading ? '...' : formatNumber(stats.totalScans)}
           </span>
-          <span className="text-xs text-gray-400">audited</span>
+          <span className="text-xs text-gray-500">audited</span>
         </div>
-        <div className="w-px h-4 bg-gray-200" />
+        <div className="w-px h-4 bg-gray-700" />
         <div className="flex items-center gap-2">
-          <span className="text-xl font-bold text-primary">{stats.checksPerScan}+</span>
-          <span className="text-xs text-gray-400">checks</span>
+          <span className="text-xl font-bold font-mono text-primary">{stats.checksPerScan}+</span>
+          <span className="text-xs text-gray-500">checks</span>
         </div>
-        <div className="w-px h-4 bg-gray-200" />
+        <div className="w-px h-4 bg-gray-700" />
         <div className="flex items-center gap-2">
-          <span className="text-xl font-bold text-success">{stats.accuracy}%</span>
-          <span className="text-xs text-gray-400">accuracy</span>
+          <span className="text-xl font-bold font-mono text-success">{stats.accuracy}%</span>
+          <span className="text-xs text-gray-500">accuracy</span>
         </div>
       </div>
     );
@@ -96,22 +96,22 @@ export function Stats({ variant = 'default', className = '' }: StatsProps) {
   return (
     <div className={`flex flex-wrap justify-center gap-8 text-center ${className}`}>
       <div>
-        <div className="text-3xl font-bold text-primary">
+        <div className="text-3xl font-bold font-mono text-primary">
           {isLoading ? (
             <span className="animate-pulse">---</span>
           ) : (
             formatNumber(stats.totalScans)
           )}
         </div>
-        <div className="text-xs text-gray-400">Sites Audited</div>
+        <div className="text-xs text-gray-500">Sites Audited</div>
       </div>
       <div>
-        <div className="text-3xl font-bold text-primary">{stats.checksPerScan}+</div>
-        <div className="text-xs text-gray-400">Security Checks</div>
+        <div className="text-3xl font-bold font-mono text-primary">{stats.checksPerScan}+</div>
+        <div className="text-xs text-gray-500">Security Checks</div>
       </div>
       <div>
-        <div className="text-3xl font-bold text-success">{stats.accuracy}%</div>
-        <div className="text-xs text-gray-400">Accuracy Rate</div>
+        <div className="text-3xl font-bold font-mono text-success">{stats.accuracy}%</div>
+        <div className="text-xs text-gray-500">Accuracy Rate</div>
       </div>
     </div>
   );

@@ -50,16 +50,16 @@ function Section({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+    <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
+        className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-800 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
-            <Icon size={18} className="text-gray-600" />
+          <div className="w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center">
+            <Icon size={18} className="text-gray-400" />
           </div>
-          <span className="font-medium text-gray-900">{title}</span>
+          <span className="font-medium text-gray-200">{title}</span>
         </div>
         <div className="flex items-center gap-3">
           {score !== undefined && <ScoreBadge score={score} />}
@@ -70,7 +70,7 @@ function Section({
         </div>
       </button>
       {isOpen && (
-        <div className="px-4 py-4 border-t border-gray-100 text-sm">
+        <div className="px-4 py-4 border-t border-gray-800 text-sm">
           {children}
         </div>
       )}
@@ -99,7 +99,7 @@ export function ExtendedAudits({ scan }: ExtendedAuditsProps) {
 
   return (
     <section className="mb-12">
-      <h2 className="text-xl font-semibold text-gray-900 mb-6">
+      <h2 className="text-xl font-semibold text-gray-50 mb-6">
         Extended Analysis
       </h2>
 
@@ -113,14 +113,14 @@ export function ExtendedAudits({ scan }: ExtendedAuditsProps) {
                 <StatusBadge ok={scan.resultsProtocol.http2Supported} label="HTTP/2" />
                 <StatusBadge ok={scan.resultsProtocol.http3Supported} label="HTTP/3 (QUIC)" />
                 {scan.resultsProtocol.alpn && (
-                  <span className="px-2.5 py-1 rounded-lg text-xs bg-gray-100 text-gray-600">
+                  <span className="px-2.5 py-1 rounded-lg text-xs bg-gray-800 text-gray-400">
                     ALPN: {scan.resultsProtocol.alpn}
                   </span>
                 )}
               </div>
               {scan.resultsProtocol.recommendations.length > 0 && (
-                <div className="mt-2 text-gray-600">
-                  <p className="font-medium text-gray-700 mb-1">Recommendations:</p>
+                <div className="mt-2 text-gray-400">
+                  <p className="font-medium text-gray-300 mb-1">Recommendations:</p>
                   <ul className="list-disc list-inside space-y-1">
                     {scan.resultsProtocol.recommendations.map((rec, i) => (
                       <li key={i}>{rec}</li>
@@ -148,16 +148,16 @@ export function ExtendedAudits({ scan }: ExtendedAuditsProps) {
               </div>
               {scan.resultsPwa.issues.length > 0 && (
                 <div className="mt-2">
-                  <p className="font-medium text-gray-700 mb-2">Issues:</p>
+                  <p className="font-medium text-gray-300 mb-2">Issues:</p>
                   <div className="space-y-2">
                     {scan.resultsPwa.issues.map((issue, i) => (
                       <div key={i} className={clsx(
                         'p-3 rounded-lg border-l-2',
                         issue.severity === 'high' ? 'border-danger bg-danger/5' :
                         issue.severity === 'medium' ? 'border-warning bg-warning/5' :
-                        'border-gray-300 bg-gray-50'
+                        'border-gray-700 bg-gray-800/50'
                       )}>
-                        <p className="text-gray-800">{issue.description}</p>
+                        <p className="text-gray-300">{issue.description}</p>
                         <p className="text-gray-500 text-xs mt-1">{issue.recommendation}</p>
                       </div>
                     ))}
@@ -172,13 +172,13 @@ export function ExtendedAudits({ scan }: ExtendedAuditsProps) {
         {scan.resultsStructuredData && (
           <Section title="Structured Data (Schema.org)" icon={FileText} score={scan.resultsStructuredData.score}>
             <div className="space-y-3">
-              <div className="flex flex-wrap gap-4 text-gray-600">
-                <span>JSON-LD Blocks: <strong className="text-gray-900">{scan.resultsStructuredData.jsonLdCount}</strong></span>
-                <span>Microdata Items: <strong className="text-gray-900">{scan.resultsStructuredData.microdataCount}</strong></span>
+              <div className="flex flex-wrap gap-4 text-gray-400">
+                <span>JSON-LD Blocks: <strong className="text-gray-200">{scan.resultsStructuredData.jsonLdCount}</strong></span>
+                <span>Microdata Items: <strong className="text-gray-200">{scan.resultsStructuredData.microdataCount}</strong></span>
               </div>
               {scan.resultsStructuredData.types.length > 0 && (
                 <div>
-                  <p className="text-gray-600 mb-1">Schema Types Found:</p>
+                  <p className="text-gray-400 mb-1">Schema Types Found:</p>
                   <div className="flex flex-wrap gap-2">
                     {scan.resultsStructuredData.types.map((type, i) => (
                       <span key={i} className="px-2.5 py-1 bg-primary/10 text-primary rounded-lg text-xs font-medium">
@@ -190,7 +190,7 @@ export function ExtendedAudits({ scan }: ExtendedAuditsProps) {
               )}
               {scan.resultsStructuredData.errors.length > 0 && (
                 <div>
-                  <p className="font-medium text-gray-700 mb-2">
+                  <p className="font-medium text-gray-300 mb-2">
                     Errors ({scan.resultsStructuredData.errors.filter(e => e.severity === 'error').length}) /
                     Warnings ({scan.resultsStructuredData.errors.filter(e => e.severity === 'warning').length}):
                   </p>
@@ -207,8 +207,8 @@ export function ExtendedAudits({ scan }: ExtendedAuditsProps) {
                 </div>
               )}
               {scan.resultsStructuredData.recommendations.length > 0 && (
-                <div className="text-gray-600">
-                  <p className="font-medium text-gray-700 mb-1">Recommendations:</p>
+                <div className="text-gray-400">
+                  <p className="font-medium text-gray-300 mb-1">Recommendations:</p>
                   <ul className="list-disc list-inside space-y-1">
                     {scan.resultsStructuredData.recommendations.map((rec, i) => (
                       <li key={i}>{rec}</li>
@@ -225,20 +225,20 @@ export function ExtendedAudits({ scan }: ExtendedAuditsProps) {
           <Section title="Link Audit" icon={Link} score={scan.resultsLinks.score}>
             <div className="space-y-3">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <div className="text-xl font-bold text-gray-900">{scan.resultsLinks.totalLinks}</div>
+                <div className="bg-gray-800 rounded-lg p-3">
+                  <div className="text-xl font-bold text-gray-200">{scan.resultsLinks.totalLinks}</div>
                   <div className="text-xs text-gray-500">Total Links</div>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <div className="text-xl font-bold text-gray-900">{scan.resultsLinks.internalLinks}</div>
+                <div className="bg-gray-800 rounded-lg p-3">
+                  <div className="text-xl font-bold text-gray-200">{scan.resultsLinks.internalLinks}</div>
                   <div className="text-xs text-gray-500">Internal</div>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <div className="text-xl font-bold text-gray-900">{scan.resultsLinks.externalLinks}</div>
+                <div className="bg-gray-800 rounded-lg p-3">
+                  <div className="text-xl font-bold text-gray-200">{scan.resultsLinks.externalLinks}</div>
                   <div className="text-xs text-gray-500">External</div>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <div className="text-xl font-bold text-gray-900">{scan.resultsLinks.checkedLinks}</div>
+                <div className="bg-gray-800 rounded-lg p-3">
+                  <div className="text-xl font-bold text-gray-200">{scan.resultsLinks.checkedLinks}</div>
                   <div className="text-xs text-gray-500">Checked</div>
                 </div>
               </div>
@@ -277,9 +277,9 @@ export function ExtendedAudits({ scan }: ExtendedAuditsProps) {
         {scan.resultsImages && scan.resultsImages.issues.length > 0 && (
           <Section title="Image Optimization" icon={Image} score={scan.resultsImages.score}>
             <div className="space-y-3">
-              <div className="flex flex-wrap gap-4 text-gray-600">
-                <span>Total Images: <strong className="text-gray-900">{scan.resultsImages.totalImages}</strong></span>
-                <span>Total Size: <strong className="text-gray-900">{(scan.resultsImages.totalSize / 1024).toFixed(1)}KB</strong></span>
+              <div className="flex flex-wrap gap-4 text-gray-400">
+                <span>Total Images: <strong className="text-gray-200">{scan.resultsImages.totalImages}</strong></span>
+                <span>Total Size: <strong className="text-gray-200">{(scan.resultsImages.totalSize / 1024).toFixed(1)}KB</strong></span>
                 <span>Potential Savings: <strong className="text-success">{(scan.resultsImages.optimizationPotential / 1024).toFixed(1)}KB</strong></span>
               </div>
               <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -288,9 +288,9 @@ export function ExtendedAudits({ scan }: ExtendedAuditsProps) {
                     'p-3 rounded-lg border-l-2',
                     issue.severity === 'high' ? 'border-danger bg-danger/5' :
                     issue.severity === 'medium' ? 'border-warning bg-warning/5' :
-                    'border-gray-300 bg-gray-50'
+                    'border-gray-700 bg-gray-800/50'
                   )}>
-                    <p className="text-gray-700 text-xs font-mono truncate">{issue.src.split('/').pop()}</p>
+                    <p className="text-gray-300 text-xs font-mono truncate">{issue.src.split('/').pop()}</p>
                     <p className="text-gray-500 text-xs">{issue.issues.join(', ')}</p>
                   </div>
                 ))}
@@ -303,10 +303,10 @@ export function ExtendedAudits({ scan }: ExtendedAuditsProps) {
         {scan.resultsCaching && scan.resultsCaching.issues.length > 0 && (
           <Section title="Cache Headers" icon={Database} score={scan.resultsCaching.score}>
             <div className="space-y-3">
-              <div className="flex flex-wrap gap-4 text-gray-600">
-                <span>Cached: <strong className="text-gray-900">{scan.resultsCaching.summary.cached}/{scan.resultsCaching.summary.totalResources}</strong></span>
-                <span>Long Cache: <strong className="text-gray-900">{scan.resultsCaching.summary.longCache}</strong></span>
-                <span>Immutable: <strong className="text-gray-900">{scan.resultsCaching.summary.immutable}</strong></span>
+              <div className="flex flex-wrap gap-4 text-gray-400">
+                <span>Cached: <strong className="text-gray-200">{scan.resultsCaching.summary.cached}/{scan.resultsCaching.summary.totalResources}</strong></span>
+                <span>Long Cache: <strong className="text-gray-200">{scan.resultsCaching.summary.longCache}</strong></span>
+                <span>Immutable: <strong className="text-gray-200">{scan.resultsCaching.summary.immutable}</strong></span>
               </div>
               <div className="space-y-2 max-h-40 overflow-y-auto">
                 {scan.resultsCaching.issues.slice(0, 5).map((issue, i) => (
@@ -314,9 +314,9 @@ export function ExtendedAudits({ scan }: ExtendedAuditsProps) {
                     'p-3 rounded-lg border-l-2 text-xs',
                     issue.severity === 'high' ? 'border-danger bg-danger/5' :
                     issue.severity === 'medium' ? 'border-warning bg-warning/5' :
-                    'border-gray-300 bg-gray-50'
+                    'border-gray-700 bg-gray-800/50'
                   )}>
-                    <p className="text-gray-700">{issue.description}</p>
+                    <p className="text-gray-300">{issue.description}</p>
                     <p className="text-gray-500 mt-1">{issue.recommendation}</p>
                   </div>
                 ))}
@@ -329,11 +329,11 @@ export function ExtendedAudits({ scan }: ExtendedAuditsProps) {
         {scan.resultsRedirects && scan.resultsRedirects.totalRedirects > 0 && (
           <Section title="Redirect Chain" icon={ArrowRight} score={Math.max(0, 100 - scan.resultsRedirects.totalRedirects * 10)}>
             <div className="space-y-3">
-              <div className="flex flex-wrap gap-4 text-gray-600">
+              <div className="flex flex-wrap gap-4 text-gray-400">
                 <span>Redirects: <strong className="text-warning">{scan.resultsRedirects.totalRedirects}</strong></span>
-                <span>Total Time: <strong className="text-gray-900">{scan.resultsRedirects.totalTime}ms</strong></span>
+                <span>Total Time: <strong className="text-gray-200">{scan.resultsRedirects.totalTime}ms</strong></span>
               </div>
-              <div className="bg-gray-50 rounded-lg p-3 font-mono text-xs space-y-2">
+              <div className="bg-gray-950 border border-gray-800 rounded-lg p-3 font-mono text-xs space-y-2">
                 {scan.resultsRedirects.redirectChain.map((hop, i) => (
                   <div key={i} className="flex items-center gap-2">
                     <span className={clsx(
@@ -344,7 +344,7 @@ export function ExtendedAudits({ scan }: ExtendedAuditsProps) {
                     )}>
                       {hop.statusCode}
                     </span>
-                    <span className="text-gray-600 truncate flex-1">{hop.url}</span>
+                    <span className="text-gray-400 truncate flex-1">{hop.url}</span>
                     <span className="text-gray-400">{hop.duration}ms</span>
                   </div>
                 ))}
@@ -366,7 +366,7 @@ export function ExtendedAudits({ scan }: ExtendedAuditsProps) {
                 <div key={i} className="bg-danger/5 border border-danger/20 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="font-semibold text-danger">{lib.name}</span>
-                    <span className="text-xs bg-gray-100 px-2 py-0.5 rounded-md text-gray-600">v{lib.detectedVersion}</span>
+                    <span className="text-xs bg-gray-800 px-2 py-0.5 rounded-md text-gray-400">v{lib.detectedVersion}</span>
                   </div>
                   <div className="space-y-2">
                     {lib.vulnerabilities.map((vuln, j) => (
@@ -380,7 +380,7 @@ export function ExtendedAudits({ scan }: ExtendedAuditsProps) {
                           {vuln.severity.toUpperCase()}
                         </span>
                         {vuln.cve && <span className="text-gray-500 mr-2">{vuln.cve}</span>}
-                        <span className="text-gray-600">{vuln.description}</span>
+                        <span className="text-gray-400">{vuln.description}</span>
                         <p className="mt-1 text-gray-500">Fix: Update to {vuln.fixedIn}</p>
                       </div>
                     ))}

@@ -107,7 +107,7 @@ export function PaymentButton({
       </button>
 
       {description && (
-        <p className="mt-2 text-xs text-gray-500 text-center">{description}</p>
+        <p className="mt-2 text-xs text-gray-400 text-center">{description}</p>
       )}
 
       {error && (
@@ -144,8 +144,8 @@ export function PricingCard({
       className={clsx(
         'relative p-6 rounded-xl border shadow-sm',
         popular
-          ? 'border-primary bg-primary/5'
-          : 'border-gray-200 bg-white',
+          ? 'border-primary bg-primary/10'
+          : 'border-gray-800 bg-gray-900',
         className
       )}
     >
@@ -155,16 +155,16 @@ export function PricingCard({
         </span>
       )}
 
-      <h3 className="text-xl font-bold text-gray-900 mb-2">{name}</h3>
+      <h3 className="text-xl font-bold text-gray-50 mb-2">{name}</h3>
 
       <div className="mb-6">
         <span className="text-4xl font-bold text-primary">{price}</span>
-        {period && <span className="text-gray-500 ml-1">/{period}</span>}
+        {period && <span className="text-gray-400 ml-1">/{period}</span>}
       </div>
 
       <ul className="space-y-3 mb-6">
         {features.map((feature, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+          <li key={i} className="flex items-start gap-2 text-sm text-gray-400">
             <span className="text-success mt-0.5">✓</span>
             <span>{feature}</span>
           </li>

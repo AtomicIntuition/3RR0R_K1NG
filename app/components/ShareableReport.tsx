@@ -84,7 +84,7 @@ export function ShareableReport({
       id="shareable-report-fixed"
       style={{
         width: '600px',
-        backgroundColor: '#ffffff',
+        backgroundColor: '#09090B',
         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif',
         padding: '32px',
         boxSizing: 'border-box',
@@ -95,8 +95,8 @@ export function ShareableReport({
         style={{
           textAlign: 'center',
           padding: '24px 28px',
-          background: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
-          border: '1px solid #e5e7eb',
+          background: 'linear-gradient(135deg, #18181B 0%, #09090B 100%)',
+          border: '1px solid #27272A',
           borderRadius: '16px',
           marginBottom: '28px',
         }}
@@ -106,16 +106,16 @@ export function ShareableReport({
             width: '40px',
             height: '40px',
             borderRadius: '10px',
-            backgroundColor: '#0071E3',
+            backgroundColor: '#10B981',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
           }}>
             <span style={{ color: '#ffffff', fontSize: '16px', fontWeight: '700' }}>C</span>
           </div>
-          <span style={{ fontSize: '24px', fontWeight: '600', color: '#1d1d1f' }}>Crisp</span>
+          <span style={{ fontSize: '24px', fontWeight: '600', color: '#FAFAFA' }}>Crisp</span>
         </div>
-        <div style={{ fontSize: '14px', color: '#86868b', letterSpacing: '0.5px' }}>
+        <div style={{ fontSize: '14px', color: '#A1A1AA', letterSpacing: '0.5px' }}>
           Website Audit Report
         </div>
       </div>
@@ -128,15 +128,15 @@ export function ShareableReport({
             alignItems: 'center',
             gap: '8px',
             padding: '10px 20px',
-            backgroundColor: '#f5f5f7',
+            backgroundColor: '#18181B',
             borderRadius: '10px',
           }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#86868b" strokeWidth="2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A1A1AA" strokeWidth="2">
             <circle cx="12" cy="12" r="10"/>
             <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
           </svg>
-          <span style={{ color: '#1d1d1f', fontWeight: '500', fontSize: '14px' }}>
+          <span style={{ color: '#FAFAFA', fontWeight: '500', fontSize: '14px' }}>
             {url.replace(/^https?:\/\//, '').slice(0, 35)}{url.replace(/^https?:\/\//, '').length > 35 ? '...' : ''}
           </span>
         </div>
@@ -155,7 +155,7 @@ export function ShareableReport({
         {/* Score Ring */}
         <div style={{ position: 'relative', width: '120px', height: '120px' }}>
           <svg width="120" height="120" viewBox="0 0 120 120">
-            <circle cx="60" cy="60" r="52" fill="none" stroke="#f5f5f7" strokeWidth="8" />
+            <circle cx="60" cy="60" r="52" fill="none" stroke="#27272A" strokeWidth="8" />
             <circle
               cx="60"
               cy="60"
@@ -167,10 +167,10 @@ export function ShareableReport({
               strokeDasharray={`${(scoreOverall / 100) * 327} 327`}
               transform="rotate(-90 60 60)"
             />
-            <text x="60" y="56" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '32px', fontWeight: '600', fill: '#1d1d1f' }}>
+            <text x="60" y="56" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '32px', fontWeight: '600', fill: '#FAFAFA' }}>
               {scoreOverall}
             </text>
-            <text x="60" y="76" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '12px', fill: '#86868b' }}>
+            <text x="60" y="76" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '12px', fill: '#A1A1AA' }}>
               /100
             </text>
           </svg>
@@ -211,13 +211,13 @@ export function ShareableReport({
             <div
               key={cat.category}
               style={{
-                backgroundColor: '#f5f5f7',
+                backgroundColor: '#18181B',
                 borderRadius: '12px',
                 padding: '14px 10px',
                 textAlign: 'center',
               }}
             >
-              <div style={{ fontSize: '11px', color: '#86868b', marginBottom: '6px', fontWeight: '500' }}>
+              <div style={{ fontSize: '11px', color: '#A1A1AA', marginBottom: '6px', fontWeight: '500' }}>
                 {getShortLabel(cat.category)}
               </div>
               <div style={{ fontSize: '22px', fontWeight: '600', color: getScoreColor(cat.score) }}>
@@ -232,16 +232,16 @@ export function ShareableReport({
       {roastTitle && roastBody && (
         <div
           style={{
-            backgroundColor: '#f5f5f7',
+            backgroundColor: '#18181B',
             borderRadius: '16px',
             padding: '20px 24px',
             marginBottom: '20px',
           }}
         >
-          <h3 style={{ fontSize: '17px', fontWeight: '600', color: '#1d1d1f', marginBottom: '12px', lineHeight: 1.4 }}>
+          <h3 style={{ fontSize: '17px', fontWeight: '600', color: '#FAFAFA', marginBottom: '12px', lineHeight: 1.4 }}>
             {roastTitle}
           </h3>
-          <p style={{ fontSize: '14px', color: '#424245', lineHeight: 1.6, margin: 0 }}>
+          <p style={{ fontSize: '14px', color: '#A1A1AA', lineHeight: 1.6, margin: 0 }}>
             {roastBody.length > 300 ? roastBody.slice(0, 300) + '...' : roastBody}
           </p>
         </div>
@@ -251,18 +251,18 @@ export function ShareableReport({
       {fixes && fixes.length > 0 && (
         <div
           style={{
-            backgroundColor: '#ffffff',
-            border: '1px solid #e5e7eb',
+            backgroundColor: '#09090B',
+            border: '1px solid #27272A',
             borderRadius: '16px',
             padding: '20px 24px',
             marginBottom: '20px',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0071E3" strokeWidth="2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2">
               <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
             </svg>
-            <span style={{ fontSize: '15px', fontWeight: '600', color: '#1d1d1f' }}>
+            <span style={{ fontSize: '15px', fontWeight: '600', color: '#FAFAFA' }}>
               Priority Fixes
             </span>
           </div>
@@ -271,10 +271,10 @@ export function ShareableReport({
               const priorityColors: Record<string, string> = {
                 critical: '#FF3B30',
                 high: '#FF9500',
-                medium: '#0071E3',
-                low: '#86868b',
+                medium: '#10B981',
+                low: '#A1A1AA',
               };
-              const priorityColor = priorityColors[fix.priority] || '#86868b';
+              const priorityColor = priorityColors[fix.priority] || '#A1A1AA';
 
               return (
                 <div
@@ -284,19 +284,19 @@ export function ShareableReport({
                     alignItems: 'flex-start',
                     gap: '12px',
                     padding: '12px 14px',
-                    backgroundColor: '#f5f5f7',
+                    backgroundColor: '#18181B',
                     borderRadius: '10px',
                     borderLeft: `3px solid ${priorityColor}`,
                   }}
                 >
-                  <span style={{ fontSize: '13px', color: '#86868b', fontWeight: '500', minWidth: '20px' }}>
+                  <span style={{ fontSize: '13px', color: '#A1A1AA', fontWeight: '500', minWidth: '20px' }}>
                     {index + 1}.
                   </span>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '13px', fontWeight: '500', color: '#1d1d1f', marginBottom: '4px' }}>
+                    <div style={{ fontSize: '13px', fontWeight: '500', color: '#FAFAFA', marginBottom: '4px' }}>
                       {fix.title}
                     </div>
-                    <div style={{ fontSize: '12px', color: '#86868b', lineHeight: 1.4 }}>
+                    <div style={{ fontSize: '12px', color: '#A1A1AA', lineHeight: 1.4 }}>
                       {fix.description.length > 70 ? fix.description.slice(0, 70) + '...' : fix.description}
                     </div>
                   </div>
@@ -323,7 +323,7 @@ export function ShareableReport({
       {/* CTA */}
       <div
         style={{
-          background: 'linear-gradient(135deg, #0071E3 0%, #0077ED 100%)',
+          background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
           borderRadius: '16px',
           padding: '24px',
           textAlign: 'center',
@@ -346,7 +346,7 @@ export function ShareableReport({
             borderRadius: '10px',
           }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0071E3" strokeWidth="2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2">
             <circle cx="11" cy="11" r="8"/>
             <path d="M21 21l-4.35-4.35"/>
           </svg>
@@ -361,7 +361,7 @@ export function ShareableReport({
           alignItems: 'center',
           justifyContent: 'space-between',
           paddingTop: '16px',
-          borderTop: '1px solid #e5e7eb',
+          borderTop: '1px solid #27272A',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -369,15 +369,15 @@ export function ShareableReport({
             width: '24px',
             height: '24px',
             borderRadius: '6px',
-            backgroundColor: '#0071E3',
+            backgroundColor: '#10B981',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
           }}>
             <span style={{ color: '#ffffff', fontSize: '10px', fontWeight: '700' }}>C</span>
           </div>
-          <span style={{ fontSize: '12px', color: '#86868b' }}>
-            Analyzed by <span style={{ color: '#171717', fontWeight: '500' }}>Crisp</span>
+          <span style={{ fontSize: '12px', color: '#A1A1AA' }}>
+            Analyzed by <span style={{ color: '#FAFAFA', fontWeight: '500' }}>Crisp</span>
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -389,7 +389,7 @@ export function ShareableReport({
               backgroundColor: '#34C759',
             }}
           />
-          <span style={{ fontSize: '11px', color: '#86868b' }}>Analysis Complete</span>
+          <span style={{ fontSize: '11px', color: '#A1A1AA' }}>Analysis Complete</span>
         </div>
       </div>
     </div>

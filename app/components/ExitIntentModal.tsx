@@ -124,9 +124,9 @@ export function ExitIntentModal({ discountPriceId }: ExitIntentModalProps) {
       closeOnEscape={true}
       className="max-w-md"
     >
-      <div className="relative overflow-hidden bg-white">
+      <div className="relative overflow-hidden bg-gray-900">
         {/* Subtle gradient background */}
-        <div className="absolute inset-0 bg-gray-50" />
+        <div className="absolute inset-0 bg-gray-800" />
 
         <div className="relative p-8">
           {/* Header */}
@@ -135,11 +135,11 @@ export function ExitIntentModal({ discountPriceId }: ExitIntentModalProps) {
               EXCLUSIVE OFFER
             </div>
 
-            <h2 className="text-3xl font-bold text-gray-800 mb-3">
+            <h2 className="text-3xl font-bold text-gray-50 mb-3">
               Wait — don&apos;t leave yet!
             </h2>
 
-            <p className="text-gray-500">
+            <p className="text-gray-400">
               Get your first month of Pro for just
             </p>
           </div>
@@ -162,8 +162,8 @@ export function ExitIntentModal({ discountPriceId }: ExitIntentModalProps) {
           </div>
 
           {/* What you get */}
-          <div className="bg-gray-50 rounded-xl p-4 mb-6">
-            <p className="text-sm text-gray-500 font-medium mb-3">What you get:</p>
+          <div className="bg-gray-800 rounded-xl p-4 mb-6">
+            <p className="text-sm text-gray-400 font-medium mb-3">What you get:</p>
             <ul className="space-y-2">
               {[
                 `${PRICING.PRO_SCANS_PER_MONTH} scans per month`,
@@ -172,7 +172,7 @@ export function ExitIntentModal({ discountPriceId }: ExitIntentModalProps) {
                 'Scan history saved to account',
                 'Cancel anytime',
               ].map((feature, i) => (
-                <li key={i} className="flex items-center gap-2 text-sm text-gray-700">
+                <li key={i} className="flex items-center gap-2 text-sm text-gray-300">
                   <svg className="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
@@ -184,7 +184,7 @@ export function ExitIntentModal({ discountPriceId }: ExitIntentModalProps) {
 
           {/* Timer */}
           <div className="text-center mb-6">
-            <p className="text-sm text-gray-500 mb-1">Offer expires in</p>
+            <p className="text-sm text-gray-400 mb-1">Offer expires in</p>
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-danger/10 border border-danger/20 rounded-lg">
               <svg className="w-5 h-5 text-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -224,7 +224,7 @@ export function ExitIntentModal({ discountPriceId }: ExitIntentModalProps) {
 
             <button
               onClick={handleDecline}
-              className="w-full px-6 py-3 text-gray-500 hover:text-gray-700 transition-colors text-sm"
+              className="w-full px-6 py-3 text-gray-400 hover:text-gray-300 transition-colors text-sm"
             >
               No thanks, I&apos;ll pay full price later
             </button>

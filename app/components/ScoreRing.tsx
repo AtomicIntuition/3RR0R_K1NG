@@ -111,7 +111,7 @@ export function ScoreRing({
           className="absolute inset-0 rounded-full blur-xl transition-all duration-500"
           style={{
             background: `radial-gradient(circle, ${glowColor} 0%, transparent 70%)`,
-            transform: 'scale(1.3)',
+            transform: 'scale(1.1)',
           }}
         />
 
@@ -125,7 +125,7 @@ export function ScoreRing({
             stroke="currentColor"
             strokeWidth={stroke}
             strokeDasharray="4 4"
-            className="text-gray-200"
+            className="text-gray-800"
           />
           {/* Progress circle with gradient effect */}
           <circle
@@ -155,7 +155,7 @@ export function ScoreRing({
               <span
                 className={clsx(
                   text,
-                  'font-bold tabular-nums leading-none font-display',
+                  'font-bold tabular-nums leading-none font-display text-gray-50',
                   colorClass,
                   hasAnimated && 'animate-scale-in'
                 )}
@@ -169,7 +169,7 @@ export function ScoreRing({
       </div>
 
       {label && (
-        <span className={clsx(labelSize, 'mt-3 text-gray-600 font-medium')}>
+        <span className={clsx(labelSize, 'mt-3 text-gray-400 font-medium')}>
           {label}
         </span>
       )}

@@ -95,10 +95,10 @@ export default function ResetPasswordPage() {
   // Loading state
   if (checking) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-gray-950">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-white/80 font-medium">Verifying reset link...</p>
+          <div className="w-16 h-16 border-4 border-gray-700 border-t-white rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-400 font-medium">Verifying reset link...</p>
         </div>
       </div>
     );
@@ -108,68 +108,68 @@ export default function ResetPasswordPage() {
   if (!isValidSession && !checking) {
     return (
       <div className="min-h-screen flex">
-        {/* Left side - Error Gradient */}
-        <div className="hidden lg:flex lg:w-1/2 bg-red-600 relative overflow-hidden">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-10 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
+        {/* Left side - Error */}
+        <div className="hidden lg:flex lg:w-1/2 bg-gray-900 relative overflow-hidden">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-red-900/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-72 h-72 bg-red-800/20 rounded-full blur-3xl" />
 
           <div className="relative z-10 flex flex-col justify-center px-12">
             <Link href="/" className="flex items-center gap-3 mb-12">
-              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center">
                 <span className="text-white text-xl font-black">C</span>
               </div>
               <span className="text-3xl font-black text-white">Crisp</span>
             </Link>
 
-            <div className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center mb-6">
-              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-20 h-20 rounded-2xl bg-red-500/20 flex items-center justify-center mb-6">
+              <svg className="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
 
-            <h1 className="text-4xl font-black text-white mb-4">
+            <h1 className="text-4xl font-black text-gray-50 mb-4">
               Link expired
             </h1>
-            <p className="text-xl text-white/80 max-w-md">
+            <p className="text-xl text-gray-400 max-w-md">
               This password reset link is invalid or has expired. Please request a new one.
             </p>
           </div>
         </div>
 
         {/* Right side - Action */}
-        <div className="flex-1 flex items-center justify-center px-6 py-12 bg-gray-50">
+        <div className="flex-1 flex items-center justify-center px-6 py-12 bg-gray-950">
           <div className="w-full max-w-md text-center">
             {/* Mobile display */}
             <div className="lg:hidden mb-8">
-              <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-2xl flex items-center justify-center">
-                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 mx-auto mb-4 bg-red-500/20 rounded-2xl flex items-center justify-center">
+                <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
-              <h2 className="text-2xl font-black text-gray-900 mb-2">Link expired</h2>
+              <h2 className="text-2xl font-black text-gray-50 mb-2">Link expired</h2>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8">
-              <div className="hidden lg:block w-16 h-16 mx-auto mb-6 bg-red-100 rounded-2xl flex items-center justify-center">
-                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-gray-900 rounded-2xl shadow-xl border border-gray-800 p-8">
+              <div className="hidden lg:block w-16 h-16 mx-auto mb-6 bg-red-500/20 rounded-2xl flex items-center justify-center">
+                <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
 
-              <p className="text-gray-500 mb-6">
+              <p className="text-gray-400 mb-6">
                 Password reset links expire after 24 hours for security. Request a new link to continue.
               </p>
 
               <Link
                 href="/forgot-password"
-                className="block w-full px-6 py-4 bg-gray-900 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-center"
+                className="block w-full px-6 py-4 bg-emerald-500 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-emerald-400 transition-all text-center"
               >
                 Request new link
               </Link>
             </div>
 
-            <p className="mt-8 text-gray-500">
-              <Link href="/login" className="text-primary hover:text-primary-700 font-semibold">
+            <p className="mt-8 text-gray-400">
+              <Link href="/login" className="text-emerald-500 hover:text-emerald-400 font-semibold">
                 Back to sign in
               </Link>
             </p>
@@ -182,16 +182,16 @@ export default function ResetPasswordPage() {
   // Success state
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-emerald-600">
+      <div className="min-h-screen flex items-center justify-center bg-gray-950">
         <div className="text-center">
-          <div className="w-20 h-20 mx-auto mb-6 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center">
-            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-20 h-20 mx-auto mb-6 bg-emerald-500/20 rounded-2xl flex items-center justify-center">
+            <svg className="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-3xl font-black text-white mb-2">Password updated!</h1>
-          <p className="text-white/80 mb-4">Redirecting you to the app...</p>
-          <div className="w-8 h-8 border-3 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
+          <h1 className="text-3xl font-black text-gray-50 mb-2">Password updated!</h1>
+          <p className="text-gray-400 mb-4">Redirecting you to the app...</p>
+          <div className="w-8 h-8 border-3 border-gray-700 border-t-white rounded-full animate-spin mx-auto" />
         </div>
       </div>
     );
@@ -200,55 +200,55 @@ export default function ResetPasswordPage() {
   // Reset form
   return (
     <div className="min-h-screen flex">
-      {/* Left side - Gradient */}
+      {/* Left side */}
       <div className="hidden lg:flex lg:w-1/2 bg-gray-900 relative overflow-hidden">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute top-20 left-10 w-72 h-72 bg-gray-700/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 right-10 w-72 h-72 bg-gray-700/20 rounded-full blur-3xl" />
 
         <div className="relative z-10 flex flex-col justify-center px-12">
           <Link href="/" className="flex items-center gap-3 mb-12">
-            <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center">
               <span className="text-white text-xl font-black">C</span>
             </div>
             <span className="text-3xl font-black text-white">Crisp</span>
           </Link>
 
-          <h1 className="text-4xl font-black text-white mb-4">
+          <h1 className="text-4xl font-black text-gray-50 mb-4">
             Create new password
           </h1>
-          <p className="text-xl text-white/80 max-w-md">
+          <p className="text-xl text-gray-400 max-w-md">
             Choose a strong password with at least 6 characters to keep your account secure.
           </p>
         </div>
       </div>
 
       {/* Right side - Form */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-gray-50">
+      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-gray-950">
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-8">
             <Link href="/" className="inline-flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gray-900 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center">
                 <span className="text-white text-lg font-black">C</span>
               </div>
-              <span className="text-2xl font-black text-gray-900">Crisp</span>
+              <span className="text-2xl font-black text-gray-50">Crisp</span>
             </Link>
           </div>
 
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-black text-gray-900 mb-2">
+            <h2 className="text-3xl font-black text-gray-50 mb-2">
               New password
             </h2>
-            <p className="text-gray-500">
+            <p className="text-gray-400">
               Enter your new password below
             </p>
           </div>
 
           {/* Form Card */}
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8">
+          <div className="bg-gray-900 rounded-2xl shadow-xl border border-gray-800 p-8">
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-300 mb-2">
                   New password
                 </label>
                 <input
@@ -256,7 +256,7 @@ export default function ResetPasswordPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all"
+                  className="w-full px-4 py-3.5 bg-gray-800 border-2 border-gray-700 rounded-xl text-gray-50 font-medium placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 transition-all"
                   placeholder="At least 6 characters"
                   required
                   autoFocus
@@ -264,7 +264,7 @@ export default function ResetPasswordPage() {
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-300 mb-2">
                   Confirm new password
                 </label>
                 <input
@@ -272,14 +272,14 @@ export default function ResetPasswordPage() {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all"
+                  className="w-full px-4 py-3.5 bg-gray-800 border-2 border-gray-700 rounded-xl text-gray-50 font-medium placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20 transition-all"
                   placeholder="Confirm your password"
                   required
                 />
               </div>
 
               {error && (
-                <div className="px-4 py-3 bg-red-50 border-2 border-red-200 rounded-xl text-red-600 text-sm font-medium">
+                <div className="px-4 py-3 bg-red-500/10 border-2 border-red-500/30 rounded-xl text-red-400 text-sm font-medium">
                   {error}
                 </div>
               )}
@@ -287,7 +287,7 @@ export default function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-6 py-4 bg-gray-900 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                className="w-full px-6 py-4 bg-emerald-500 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-emerald-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -304,8 +304,8 @@ export default function ResetPasswordPage() {
             </form>
           </div>
 
-          <p className="mt-8 text-center text-gray-500">
-            <Link href="/login" className="text-primary hover:text-primary-700 font-semibold">
+          <p className="mt-8 text-center text-gray-400">
+            <Link href="/login" className="text-emerald-500 hover:text-emerald-400 font-semibold">
               Back to sign in
             </Link>
           </p>

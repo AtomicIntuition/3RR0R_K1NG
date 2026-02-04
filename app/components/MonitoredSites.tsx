@@ -19,7 +19,7 @@ interface MonitoredSite {
 }
 
 function getGradeColor(grade: string | null) {
-  if (!grade) return 'text-gray-500';
+  if (!grade) return 'text-gray-400';
   switch (grade[0]) {
     case 'A': return 'text-success';
     case 'B': return 'text-primary';
@@ -109,11 +109,11 @@ export function MonitoredSites() {
   const activeSites = sites.filter(s => s.is_active);
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-      <div className="px-4 sm:px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+    <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden shadow-sm">
+      <div className="px-4 sm:px-6 py-4 border-b border-gray-800 flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-bold text-gray-800">Monitored Sites</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-lg font-bold text-gray-50">Monitored Sites</h2>
+          <p className="text-sm text-gray-400 mt-1">
             We scan these sites daily and alert you when scores drop.
           </p>
         </div>
@@ -135,8 +135,8 @@ export function MonitoredSites() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </div>
-          <h3 className="text-lg font-bold text-gray-800 mb-2">Monitor Your Sites</h3>
-          <p className="text-gray-500 mb-4 max-w-md mx-auto">
+          <h3 className="text-lg font-bold text-gray-50 mb-2">Monitor Your Sites</h3>
+          <p className="text-gray-400 mb-4 max-w-md mx-auto">
             Pro users can monitor up to 5 sites. We&apos;ll scan them daily and email you when scores drop.
           </p>
           <Link
@@ -150,14 +150,14 @@ export function MonitoredSites() {
 
       {/* Add site form */}
       {isPro && showAddForm && (
-        <div className="p-4 sm:p-6 border-b border-gray-100 bg-gray-50">
+        <div className="p-4 sm:p-6 border-b border-gray-800 bg-gray-800">
           <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
               value={newUrl}
               onChange={(e) => setNewUrl(e.target.value)}
               placeholder="https://example.com"
-              className="flex-1 px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/10 focus:outline-none"
+              className="flex-1 px-4 py-2 bg-gray-900 border border-gray-700 rounded-xl text-gray-50 placeholder-gray-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 focus:outline-none"
               onKeyDown={(e) => e.key === 'Enter' && addSite()}
             />
             <button
@@ -171,7 +171,7 @@ export function MonitoredSites() {
           {error && (
             <p className="text-danger text-sm mt-2">{error}</p>
           )}
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-gray-400 mt-2">
             {activeSites.length} / {maxSites} sites monitored
           </p>
         </div>
@@ -181,9 +181,9 @@ export function MonitoredSites() {
       {isPro && (
         <>
           {loading ? (
-            <div className="p-6 text-center text-gray-500">Loading...</div>
+            <div className="p-6 text-center text-gray-400">Loading...</div>
           ) : activeSites.length === 0 ? (
-            <div className="p-6 text-center text-gray-500">
+            <div className="p-6 text-center text-gray-400">
               {showAddForm ? (
                 'Add your first site to start monitoring.'
               ) : (
@@ -199,25 +199,25 @@ export function MonitoredSites() {
               )}
             </div>
           ) : (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-gray-800">
               {activeSites.map((site) => (
                 <div key={site.id} className="px-4 sm:px-6 py-4 flex items-center gap-4">
                   {/* Score badge */}
-                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gray-800 border border-gray-800 flex items-center justify-center">
                     {site.last_grade ? (
                       <span className={`text-xl font-bold ${getGradeColor(site.last_grade)}`}>
                         {site.last_grade}
                       </span>
                     ) : (
-                      <span className="text-gray-400 text-sm">--</span>
+                      <span className="text-gray-500 text-sm">--</span>
                     )}
                   </div>
 
                   {/* Site info */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-gray-800 font-medium truncate">{site.name}</p>
-                    <p className="text-sm text-gray-500 truncate">{site.url}</p>
-                    <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
+                    <p className="text-gray-50 font-medium truncate">{site.name}</p>
+                    <p className="text-sm text-gray-400 truncate">{site.url}</p>
+                    <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
                       <span>
                         {site.last_scanned_at
                           ? `Scanned ${new Date(site.last_scanned_at).toLocaleDateString()}`
@@ -231,15 +231,15 @@ export function MonitoredSites() {
                   {/* Score */}
                   {site.last_score !== null && (
                     <div className="text-right hidden sm:block">
-                      <p className="text-2xl font-bold text-gray-800">{site.last_score}</p>
-                      <p className="text-xs text-gray-400">score</p>
+                      <p className="text-2xl font-bold text-gray-50">{site.last_score}</p>
+                      <p className="text-xs text-gray-500">score</p>
                     </div>
                   )}
 
                   {/* Remove button */}
                   <button
                     onClick={() => removeSite(site.id)}
-                    className="px-3 py-1 text-sm text-gray-400 hover:text-danger hover:bg-danger/10 rounded-lg transition-colors"
+                    className="px-3 py-1 text-sm text-gray-500 hover:text-danger hover:bg-danger/10 rounded-lg transition-colors"
                   >
                     Remove
                   </button>
@@ -249,7 +249,7 @@ export function MonitoredSites() {
           )}
 
           {activeSites.length > 0 && activeSites.length < maxSites && !showAddForm && (
-            <div className="px-4 sm:px-6 py-3 border-t border-gray-100 text-center">
+            <div className="px-4 sm:px-6 py-3 border-t border-gray-800 text-center">
               <button
                 onClick={() => setShowAddForm(true)}
                 className="text-sm text-primary hover:underline"

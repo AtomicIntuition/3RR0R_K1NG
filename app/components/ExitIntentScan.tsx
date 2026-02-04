@@ -95,18 +95,18 @@ export function ExitIntentScan({ onScanUrl }: ExitIntentScanProps) {
             WAIT
           </div>
 
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-50 mb-2">
             Try one scan free
           </h2>
 
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-400 text-sm">
             See how your favorite site scores. No signup required.
           </p>
         </div>
 
         {/* URL Selection */}
         <div className="mb-6">
-          <p className="text-xs text-gray-500 mb-3 text-center">Pick a site to analyze:</p>
+          <p className="text-xs text-gray-400 mb-3 text-center">Pick a site to analyze:</p>
           <div className="grid grid-cols-2 gap-2">
             {EXAMPLE_URLS.map((url) => (
               <button
@@ -116,7 +116,7 @@ export function ExitIntentScan({ onScanUrl }: ExitIntentScanProps) {
                 className={`px-4 py-3 rounded-xl border text-sm font-medium transition-all ${
                   selectedUrl === url
                     ? 'bg-primary/10 border-primary text-primary'
-                    : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-300'
+                    : 'bg-gray-800 border-gray-700 text-gray-400 hover:border-gray-600'
                 }`}
               >
                 {url}
@@ -134,7 +134,7 @@ export function ExitIntentScan({ onScanUrl }: ExitIntentScanProps) {
         </button>
 
         {/* Subtext */}
-        <p className="text-center text-xs text-gray-500 mt-4">
+        <p className="text-center text-xs text-gray-400 mt-4">
           2 free scans per hour. Create a free account for more.
         </p>
       </div>

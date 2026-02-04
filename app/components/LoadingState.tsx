@@ -105,10 +105,10 @@ export function LoadingState({ phase, percentage = 0, completedAudits = [], curr
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-6"
       >
-        <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1 font-display">
+        <h2 className="text-xl sm:text-2xl font-semibold text-gray-50 mb-1 font-display">
           Analyzing Website
         </h2>
-        <p className="text-primary text-sm">{phase}</p>
+        <p className="text-emerald-500 text-sm">{phase}</p>
       </motion.div>
 
       {/* Main Progress Card */}
@@ -117,15 +117,15 @@ export function LoadingState({ phase, percentage = 0, completedAudits = [], curr
         animate={{ opacity: 1, scale: 1 }}
         className="w-full mb-6"
       >
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-card overflow-hidden">
+        <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
           {/* Progress header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50/50">
-            <span className="text-sm font-medium text-gray-600">Audit Progress</span>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-gray-800/50">
+            <span className="text-sm font-medium text-gray-400">Audit Progress</span>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-primary">{percentage}%</span>
-              <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
+              <span className="text-sm font-semibold text-emerald-500">{percentage}%</span>
+              <div className="w-24 h-2 bg-gray-800 rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-gray-900 rounded-full"
+                  className="h-full bg-emerald-500 rounded-full"
                   initial={{ width: 0 }}
                   animate={{ width: `${percentage}%` }}
                   transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
@@ -138,10 +138,10 @@ export function LoadingState({ phase, percentage = 0, completedAudits = [], curr
           <div className="p-6">
             <div className="flex items-center justify-center gap-3">
               <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-primary" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
               </span>
-              <span className="text-gray-600">
+              <span className="text-gray-300">
                 {currentPhase === 'roast' ? 'Generating AI analysis...' :
                  currentPhase === 'complete' ? 'Finalizing report...' :
                  `Running ${currentPhase.replace('_', ' ')} audit...`}
@@ -169,22 +169,22 @@ export function LoadingState({ phase, percentage = 0, completedAudits = [], curr
                 className={clsx(
                   'flex flex-col items-center p-3 rounded-xl border transition-all duration-300',
                   isComplete && 'bg-success/5 border-success/30',
-                  isCurrent && 'bg-primary/5 border-primary/30 shadow-sm',
-                  !isComplete && !isCurrent && 'bg-gray-50 border-gray-100 opacity-50'
+                  isCurrent && 'bg-emerald-500/5 border-emerald-500/30 shadow-sm',
+                  !isComplete && !isCurrent && 'bg-gray-900 border-gray-800 opacity-50'
                 )}
               >
                 <AuditIcon
                   type={audit}
                   className={clsx(
                     isComplete && 'text-success',
-                    isCurrent && 'text-primary',
+                    isCurrent && 'text-emerald-500',
                     !isComplete && !isCurrent && 'text-gray-400'
                   )}
                 />
                 <span className={clsx(
                   'text-[9px] sm:text-[10px] font-medium text-center leading-tight mt-1',
                   isComplete && 'text-success',
-                  isCurrent && 'text-primary',
+                  isCurrent && 'text-emerald-500',
                   !isComplete && !isCurrent && 'text-gray-400'
                 )}>
                   {audit.split(' ')[0]}
@@ -196,8 +196,8 @@ export function LoadingState({ phase, percentage = 0, completedAudits = [], curr
                 )}
                 {isCurrent && (
                   <span className="relative flex h-2 w-2 mt-0.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                   </span>
                 )}
               </div>
@@ -218,7 +218,7 @@ export function LoadingState({ phase, percentage = 0, completedAudits = [], curr
           <div
             className="absolute inset-0 rounded-full blur-xl"
             style={{
-              background: `radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, transparent 70%)`,
+              background: `radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%)`,
               transform: 'scale(1.5)',
             }}
           />
@@ -231,7 +231,7 @@ export function LoadingState({ phase, percentage = 0, completedAudits = [], curr
               strokeWidth="4"
               fill="transparent"
               strokeDasharray="4 4"
-              className="text-gray-200"
+              className="text-gray-800"
             />
             <circle
               cx="60"
@@ -242,17 +242,17 @@ export function LoadingState({ phase, percentage = 0, completedAudits = [], curr
               fill="transparent"
               strokeDasharray={circumference}
               strokeDashoffset={strokeDashoffset}
-              className="text-primary transition-all duration-500 ease-premium"
+              className="text-emerald-500 transition-all duration-500 ease-premium"
               strokeLinecap="round"
             />
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-primary font-semibold text-sm font-display">{percentage}%</span>
+            <span className="text-emerald-500 font-semibold text-sm font-display">{percentage}%</span>
           </div>
         </div>
         <div className="text-left">
           <p className="text-xs text-gray-400">Completed</p>
-          <p className="text-sm font-semibold text-gray-700">{completedAudits.length} / 8 audits</p>
+          <p className="text-sm font-semibold text-gray-300">{completedAudits.length} / 8 audits</p>
         </div>
       </motion.div>
     </div>

@@ -85,12 +85,12 @@ export function ExampleRoasts() {
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      <h2 className="text-lg font-semibold text-center mb-4 text-gray-800">
+      <h2 className="text-lg font-semibold text-center mb-4 text-gray-50">
         Recent Reports
       </h2>
 
       {/* Carousel */}
-      <div className="relative bg-white rounded-2xl border border-gray-200 shadow-card p-6 overflow-hidden">
+      <div className="relative bg-gray-900 rounded-2xl border border-gray-800 p-6 overflow-hidden">
         <div className="relative">
           {/* Report card */}
           <div className="flex items-start gap-4">
@@ -114,13 +114,13 @@ export function ExampleRoasts() {
                   {currentReport.domain}
                 </span>
               </div>
-              <p className="text-gray-600 font-medium text-sm line-clamp-2">
+              <p className="text-gray-400 font-medium text-sm line-clamp-2">
                 "{currentReport.roastTitle}"
               </p>
               {currentReport.id && !currentReport.id.startsWith('example') && (
                 <Link
                   href={`/scan/${currentReport.id}`}
-                  className="text-xs text-primary hover:underline mt-2 inline-block"
+                  className="text-xs text-emerald-500 hover:underline mt-2 inline-block"
                 >
                   View full report →
                 </Link>
@@ -137,8 +137,8 @@ export function ExampleRoasts() {
                 className={clsx(
                   'w-2 h-2 rounded-full transition-all',
                   index === currentIndex
-                    ? 'bg-primary w-4'
-                    : 'bg-gray-200 hover:bg-gray-300'
+                    ? 'bg-emerald-500 w-4'
+                    : 'bg-gray-700 hover:bg-gray-600'
                 )}
                 aria-label={`Go to report ${index + 1}`}
               />

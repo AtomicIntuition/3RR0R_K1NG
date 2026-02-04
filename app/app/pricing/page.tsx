@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
+import { Zap, Rocket, BarChart3, Bell, Key, TrendingUp } from 'lucide-react';
 import { PaymentButton } from '@/components/PaymentButton';
 import { PRICING } from '@/lib/constants';
 
@@ -20,12 +21,12 @@ const FAQ_DATA = [
 ];
 
 const PRO_FEATURES = [
-  { icon: '⚡', title: '200 Scans/Month', desc: 'Audit your entire portfolio' },
-  { icon: '🚀', title: 'Priority Queue', desc: '2x faster results' },
-  { icon: '📊', title: 'Site Monitoring', desc: '5 sites with daily scans' },
-  { icon: '🔔', title: 'Score Alerts', desc: 'Email when scores drop' },
-  { icon: '🔑', title: 'API Access', desc: 'Integrate into your workflow' },
-  { icon: '📈', title: 'Scan History', desc: 'Track progress over time' },
+  { icon: Zap, title: '200 Scans/Month', desc: 'Audit your entire portfolio' },
+  { icon: Rocket, title: 'Priority Queue', desc: '2x faster results' },
+  { icon: BarChart3, title: 'Site Monitoring', desc: '5 sites with daily scans' },
+  { icon: Bell, title: 'Score Alerts', desc: 'Email when scores drop' },
+  { icon: Key, title: 'API Access', desc: 'Integrate into your workflow' },
+  { icon: TrendingUp, title: 'Scan History', desc: 'Track progress over time' },
 ];
 
 export default function PricingPage() {
@@ -40,16 +41,14 @@ export default function PricingPage() {
   const monthlyEquivalent = useMemo(() => Math.round(PRICING.PRO_YEARLY / 12), []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-950">
       {/* Hero Section */}
       <div className="bg-gray-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
 
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 border border-gray-700 backdrop-blur-sm rounded-full mb-8">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
@@ -65,13 +64,13 @@ export default function PricingPage() {
           </p>
 
           {/* Billing Toggle */}
-          <div className="inline-flex bg-white/10 backdrop-blur rounded-2xl p-1.5 border border-white/20">
+          <div className="inline-flex bg-gray-800 backdrop-blur rounded-2xl p-1.5 border border-gray-700">
             <button
               type="button"
               onClick={() => handleToggle(false)}
               className={`px-8 py-3 rounded-xl text-sm font-bold transition-all ${
                 !isYearly
-                  ? 'bg-white text-primary shadow-lg'
+                  ? 'bg-gray-700 text-white shadow-lg'
                   : 'text-white/80 hover:text-white'
               }`}
             >
@@ -82,7 +81,7 @@ export default function PricingPage() {
               onClick={() => handleToggle(true)}
               className={`px-8 py-3 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${
                 isYearly
-                  ? 'bg-white text-primary shadow-lg'
+                  ? 'bg-gray-700 text-white shadow-lg'
                   : 'text-white/80 hover:text-white'
               }`}
             >
@@ -99,14 +98,14 @@ export default function PricingPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 -mt-16 relative z-20">
         <div className="grid md:grid-cols-3 gap-6">
           {/* Free Plan */}
-          <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-8 hover:shadow-2xl transition-all hover:-translate-y-1">
+          <div className="bg-gray-900 rounded-3xl border border-gray-800 p-8 transition-all">
             <div className="mb-6">
               <h3 className="text-xl font-black text-gray-900 mb-1">Free</h3>
               <p className="text-gray-500 text-sm">For casual audits</p>
             </div>
 
             <div className="mb-8">
-              <span className="text-5xl font-black text-gray-300">$0</span>
+              <span className="text-5xl font-black text-gray-500">$0</span>
               <span className="text-gray-400 ml-2">/forever</span>
             </div>
 
@@ -118,9 +117,9 @@ export default function PricingPage() {
                 'Shareable reports',
                 'Basic scan history',
               ].map((feature, i) => (
-                <li key={i} className="flex items-center gap-3 text-gray-600">
-                  <div className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <li key={i} className="flex items-center gap-3 text-gray-400">
+                  <div className="w-5 h-5 rounded-full bg-gray-800 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
@@ -131,7 +130,7 @@ export default function PricingPage() {
 
             <Link
               href="/"
-              className="block w-full py-4 text-center bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 hover:-translate-y-0.5 transition-all"
+              className="block w-full py-4 text-center bg-gray-800 text-gray-200 font-bold rounded-xl hover:bg-gray-700 transition-all"
             >
               Start Free
             </Link>
@@ -141,7 +140,7 @@ export default function PricingPage() {
           <div className="relative bg-gray-900 rounded-3xl shadow-2xl p-8 md:-mt-4 md:mb-4">
             {/* Popular badge */}
             <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-              <span className="px-6 py-2 bg-amber-400 text-amber-900 text-sm font-black rounded-full shadow-lg">
+              <span className="px-6 py-2 bg-emerald-500 text-white text-sm font-black rounded-full shadow-lg">
                 MOST POPULAR
               </span>
             </div>
@@ -186,20 +185,20 @@ export default function PricingPage() {
               priceId={isYearly ? PRICE_IDS.proYearly : PRICE_IDS.proMonthly}
               mode="subscription"
               label="Go Pro"
-              className="[&_button]:bg-white [&_button]:text-primary [&_button]:hover:bg-gray-100 [&_button]:shadow-xl"
+              className="[&_button]:bg-emerald-500 [&_button]:text-white [&_button]:hover:bg-emerald-400 [&_button]:shadow-xl"
             />
             <p className="text-white/50 text-xs text-center mt-4">Cancel anytime</p>
           </div>
 
           {/* Scan Pack */}
-          <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-8 hover:shadow-2xl transition-all hover:-translate-y-1">
+          <div className="bg-gray-900 rounded-3xl border border-gray-800 p-8 transition-all">
             <div className="mb-6">
               <h3 className="text-xl font-black text-gray-900 mb-1">Scan Pack</h3>
               <p className="text-gray-500 text-sm">For agencies & teams</p>
             </div>
 
             <div className="mb-8">
-              <span className="text-5xl font-black text-emerald-600">${PRICING.SCAN_PACK}</span>
+              <span className="text-5xl font-black text-emerald-500">${PRICING.SCAN_PACK}</span>
               <span className="text-gray-400 ml-2">/once</span>
             </div>
 
@@ -212,9 +211,9 @@ export default function PricingPage() {
                 'No subscription needed',
                 'Stackable packs',
               ].map((feature, i) => (
-                <li key={i} className="flex items-center gap-3 text-gray-600">
-                  <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <li key={i} className="flex items-center gap-3 text-gray-400">
+                  <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
@@ -227,7 +226,7 @@ export default function PricingPage() {
               priceId={PRICE_IDS.scanPack}
               mode="payment"
               label="Buy Pack"
-              className="[&_button]:bg-emerald-600 [&_button]:hover:bg-emerald-700"
+              className="[&_button]:bg-emerald-500 [&_button]:hover:bg-emerald-400"
             />
           </div>
         </div>
@@ -235,7 +234,7 @@ export default function PricingPage() {
 
       {/* Pro Features Grid */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-24">
-        <h2 className="text-3xl sm:text-4xl font-black text-gray-900 text-center mb-12">
+        <h2 className="text-3xl sm:text-4xl font-black text-gray-50 text-center mb-12">
           Everything in Pro
         </h2>
 
@@ -243,13 +242,13 @@ export default function PricingPage() {
           {PRO_FEATURES.map((feature, i) => (
             <div
               key={i}
-              className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all"
+              className="bg-gray-900 rounded-2xl p-6 border border-gray-800 transition-all"
             >
-              <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mb-4 text-2xl">
-                {feature.icon}
+              <div className="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center mb-4 text-emerald-500">
+                <feature.icon className="w-5 h-5" />
               </div>
-              <h3 className="text-lg font-black text-gray-900 mb-1">{feature.title}</h3>
-              <p className="text-gray-500 text-sm">{feature.desc}</p>
+              <h3 className="text-lg font-black text-gray-50 mb-1">{feature.title}</h3>
+              <p className="text-gray-400 text-sm">{feature.desc}</p>
             </div>
           ))}
         </div>
@@ -257,16 +256,16 @@ export default function PricingPage() {
 
       {/* Comparison Table */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-24">
-        <h2 className="text-3xl sm:text-4xl font-black text-gray-900 text-center mb-12">
+        <h2 className="text-3xl sm:text-4xl font-black text-gray-50 text-center mb-12">
           Compare Plans
         </h2>
 
-        <div className="bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden">
+        <div className="bg-gray-900 rounded-3xl border border-gray-800 overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-100 bg-gray-50">
-                <th className="text-left py-5 px-6 text-gray-500 font-bold">Feature</th>
-                <th className="text-center py-5 px-6 text-gray-500 font-bold w-28">Free</th>
+              <tr className="border-b border-gray-800 bg-gray-800">
+                <th className="text-left py-5 px-6 text-gray-400 font-bold">Feature</th>
+                <th className="text-center py-5 px-6 text-gray-400 font-bold w-28">Free</th>
                 <th className="text-center py-5 px-6 font-black w-28 bg-gray-900 text-white">Pro</th>
               </tr>
             </thead>
@@ -279,8 +278,8 @@ export default function PricingPage() {
                 { feature: 'Score Alerts', free: false, pro: true },
                 { feature: 'API Access', free: false, pro: true },
               ].map((row, i) => (
-                <tr key={i} className="border-b border-gray-50 last:border-0">
-                  <td className="py-4 px-6 text-gray-700 font-medium">{row.feature}</td>
+                <tr key={i} className="border-b border-gray-800 last:border-0">
+                  <td className="py-4 px-6 text-gray-300 font-medium">{row.feature}</td>
                   <td className="text-center py-4 px-6">
                     {typeof row.free === 'boolean' ? (
                       row.free ? (
@@ -288,19 +287,19 @@ export default function PricingPage() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
                       ) : (
-                        <span className="text-gray-300">—</span>
+                        <span className="text-gray-600">—</span>
                       )
                     ) : (
                       <span className="text-gray-400">{row.free}</span>
                     )}
                   </td>
-                  <td className="text-center py-4 px-6 bg-primary-50">
+                  <td className="text-center py-4 px-6 bg-emerald-500/5">
                     {typeof row.pro === 'boolean' ? (
-                      <svg className="w-5 h-5 text-primary mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-emerald-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     ) : (
-                      <span className="text-primary font-bold">{row.pro}</span>
+                      <span className="text-emerald-500 font-bold">{row.pro}</span>
                     )}
                   </td>
                 </tr>
@@ -321,8 +320,8 @@ export default function PricingPage() {
             {FAQ_DATA.map((item, i) => (
               <div
                 key={i}
-                className={`bg-white/5 backdrop-blur rounded-2xl border transition-all ${
-                  openFaq === i ? 'border-primary-500' : 'border-white/10'
+                className={`bg-gray-800 backdrop-blur rounded-2xl border transition-all ${
+                  openFaq === i ? 'border-emerald-500' : 'border-gray-700'
                 }`}
               >
                 <button
@@ -352,13 +351,13 @@ export default function PricingPage() {
       </div>
 
       {/* Contact CTA */}
-      <div className="bg-white py-16">
+      <div className="bg-gray-950 py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-2xl font-black text-gray-900 mb-4">Questions?</h2>
-          <p className="text-gray-500 mb-6">We&apos;re here to help with any questions about pricing or features.</p>
+          <h2 className="text-2xl font-black text-gray-50 mb-4">Questions?</h2>
+          <p className="text-gray-400 mb-6">We&apos;re here to help with any questions about pricing or features.</p>
           <a
             href="mailto:support@crisp.dev"
-            className="inline-block px-8 py-4 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
+            className="inline-block px-8 py-4 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-400 transition-all"
           >
             Contact Support
           </a>

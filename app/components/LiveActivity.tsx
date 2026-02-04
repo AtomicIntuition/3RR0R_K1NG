@@ -94,7 +94,7 @@ export function LiveActivity({ className = '', compact = false }: LiveActivityPr
       );
     }
     return (
-      <div className={`bg-white border border-gray-200 rounded-xl p-3 min-h-[52px] ${className}`}>
+      <div className={`bg-gray-900 border border-gray-800 rounded-xl p-3 min-h-[52px] ${className}`}>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <span className="relative flex h-2 w-2">
@@ -121,7 +121,7 @@ export function LiveActivity({ className = '', compact = false }: LiveActivityPr
             className={`transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
           >
             <span className="text-gray-400">
-              <span className="text-gray-600 font-medium">{current.domain}</span>
+              <span className="text-gray-300 font-medium">{current.domain}</span>
               {' '}scored{' '}
               <span className={`font-semibold ${getScoreColor(current.score)}`}>{current.score}</span>
               {' '}{current.timeAgo}
@@ -133,7 +133,7 @@ export function LiveActivity({ className = '', compact = false }: LiveActivityPr
   }
 
   return (
-    <div className={`bg-white border border-gray-200 rounded-xl p-3 min-h-[52px] ${className}`}>
+    <div className={`bg-gray-900 border border-gray-800 rounded-xl p-3 min-h-[52px] ${className}`}>
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
@@ -149,8 +149,8 @@ export function LiveActivity({ className = '', compact = false }: LiveActivityPr
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
             }`}
           >
-            <span className="text-sm text-gray-500">
-              <span className="text-gray-700 font-medium">{current.domain}</span>
+            <span className="text-sm text-gray-400">
+              <span className="text-gray-300 font-medium">{current.domain}</span>
               {' '}just got audited —{' '}
               <span className={`font-semibold ${getScoreColor(current.score)}`}>
                 {current.score}/100

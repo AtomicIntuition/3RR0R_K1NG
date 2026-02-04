@@ -127,12 +127,10 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-950">
       {/* Hero Header */}
       <div className="bg-gray-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
 
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
@@ -143,14 +141,14 @@ export default function DashboardPage() {
             <div className="flex gap-3">
               <Link
                 href="/"
-                className="px-6 py-3 bg-white text-primary font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
+                className="px-6 py-3 bg-emerald-500 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:bg-emerald-400 transition-all"
               >
                 New Scan
               </Link>
               {profile?.tier !== 'pro' && (
                 <Link
                   href="/pricing"
-                  className="px-6 py-3 bg-white/20 backdrop-blur text-white font-bold rounded-xl hover:bg-white/30 transition-all"
+                  className="px-6 py-3 bg-gray-800 border border-gray-700 text-white font-bold rounded-xl hover:bg-gray-700 transition-all"
                 >
                   Upgrade
                 </Link>
@@ -160,11 +158,11 @@ export default function DashboardPage() {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-white/20">
+            <div className="bg-gray-800 rounded-2xl p-4 sm:p-6 border border-gray-700">
               <div className="text-3xl sm:text-4xl font-black text-white mb-1">{completedCount}</div>
               <div className="text-white/70 text-sm font-medium">Scans Completed</div>
             </div>
-            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-white/20">
+            <div className="bg-gray-800 rounded-2xl p-4 sm:p-6 border border-gray-700">
               <div className={`text-3xl sm:text-4xl font-black mb-1 ${
                 profile?.tier === 'pro' ? 'text-amber-300' : 'text-white'
               }`}>
@@ -172,7 +170,7 @@ export default function DashboardPage() {
               </div>
               <div className="text-white/70 text-sm font-medium">Current Plan</div>
             </div>
-            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-white/20">
+            <div className="bg-gray-800 rounded-2xl p-4 sm:p-6 border border-gray-700">
               <div className={`text-3xl sm:text-4xl font-black mb-1 ${
                 avgScore !== null && avgScore >= 80 ? 'text-emerald-300' :
                 avgScore !== null && avgScore >= 60 ? 'text-amber-300' :
@@ -194,14 +192,14 @@ export default function DashboardPage() {
         </div>
 
         {/* Scan History */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+        <div className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
           {/* Header */}
-          <div className="px-6 py-5 border-b border-gray-100 bg-gray-50">
+          <div className="px-6 py-5 border-b border-gray-800 bg-gray-800">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <h2 className="text-xl font-black text-gray-900">Scan History</h2>
+              <h2 className="text-xl font-black text-gray-50">Scan History</h2>
 
               {/* Filter Tabs */}
-              <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
+              <div className="flex gap-1 bg-gray-700 rounded-xl p-1">
                 {(['all', 'completed', 'failed'] as FilterType[]).map((f) => (
                   <button
                     key={f}
@@ -211,8 +209,8 @@ export default function DashboardPage() {
                     }}
                     className={`px-4 py-2 text-sm font-bold rounded-lg transition-all capitalize ${
                       filter === f
-                        ? 'bg-white text-gray-900 shadow-md'
-                        : 'text-gray-500 hover:text-gray-700'
+                        ? 'bg-gray-900 text-gray-50'
+                        : 'text-gray-400 hover:text-gray-200'
                     }`}
                   >
                     {f} ({f === 'all' ? scans.length : f === 'completed' ? completedCount : failedCount})
@@ -225,24 +223,24 @@ export default function DashboardPage() {
           {/* Content */}
           {loadingScans ? (
             <div className="p-12 text-center">
-              <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
               <p className="text-gray-500 font-medium">Loading scans...</p>
             </div>
           ) : filteredScans.length === 0 ? (
             <div className="p-12 text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <p className="text-gray-900 font-bold text-lg mb-2">
+              <p className="text-gray-50 font-bold text-lg mb-2">
                 {filter === 'all' ? 'No scans yet' : `No ${filter} scans`}
               </p>
-              <p className="text-gray-500 mb-6">Start scanning websites to see them here</p>
+              <p className="text-gray-400 mb-6">Start scanning websites to see them here</p>
               {filter === 'all' && (
                 <Link
                   href="/"
-                  className="inline-block px-6 py-3 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
+                  className="inline-block px-6 py-3 bg-emerald-500 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:bg-emerald-400 transition-all"
                 >
                   Run your first scan
                 </Link>
@@ -250,23 +248,23 @@ export default function DashboardPage() {
             </div>
           ) : (
             <>
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-gray-800">
                 {visibleScans.map((scan) => (
                   <Link
                     key={scan.id}
                     href={`/scan/${scan.id}`}
-                    className="flex items-center px-6 py-4 hover:bg-gray-50 transition-all group"
+                    className="flex items-center px-6 py-4 hover:bg-gray-800 transition-all group"
                   >
                     {/* Grade Badge */}
                     <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center mr-4 ${
                       scan.status === 'completed' && scan.letter_grade
                         ? getGradeBg(scan.letter_grade)
-                        : 'bg-gray-100'
+                        : 'bg-gray-800'
                     }`}>
                       {scan.status === 'completed' && scan.letter_grade ? (
                         <span className="text-lg font-black text-white">{scan.letter_grade}</span>
                       ) : scan.status === 'processing' ? (
-                        <span className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                        <span className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
                       ) : scan.status === 'failed' ? (
                         <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -278,15 +276,15 @@ export default function DashboardPage() {
 
                     {/* URL & Meta */}
                     <div className="flex-1 min-w-0 mr-4">
-                      <p className="text-gray-900 font-bold truncate group-hover:text-primary transition-colors">
+                      <p className="text-gray-100 font-bold truncate group-hover:text-emerald-500 transition-colors">
                         {scan.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
                       </p>
                       <div className="flex items-center gap-3 mt-1">
                         <span className={`px-2 py-0.5 rounded-full text-xs font-bold capitalize ${
-                          scan.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
-                          scan.status === 'processing' ? 'bg-amber-100 text-amber-700' :
-                          scan.status === 'failed' ? 'bg-red-100 text-red-700' :
-                          'bg-gray-100 text-gray-600'
+                          scan.status === 'completed' ? 'bg-emerald-500/10 text-emerald-500' :
+                          scan.status === 'processing' ? 'bg-amber-500/10 text-amber-500' :
+                          scan.status === 'failed' ? 'bg-red-500/10 text-red-500' :
+                          'bg-gray-800 text-gray-500'
                         }`}>
                           {scan.status}
                         </span>
@@ -305,7 +303,7 @@ export default function DashboardPage() {
                     )}
 
                     {/* Arrow */}
-                    <svg className="w-5 h-5 text-gray-300 group-hover:text-primary group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-gray-600 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </Link>
@@ -314,10 +312,10 @@ export default function DashboardPage() {
 
               {/* Load More */}
               {hasMore && (
-                <div className="px-6 py-4 border-t border-gray-100 text-center bg-gray-50">
+                <div className="px-6 py-4 border-t border-gray-800 text-center bg-gray-800">
                   <button
                     onClick={() => setVisibleCount(prev => prev + SCANS_PER_PAGE)}
-                    className="text-primary hover:text-primary-700 font-bold transition-colors"
+                    className="text-emerald-500 hover:text-emerald-400 font-bold transition-colors"
                   >
                     Load more ({filteredScans.length - visibleCount} remaining)
                   </button>

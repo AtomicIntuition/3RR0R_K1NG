@@ -5,20 +5,19 @@ import { Scanner } from '@/components/Scanner';
 // Lazy load heavy components
 const ExampleRoasts = dynamic(() => import('@/components/ExampleRoasts').then(m => ({ default: m.ExampleRoasts })));
 const FAQ = dynamic(() => import('@/components/FAQ').then(m => ({ default: m.FAQ })), { ssr: false });
-const Testimonials = dynamic(() => import('@/components/Testimonials').then(m => ({ default: m.Testimonials })), { ssr: false });
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-950">
       {/* ============================================
           HERO SECTION
           ============================================ */}
-      <section className="relative overflow-hidden bg-white">
+      <section className="relative overflow-hidden bg-gray-950">
         {/* Subtle grid background */}
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(0,0,0,0.05) 1px, transparent 0)',
+            backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0)',
             backgroundSize: '32px 32px'
           }}
         />
@@ -26,23 +25,23 @@ export default function HomePage() {
         <div className="relative z-10 px-4 pt-24 pb-20 sm:pt-36 sm:pb-28">
           <div className="max-w-3xl mx-auto text-center">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 bg-gray-100 border border-gray-200 rounded-full">
+            <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 bg-gray-800 border border-gray-700 rounded-full">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </span>
-              <span className="text-gray-600 font-medium text-sm">Free website audits &mdash; No signup required</span>
+              <span className="text-gray-300 font-medium text-sm">Free website audits &mdash; No signup required</span>
             </div>
 
             {/* Main Headline */}
-            <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-gray-900 mb-6 tracking-tight">
+            <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-gray-50 mb-6 tracking-tight">
               Know exactly where
               <br />
               your site stands.
             </h1>
 
             {/* Subheadline */}
-            <p className="text-lg sm:text-xl text-gray-500 mb-12 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg sm:text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
               50+ checks across security, performance, SEO, and accessibility.
               AI-powered insights you can actually use.
             </p>
@@ -80,20 +79,20 @@ export default function HomePage() {
       {/* ============================================
           FEATURES GRID
           ============================================ */}
-      <section className="py-24 sm:py-32 px-4 bg-white border-t border-gray-100">
+      <section className="py-24 sm:py-32 px-4 bg-gray-950 border-t border-gray-800">
         <div className="max-w-6xl mx-auto">
           {/* Section Header */}
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-50 mb-4 tracking-tight">
               Everything we check
             </h2>
-            <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
               Comprehensive analysis across six critical areas
             </p>
           </div>
 
           {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-gray-200 rounded-2xl overflow-hidden border border-gray-200">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-gray-800 rounded-2xl overflow-hidden border border-gray-800">
             {[
               {
                 icon: (
@@ -152,13 +151,13 @@ export default function HomePage() {
             ].map((feature) => (
               <div
                 key={feature.title}
-                className="bg-white p-8 hover:bg-gray-50 transition-colors group"
+                className="bg-gray-900 p-8 hover:bg-gray-800 transition-colors group"
               >
-                <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600 mb-5 group-hover:bg-gray-200 transition-colors">
+                <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center text-gray-400 mb-5 group-hover:bg-gray-700 transition-colors">
                   {feature.icon}
                 </div>
-                <h3 className="text-base font-semibold text-gray-900 mb-2">{feature.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{feature.description}</p>
+                <h3 className="text-base font-semibold text-gray-50 mb-2">{feature.title}</h3>
+                <p className="text-sm text-gray-400 leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -168,13 +167,13 @@ export default function HomePage() {
       {/* ============================================
           HOW IT WORKS
           ============================================ */}
-      <section className="py-24 sm:py-32 px-4 bg-gray-50 border-t border-gray-100">
+      <section className="py-24 sm:py-32 px-4 bg-gray-900 border-t border-gray-800">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-50 mb-4 tracking-tight">
               Three steps to better code
             </h2>
-            <p className="text-lg text-gray-500">
+            <p className="text-lg text-gray-400">
               From URL to actionable fixes in under a minute
             </p>
           </div>
@@ -199,12 +198,12 @@ export default function HomePage() {
             ].map((item, index) => (
               <div key={item.step} className="relative text-center">
                 {/* Step Number */}
-                <div className="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center text-white font-bold text-sm mx-auto mb-5">
+                <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold text-sm mx-auto mb-5">
                   {item.step}
                 </div>
 
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{item.description}</p>
+                <h3 className="text-lg font-semibold text-gray-50 mb-2">{item.title}</h3>
+                <p className="text-sm text-gray-400 leading-relaxed">{item.description}</p>
               </div>
             ))}
           </div>
@@ -214,23 +213,16 @@ export default function HomePage() {
       {/* ============================================
           EXAMPLE REPORTS
           ============================================ */}
-      <section className="py-24 sm:py-32 px-4 bg-white border-t border-gray-100">
+      <section className="py-24 sm:py-32 px-4 bg-gray-950 border-t border-gray-800">
         <ExampleRoasts />
-      </section>
-
-      {/* ============================================
-          TESTIMONIALS
-          ============================================ */}
-      <section className="py-24 sm:py-32 px-4 bg-gray-50 border-t border-gray-100">
-        <Testimonials />
       </section>
 
       {/* ============================================
           PRICING CTA
           ============================================ */}
-      <section className="py-24 sm:py-32 px-4 bg-white border-t border-gray-100">
+      <section className="py-24 sm:py-32 px-4 bg-gray-950 border-t border-gray-800">
         <div className="max-w-3xl mx-auto">
-          <div className="bg-gray-900 rounded-3xl p-10 sm:p-16 text-center">
+          <div className="bg-gray-900 border border-gray-800 rounded-3xl p-10 sm:p-16 text-center">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 tracking-tight">
               Ready to ship better websites?
             </h2>
@@ -241,13 +233,13 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/pricing"
-                className="px-8 py-3.5 bg-white text-gray-900 font-semibold rounded-xl hover:bg-gray-100 transition-all hover:-translate-y-0.5"
+                className="px-8 py-3.5 bg-emerald-500 text-white font-semibold rounded-xl hover:bg-emerald-400 transition-all"
               >
                 View Pricing
               </Link>
               <Link
                 href="/"
-                className="px-8 py-3.5 bg-gray-800 text-white font-semibold rounded-xl border border-gray-700 hover:bg-gray-700 transition-all hover:-translate-y-0.5"
+                className="px-8 py-3.5 bg-gray-800 text-white font-semibold rounded-xl border border-gray-700 hover:bg-gray-700 transition-all"
               >
                 Try Free Scan
               </Link>
@@ -259,19 +251,19 @@ export default function HomePage() {
       {/* ============================================
           FAQ
           ============================================ */}
-      <section className="py-24 sm:py-32 px-4 bg-gray-50 border-t border-gray-100">
+      <section className="py-24 sm:py-32 px-4 bg-gray-900 border-t border-gray-800">
         <FAQ />
       </section>
 
       {/* ============================================
           FINAL CTA
           ============================================ */}
-      <section className="py-24 sm:py-32 px-4 bg-white border-t border-gray-100">
+      <section className="py-24 sm:py-32 px-4 bg-gray-950 border-t border-gray-800">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-50 mb-4 tracking-tight">
             Ready to see your score?
           </h2>
-          <p className="text-lg text-gray-500 mb-10">
+          <p className="text-lg text-gray-400 mb-10">
             It&apos;s free. Takes 30 seconds. You might learn something.
           </p>
           <Scanner className="w-full" />

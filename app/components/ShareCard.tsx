@@ -56,12 +56,12 @@ export function ShareCard({ scanId, url, score, twitterRoast, className }: Share
   };
 
   return (
-    <div className={clsx('bg-white rounded-xl border border-gray-200 p-6 shadow-sm', className)}>
-      <h3 className="text-lg font-bold text-gray-900 mb-4">
+    <div className={clsx('bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-sm', className)}>
+      <h3 className="text-lg font-bold text-gray-50 mb-4">
         Share Your Report
       </h3>
 
-      <p className="text-sm text-gray-500 mb-6">
+      <p className="text-sm text-gray-400 mb-6">
         Share your results with your team or on social media.
       </p>
 
@@ -71,15 +71,15 @@ export function ShareCard({ scanId, url, score, twitterRoast, className }: Share
           type="text"
           value={shareUrl}
           readOnly
-          className="flex-1 text-sm px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-700"
+          className="flex-1 text-sm px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300"
         />
         <button
           onClick={handleCopy}
           className={clsx(
             'px-4 py-2 rounded-lg font-medium transition-all duration-200',
             copied
-              ? 'bg-primary text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ? 'bg-emerald-500 text-white'
+              : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
           )}
         >
           {copied ? 'Copied!' : 'Copy'}
@@ -111,16 +111,16 @@ export function ShareCard({ scanId, url, score, twitterRoast, className }: Share
 
       {/* Twitter roast text */}
       {twitterRoast && (
-        <div className="p-3 bg-gray-50 rounded-xl border border-gray-200">
-          <p className="text-xs text-gray-500 mb-2">Ready-to-share (copy & paste):</p>
-          <p className="text-sm text-gray-700 font-mono">{twitterRoast}</p>
+        <div className="p-3 bg-gray-800 rounded-xl border border-gray-700">
+          <p className="text-xs text-gray-400 mb-2">Ready-to-share (copy & paste):</p>
+          <p className="text-sm text-gray-300 font-mono">{twitterRoast}</p>
           <button
             onClick={async () => {
               await navigator.clipboard.writeText(`${twitterRoast}\n\nAnalyze your site: ${shareUrl}`);
               setCopied(true);
               setTimeout(() => setCopied(false), 2000);
             }}
-            className="mt-2 text-xs text-primary hover:underline"
+            className="mt-2 text-xs text-emerald-500 hover:underline"
           >
             {copied ? 'Copied!' : 'Copy text'}
           </button>

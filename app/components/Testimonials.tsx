@@ -48,7 +48,7 @@ const testimonials: Testimonial[] = [
 export function Testimonials() {
   return (
     <div className="w-full max-w-5xl mx-auto">
-      <h2 className="text-display-sm sm:text-display-md text-center mb-4 text-gray-900 text-shadow-heading">
+      <h2 className="text-display-sm sm:text-display-md text-center mb-4 text-gray-50 text-shadow-heading">
         What Developers Are Saying
       </h2>
       <p className="text-gray-500 text-center mb-8 max-w-xl mx-auto">
@@ -63,7 +63,7 @@ export function Testimonials() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: index * 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-white border border-gray-200 rounded-xl p-5 hover:border-primary/30 hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 group"
+            className="bg-gray-900 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition-all duration-200 group"
           >
             {/* Score improvement badge */}
             {testimonial.score && (
@@ -82,7 +82,7 @@ export function Testimonials() {
             )}
 
             {/* Quote */}
-            <p className="text-gray-700 text-sm leading-relaxed mb-4">
+            <p className="text-gray-300 text-sm leading-relaxed mb-4">
               &ldquo;{testimonial.quote}&rdquo;
             </p>
 
@@ -94,16 +94,16 @@ export function Testimonials() {
                   alt={testimonial.author}
                   width={40}
                   height={40}
-                  className="w-10 h-10 rounded-full object-cover ring-2 ring-gray-100"
+                  className="w-10 h-10 rounded-full object-cover ring-2 ring-gray-800"
                   loading="lazy"
                 />
               ) : (
-                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-bold text-primary ring-2 ring-primary/10">
+                <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-sm font-bold text-primary ring-2 ring-primary/10">
                   {testimonial.avatar}
                 </div>
               )}
               <div>
-                <p className="font-medium text-gray-900 text-sm">{testimonial.author}</p>
+                <p className="font-medium text-gray-50 text-sm">{testimonial.author}</p>
                 <p className="text-xs text-gray-500">{testimonial.role}</p>
               </div>
             </div>

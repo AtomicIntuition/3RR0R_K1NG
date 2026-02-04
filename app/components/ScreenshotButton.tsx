@@ -78,7 +78,7 @@ export function ScreenshotButton({
       }
 
       const canvas = await html2canvas(element as HTMLElement, {
-        backgroundColor: '#ffffff',
+        backgroundColor: '#09090B',
         scale: 2, // 2x for high quality (1200px output)
         useCORS: true,
         logging: false,

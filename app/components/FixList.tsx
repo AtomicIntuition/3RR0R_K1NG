@@ -32,11 +32,11 @@ const PRIORITY_CONFIG = {
     Icon: AlertTriangle,
   },
   medium: {
-    badge: 'bg-primary/10 text-primary border-primary/30',
+    badge: 'bg-gray-700 text-gray-300 border-gray-600',
     Icon: FileText,
   },
   low: {
-    badge: 'bg-gray-100 text-gray-500 border-gray-200',
+    badge: 'bg-gray-800 text-gray-400 border-gray-700',
     Icon: Lightbulb,
   },
 };
@@ -74,7 +74,7 @@ export function FixList({ fixes, className }: FixListProps) {
         <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-success/10 flex items-center justify-center">
           <CheckCircle className="w-6 h-6 text-success" />
         </div>
-        <p className="text-gray-500">No critical issues found. Nice work!</p>
+        <p className="text-gray-400">No critical issues found. Nice work!</p>
       </div>
     );
   }
@@ -82,10 +82,10 @@ export function FixList({ fixes, className }: FixListProps) {
   return (
     <div className={className}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">
+        <h3 className="text-lg font-semibold text-gray-50">
           Priority Fixes
         </h3>
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-gray-400">
           {fixes.length} item{fixes.length !== 1 ? 's' : ''}
         </span>
       </div>
@@ -102,9 +102,9 @@ export function FixList({ fixes, className }: FixListProps) {
             <li
               key={index}
               className={clsx(
-                'group p-4 rounded-xl bg-white border border-gray-200',
+                'group p-4 rounded-xl bg-gray-900 border border-gray-800',
                 'transition-all duration-200',
-                'hover:border-gray-300 hover:shadow-sm'
+                'hover:border-gray-700'
               )}
             >
               {/* Header */}
@@ -123,22 +123,22 @@ export function FixList({ fixes, className }: FixListProps) {
                   </span>
 
                   {/* Title */}
-                  <h4 className="font-medium text-gray-900 leading-tight pt-0.5">
+                  <h4 className="font-medium text-gray-50 leading-tight pt-0.5">
                     {fix.title}
                   </h4>
                 </div>
 
                 {/* Category icon */}
                 <div
-                  className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center shrink-0"
+                  className="w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center shrink-0"
                   title={fix.category.replace('_', ' ')}
                 >
-                  <CategoryIcon size={16} className="text-gray-600" />
+                  <CategoryIcon size={16} className="text-gray-400" />
                 </div>
               </div>
 
               {/* Description */}
-              <p className="text-sm text-gray-600 mb-3 pl-0 sm:pl-[100px]">
+              <p className="text-sm text-gray-400 mb-3 pl-0 sm:pl-[100px]">
                 {fix.description}
               </p>
 
@@ -159,9 +159,9 @@ export function FixList({ fixes, className }: FixListProps) {
               </div>
 
               {/* Hover hint */}
-              <div className="mt-3 pt-3 border-t border-gray-100 opacity-0 group-hover:opacity-100 transition-opacity">
-                <p className="text-xs text-gray-500">
-                  <span className="text-primary font-medium">Tip:</span> Fixing {fix.priority} priority issues first will have the biggest impact on your score.
+              <div className="mt-3 pt-3 border-t border-gray-800 opacity-0 group-hover:opacity-100 transition-opacity">
+                <p className="text-xs text-gray-400">
+                  <span className="text-emerald-500 font-medium">Tip:</span> Fixing {fix.priority} priority issues first will have the biggest impact on your score.
                 </p>
               </div>
             </li>

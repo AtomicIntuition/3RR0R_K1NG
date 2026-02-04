@@ -69,7 +69,7 @@ export const ResultsCard = memo(function ResultsCard({
 
   return (
     <div className={clsx(
-      'bg-white border border-gray-200 rounded-xl overflow-hidden transition-all duration-200',
+      'bg-gray-900 border border-gray-800 rounded-xl overflow-hidden transition-all duration-200',
       hasDetails && 'hover:shadow-card',
       className
     )}>
@@ -78,17 +78,17 @@ export const ResultsCard = memo(function ResultsCard({
         onClick={() => hasDetails && setIsExpanded(!isExpanded)}
         className={clsx(
           'w-full px-4 py-3 flex items-center justify-between',
-          hasDetails && 'hover:bg-gray-50/50 transition-colors cursor-pointer',
+          hasDetails && 'hover:bg-gray-800/50 transition-colors cursor-pointer',
           !hasDetails && 'cursor-default'
         )}
       >
         <div className="flex items-center gap-3">
           {/* Neumorphic icon container */}
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center shadow-inner-subtle">
-            <CategoryIcon size={18} className="text-gray-600" />
+          <div className="w-9 h-9 rounded-xl bg-gray-800 flex items-center justify-center">
+            <CategoryIcon size={18} className="text-gray-400" />
           </div>
           <div className="text-left">
-            <span className="font-medium text-gray-800">{displayName}</span>
+            <span className="font-medium text-gray-200">{displayName}</span>
             {itemCount > 0 && (
               <span className="text-gray-400 text-sm ml-2">({itemCount})</span>
             )}
@@ -118,7 +118,7 @@ export const ResultsCard = memo(function ResultsCard({
       >
         <div className="overflow-hidden">
           {hasDetails && (
-            <div className="px-4 py-3 border-t border-gray-100 text-sm">
+            <div className="px-4 py-3 border-t border-gray-800 text-sm">
               {/* Security findings */}
               {findings && (
                 <div className="space-y-2">
@@ -126,7 +126,7 @@ export const ResultsCard = memo(function ResultsCard({
                     <div
                       key={finding.id}
                       className={clsx(
-                        'p-3 rounded-xl border-l-4 transition-all duration-200 hover:-translate-y-0.5',
+                        'p-3 rounded-xl border-l-4 transition-all duration-200',
                         finding.passed
                           ? 'border-success bg-success/5 hover:bg-success/10'
                           : 'border-danger bg-danger/5 hover:bg-danger/10'
@@ -139,10 +139,10 @@ export const ResultsCard = memo(function ResultsCard({
                         )}>
                           {finding.passed ? 'PASS' : finding.severity?.toUpperCase() || 'FAIL'}
                         </span>
-                        <span className="text-gray-700">{finding.title}</span>
+                        <span className="text-gray-300">{finding.title}</span>
                       </div>
                       {!finding.passed && finding.recommendation && (
-                        <p className="mt-2 text-xs text-gray-500">{finding.recommendation}</p>
+                        <p className="mt-2 text-xs text-gray-400">{finding.recommendation}</p>
                       )}
                     </div>
                   ))}
@@ -153,8 +153,8 @@ export const ResultsCard = memo(function ResultsCard({
               {metrics && (
                 <div className="space-y-2">
                   {metrics.map((metric) => (
-                    <div key={metric.id} className="p-3 rounded-xl bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors">
-                      <span className="text-gray-600">{metric.name}</span>
+                    <div key={metric.id} className="p-3 rounded-xl bg-gray-800/50 flex items-center justify-between hover:bg-gray-800 transition-colors">
+                      <span className="text-gray-300">{metric.name}</span>
                       <div className="flex items-center gap-2">
                         <span className={clsx('font-mono', getScoreColor(metric.score))}>
                           {metric.displayValue}
@@ -178,7 +178,7 @@ export const ResultsCard = memo(function ResultsCard({
                     <div
                       key={finding.id}
                       className={clsx(
-                        'p-3 rounded-xl border-l-4 transition-all duration-200 hover:-translate-y-0.5',
+                        'p-3 rounded-xl border-l-4 transition-all duration-200',
                         finding.passed
                           ? 'border-success bg-success/5 hover:bg-success/10'
                           : 'border-warning bg-warning/5 hover:bg-warning/10'
@@ -189,10 +189,10 @@ export const ResultsCard = memo(function ResultsCard({
                           {finding.passed ? '✓' : '!'}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <span className="text-gray-700">{finding.title}</span>
-                          <p className="text-xs text-gray-500 mt-1">{finding.description}</p>
+                          <span className="text-gray-300">{finding.title}</span>
+                          <p className="text-xs text-gray-400 mt-1">{finding.description}</p>
                           {finding.value && (
-                            <code className="mt-2 block text-xs text-gray-500 bg-gray-100 p-2 rounded-lg break-all">
+                            <code className="mt-2 block text-xs text-gray-500 bg-gray-950 border border-gray-800 p-2 rounded-lg break-all">
                               {finding.value}
                             </code>
                           )}
@@ -208,11 +208,11 @@ export const ResultsCard = memo(function ResultsCard({
                 <div className="space-y-2">
                   {violations.map((violation) => (
                     <div key={violation.id} className={clsx(
-                      'p-3 rounded-xl border-l-4 transition-all duration-200 hover:-translate-y-0.5',
+                      'p-3 rounded-xl border-l-4 transition-all duration-200',
                       violation.impact === 'critical' ? 'border-danger bg-danger/5 hover:bg-danger/10' :
                       violation.impact === 'serious' ? 'border-warning-dark bg-warning/5 hover:bg-warning/10' :
                       violation.impact === 'moderate' ? 'border-warning bg-warning/5 hover:bg-warning/10' :
-                      'border-gray-300 bg-gray-50 hover:bg-gray-100'
+                      'border-gray-700 bg-gray-800/50 hover:bg-gray-800'
                     )}>
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
@@ -222,7 +222,7 @@ export const ResultsCard = memo(function ResultsCard({
                               violation.impact === 'critical' && 'bg-danger/10 text-danger',
                               violation.impact === 'serious' && 'bg-warning/10 text-warning-dark',
                               violation.impact === 'moderate' && 'bg-warning/10 text-warning',
-                              violation.impact === 'minor' && 'bg-gray-100 text-gray-500'
+                              violation.impact === 'minor' && 'bg-gray-800 text-gray-500'
                             )}>
                               {violation.impact}
                             </span>
@@ -230,8 +230,8 @@ export const ResultsCard = memo(function ResultsCard({
                               {violation.nodes} element{violation.nodes !== 1 ? 's' : ''}
                             </span>
                           </div>
-                          <p className="text-gray-700">{violation.description}</p>
-                          <p className="text-xs text-gray-500 mt-1">{violation.help}</p>
+                          <p className="text-gray-300">{violation.description}</p>
+                          <p className="text-xs text-gray-400 mt-1">{violation.help}</p>
                         </div>
                       </div>
                     </div>
@@ -244,7 +244,7 @@ export const ResultsCard = memo(function ResultsCard({
                 <div className="space-y-2">
                   {issues.map((issue) => (
                     <div key={issue.id} className={clsx(
-                      'p-3 rounded-xl border-l-4 transition-all duration-200 hover:-translate-y-0.5',
+                      'p-3 rounded-xl border-l-4 transition-all duration-200',
                       issue.type === 'console_error' ? 'border-danger bg-danger/5 hover:bg-danger/10' :
                       issue.type === 'broken_link' ? 'border-warning bg-warning/5 hover:bg-warning/10' :
                       issue.type === 'deprecated_api' ? 'border-warning-dark bg-warning/5 hover:bg-warning/10' :
@@ -264,7 +264,7 @@ export const ResultsCard = memo(function ResultsCard({
                           <span className="text-xs text-gray-400">×{issue.count}</span>
                         )}
                       </div>
-                      <p className="text-gray-700 mt-2 break-words">{issue.message}</p>
+                      <p className="text-gray-300 mt-2 break-words">{issue.message}</p>
                       {issue.source && (
                         <code className="mt-1 block text-xs text-gray-500 break-all">{issue.source}</code>
                       )}

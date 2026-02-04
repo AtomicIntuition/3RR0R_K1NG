@@ -18,7 +18,7 @@ const siteUrl = 'https://3rrork1ng.com';
 
 // Viewport configuration with theme color
 export const viewport: Viewport = {
-  themeColor: '#171717',
+  themeColor: '#09090B',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -164,7 +164,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-screen font-sans antialiased" suppressHydrationWarning>
+      <body className="min-h-screen bg-gray-950 text-gray-50 font-sans antialiased" suppressHydrationWarning>
         <ServiceWorkerRegistration />
         <Providers>
           <div className="relative min-h-screen flex flex-col">
@@ -177,24 +177,24 @@ export default function RootLayout({
             </main>
 
             {/* Footer */}
-            <footer className="relative z-10 py-8 px-4 border-t border-gray-200 bg-white">
+            <footer className="relative z-10 py-8 px-4 border-t border-gray-800 bg-gray-950">
               <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
                 <div className="flex items-center gap-3">
-                  <div className="w-7 h-7 rounded-lg bg-gray-900 flex items-center justify-center">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center">
                     <span className="text-white text-xs font-bold">C</span>
                   </div>
-                  <span className="text-gray-900 font-bold">Crisp</span>
-                  <span className="text-gray-300">|</span>
+                  <span className="text-gray-50 font-bold">Crisp</span>
+                  <span className="text-gray-700">|</span>
                   <span>Website Audit Platform</span>
                 </div>
                 <div className="flex items-center gap-6">
-                  <a href="/privacy" className="hover:text-gray-900 transition-colors font-medium">Privacy</a>
-                  <a href="/terms" className="hover:text-gray-900 transition-colors font-medium">Terms</a>
+                  <a href="/privacy" className="hover:text-gray-200 transition-colors font-medium">Privacy</a>
+                  <a href="/terms" className="hover:text-gray-200 transition-colors font-medium">Terms</a>
                   <a
                     href="https://x.com/crisp_dev"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-gray-900 transition-colors font-medium"
+                    className="hover:text-gray-200 transition-colors font-medium"
                   >
                     @crisp
                   </a>

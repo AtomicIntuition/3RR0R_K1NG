@@ -11,8 +11,8 @@ export default function ScansPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="text-primary">Loading...</div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-950">
+      <div className="text-emerald-500">Loading...</div>
     </div>
   );
 }

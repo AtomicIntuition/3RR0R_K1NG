@@ -58,7 +58,7 @@ export default function SignUpPage() {
 
         <div className="relative z-10 flex flex-col justify-center px-12">
           <Link href="/" className="flex items-center gap-3 mb-12">
-            <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-emerald-500 backdrop-blur flex items-center justify-center">
               <span className="text-white text-xl font-black">C</span>
             </div>
             <span className="text-3xl font-black text-white">Crisp</span>
@@ -102,20 +102,20 @@ export default function SignUpPage() {
       </div>
 
       {/* Right side - Form */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-gray-50">
+      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-gray-950">
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-8">
             <Link href="/" className="inline-flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gray-900 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center">
                 <span className="text-white text-lg font-black">C</span>
               </div>
-              <span className="text-2xl font-black text-gray-900">Crisp</span>
+              <span className="text-2xl font-black text-gray-50">Crisp</span>
             </Link>
           </div>
 
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-black text-gray-900 mb-2">
+            <h2 className="text-3xl font-black text-gray-50 mb-2">
               Create account
             </h2>
             <p className="text-gray-500">
@@ -124,10 +124,10 @@ export default function SignUpPage() {
           </div>
 
           {/* Form Card */}
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8">
+          <div className="bg-gray-900 rounded-2xl border border-gray-800 p-8">
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-300 mb-2">
                   Email address
                 </label>
                 <input
@@ -135,14 +135,14 @@ export default function SignUpPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all"
+                  className="w-full px-4 py-3.5 bg-gray-800 border border-gray-700 rounded-xl text-gray-50 font-medium placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all"
                   placeholder="you@example.com"
                   required
                 />
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-300 mb-2">
                   Password
                 </label>
                 <input
@@ -150,14 +150,14 @@ export default function SignUpPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all"
+                  className="w-full px-4 py-3.5 bg-gray-800 border border-gray-700 rounded-xl text-gray-50 font-medium placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all"
                   placeholder="At least 6 characters"
                   required
                 />
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-300 mb-2">
                   Confirm password
                 </label>
                 <input
@@ -165,14 +165,14 @@ export default function SignUpPage() {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all"
+                  className="w-full px-4 py-3.5 bg-gray-800 border border-gray-700 rounded-xl text-gray-50 font-medium placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all"
                   placeholder="Confirm your password"
                   required
                 />
               </div>
 
               {error && (
-                <div className="px-4 py-3 bg-red-50 border-2 border-red-200 rounded-xl text-red-600 text-sm font-medium">
+                <div className="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm font-medium">
                   {error}
                 </div>
               )}
@@ -180,7 +180,7 @@ export default function SignUpPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-6 py-4 bg-gray-900 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                className="w-full px-6 py-4 bg-emerald-500 text-white font-bold text-lg rounded-xl hover:bg-emerald-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -198,11 +198,11 @@ export default function SignUpPage() {
 
             <p className="mt-4 text-xs text-gray-500 text-center">
               By signing up, you agree to our{' '}
-              <Link href="/terms" className="text-primary hover:text-primary-700 font-medium">
+              <Link href="/terms" className="text-emerald-500 hover:text-emerald-400 font-medium">
                 Terms of Service
               </Link>{' '}
               and{' '}
-              <Link href="/privacy" className="text-primary hover:text-primary-700 font-medium">
+              <Link href="/privacy" className="text-emerald-500 hover:text-emerald-400 font-medium">
                 Privacy Policy
               </Link>
             </p>
@@ -210,7 +210,7 @@ export default function SignUpPage() {
 
           <p className="mt-8 text-center text-gray-500">
             Already have an account?{' '}
-            <Link href="/login" className="text-primary hover:text-primary-700 font-semibold">
+            <Link href="/login" className="text-emerald-500 hover:text-emerald-400 font-semibold">
               Sign in
             </Link>
           </p>

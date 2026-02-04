@@ -156,11 +156,11 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                 WAIT — EXCLUSIVE OFFER
               </div>
 
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-50 mb-2">
                 One Last Chance!
               </h2>
 
-              <p className="text-gray-500 text-sm sm:text-base">
+              <p className="text-gray-400 text-sm sm:text-base">
                 Get your first month of Pro for just
               </p>
             </div>
@@ -183,8 +183,8 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             </div>
 
             {/* What you get */}
-            <div className="bg-gray-50 rounded-xl p-4 mb-5 border border-gray-100">
-              <p className="text-sm text-gray-500 font-medium mb-2">What you get:</p>
+            <div className="bg-gray-800 rounded-xl p-4 mb-5 border border-gray-700">
+              <p className="text-sm text-gray-400 font-medium mb-2">What you get:</p>
               <ul className="space-y-1.5">
                 {[
                   `${PRICING.PRO_SCANS_PER_MONTH} scans per month`,
@@ -192,7 +192,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                   'Full security, SEO & accessibility audits',
                   'Cancel anytime',
                 ].map((feature, i) => (
-                  <li key={i} className="flex items-center gap-2 text-sm text-gray-700">
+                  <li key={i} className="flex items-center gap-2 text-sm text-gray-300">
                     <svg className="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
@@ -229,8 +229,8 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                 disabled={isLoading !== null}
                 className={clsx(
                   'w-full px-6 py-3 sm:py-4 font-bold rounded-xl transition-all duration-200',
-                  'bg-primary text-white',
-                  'hover:bg-primary-600',
+                  'bg-emerald-500 text-white',
+                  'hover:bg-emerald-400',
                   'hover:shadow-lg',
                   'disabled:opacity-50 disabled:cursor-not-allowed',
                   'active:scale-[0.98]'
@@ -251,7 +251,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
 
               <button
                 onClick={handleDecline}
-                className="w-full px-6 py-2 text-gray-500 hover:text-gray-700 transition-colors text-sm"
+                className="w-full px-6 py-2 text-gray-500 hover:text-gray-300 transition-colors text-sm"
               >
                 No thanks, I&apos;ll pay full price later
               </button>
@@ -284,11 +284,11 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             </svg>
           </div>
 
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-50 mb-2">
             Daily Limit Reached
           </h2>
 
-          <p className="text-gray-500 text-sm sm:text-base">
+          <p className="text-gray-400 text-sm sm:text-base">
             You&apos;ve used all {PRICING.FREE_SCANS_PER_DAY} free scans for today.
             <br />
             Upgrade to keep analyzing.
@@ -309,8 +309,8 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             onClick={() => handleCheckout('monthly')}
             disabled={isLoading !== null}
             className={clsx(
-              'w-full p-4 rounded-xl border-2 border-primary bg-primary/5',
-              'hover:bg-primary/10 transition-all',
+              'w-full p-4 rounded-xl border border-emerald-500 bg-emerald-500/5',
+              'hover:bg-emerald-500/10 transition-all',
               'disabled:opacity-50 disabled:cursor-not-allowed',
               'group'
             )}
@@ -318,8 +318,8 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             <div className="flex items-center justify-between">
               <div className="text-left">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-primary text-base sm:text-lg">Pro Monthly</span>
-                  <span className="px-2 py-0.5 text-xs font-bold bg-primary text-white rounded">
+                  <span className="font-bold text-emerald-500 text-base sm:text-lg">Pro Monthly</span>
+                  <span className="px-2 py-0.5 text-xs font-bold bg-emerald-500 text-white rounded">
                     BEST
                   </span>
                 </div>
@@ -329,13 +329,13 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
               </div>
               <div className="text-right">
                 {isLoading === 'monthly' ? (
-                  <svg className="animate-spin h-6 w-6 text-primary" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-6 w-6 text-emerald-500" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
                 ) : (
                   <>
-                    <span className="text-xl sm:text-2xl font-bold text-primary">${PRICING.PRO_MONTHLY}</span>
+                    <span className="text-xl sm:text-2xl font-bold text-emerald-500">${PRICING.PRO_MONTHLY}</span>
                     <span className="text-gray-500 text-sm">/mo</span>
                   </>
                 )}
@@ -348,15 +348,15 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             onClick={() => handleCheckout('yearly')}
             disabled={isLoading !== null}
             className={clsx(
-              'w-full p-4 rounded-xl border border-gray-200 bg-white',
-              'hover:border-primary/50 hover:bg-gray-50 transition-all',
+              'w-full p-4 rounded-xl border border-gray-700 bg-gray-800',
+              'hover:border-emerald-500/50 hover:bg-gray-700 transition-all',
               'disabled:opacity-50 disabled:cursor-not-allowed'
             )}
           >
             <div className="flex items-center justify-between">
               <div className="text-left">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-gray-900 text-base sm:text-lg">Pro Yearly</span>
+                  <span className="font-bold text-gray-100 text-base sm:text-lg">Pro Yearly</span>
                   <span className="px-2 py-0.5 text-xs font-bold bg-success/10 text-success rounded">
                     SAVE 43%
                   </span>
@@ -373,7 +373,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                   </svg>
                 ) : (
                   <>
-                    <span className="text-xl sm:text-2xl font-bold text-gray-900">${PRICING.PRO_YEARLY}</span>
+                    <span className="text-xl sm:text-2xl font-bold text-gray-100">${PRICING.PRO_YEARLY}</span>
                     <span className="text-gray-500 text-sm">/yr</span>
                   </>
                 )}
@@ -386,27 +386,27 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             onClick={() => handleCheckout('pack')}
             disabled={isLoading !== null}
             className={clsx(
-              'w-full p-4 rounded-xl border border-gray-200 bg-white',
-              'hover:border-primary/50 hover:bg-gray-50 transition-all',
+              'w-full p-4 rounded-xl border border-gray-700 bg-gray-800',
+              'hover:border-emerald-500/50 hover:bg-gray-700 transition-all',
               'disabled:opacity-50 disabled:cursor-not-allowed'
             )}
           >
             <div className="flex items-center justify-between">
               <div className="text-left">
-                <span className="font-bold text-gray-900 text-base sm:text-lg">Scan Pack</span>
+                <span className="font-bold text-gray-100 text-base sm:text-lg">Scan Pack</span>
                 <p className="text-xs sm:text-sm text-gray-500 mt-1">
                   {PRICING.SCAN_PACK_SCANS} scans, one-time purchase
                 </p>
               </div>
               <div className="text-right">
                 {isLoading === 'pack' ? (
-                  <svg className="animate-spin h-6 w-6 text-primary" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-6 w-6 text-emerald-500" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
                 ) : (
                   <>
-                    <span className="text-xl sm:text-2xl font-bold text-gray-900">${PRICING.SCAN_PACK}</span>
+                    <span className="text-xl sm:text-2xl font-bold text-gray-100">${PRICING.SCAN_PACK}</span>
                     <span className="text-gray-500 text-sm"> once</span>
                   </>
                 )}
@@ -419,7 +419,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
         <div className="mt-5 text-center">
           <button
             onClick={handleDecline}
-            className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+            className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
           >
             {discountExpired ? 'Close' : 'Come back tomorrow for free scans'}
           </button>

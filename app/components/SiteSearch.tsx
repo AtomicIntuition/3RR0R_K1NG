@@ -95,7 +95,7 @@ export function SiteSearch({ className = '' }: SiteSearchProps) {
       <div className="relative">
         <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
           <svg
-            className="w-4 h-4 text-gray-400"
+            className="w-4 h-4 text-gray-500"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -117,7 +117,7 @@ export function SiteSearch({ className = '' }: SiteSearchProps) {
           }}
           onFocus={() => setIsOpen(true)}
           placeholder="Search for a site that's been audited..."
-          className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-all"
+          className="w-full pl-10 pr-4 py-2.5 bg-gray-900 border border-gray-800 rounded-xl text-sm text-gray-300 placeholder:text-gray-500 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-all"
         />
         {isLoading && (
           <div className="absolute inset-y-0 right-3 flex items-center">
@@ -131,7 +131,7 @@ export function SiteSearch({ className = '' }: SiteSearchProps) {
 
       {/* Results Dropdown */}
       {isOpen && (query.length >= 3 || results.length > 0) && (
-        <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-card overflow-hidden">
+        <div className="absolute z-50 w-full mt-2 bg-gray-900 border border-gray-800 rounded-xl shadow-card overflow-hidden">
           {results.length > 0 ? (
             <div className="max-h-80 overflow-y-auto">
               {results.map((result) => (
@@ -139,11 +139,11 @@ export function SiteSearch({ className = '' }: SiteSearchProps) {
                   key={result.id}
                   href={`/scan/${result.id}`}
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-between p-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0"
+                  className="flex items-center justify-between p-3 hover:bg-gray-800 transition-colors border-b border-gray-800 last:border-0"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-700 truncate">
+                      <span className="text-sm font-medium text-gray-300 truncate">
                         {result.domain}
                       </span>
                       <span className={`text-xs font-semibold ${getGradeColor(result.grade)}`}>
@@ -151,26 +151,26 @@ export function SiteSearch({ className = '' }: SiteSearchProps) {
                       </span>
                     </div>
                     {result.roastTitle && (
-                      <p className="text-xs text-gray-400 truncate mt-0.5">
+                      <p className="text-xs text-gray-500 truncate mt-0.5">
                         {result.roastTitle}
                       </p>
                     )}
                   </div>
                   <div className="flex items-center gap-3 ml-3">
-                    <span className="text-lg font-semibold text-gray-500">{result.score}</span>
-                    <span className="text-xs text-gray-400">{formatTimeAgo(result.scannedAt)}</span>
+                    <span className="text-lg font-semibold text-gray-400">{result.score}</span>
+                    <span className="text-xs text-gray-500">{formatTimeAgo(result.scannedAt)}</span>
                   </div>
                 </Link>
               ))}
             </div>
           ) : hasSearched && !isLoading ? (
             <div className="p-4 text-center">
-              <p className="text-sm text-gray-500">No reports found for &quot;{query}&quot;</p>
-              <p className="text-xs text-gray-400 mt-1">Be the first to audit it!</p>
+              <p className="text-sm text-gray-400">No reports found for &quot;{query}&quot;</p>
+              <p className="text-xs text-gray-500 mt-1">Be the first to audit it!</p>
             </div>
           ) : (
             <div className="p-4 text-center">
-              <p className="text-xs text-gray-400">Type at least 3 characters to search</p>
+              <p className="text-xs text-gray-500">Type at least 3 characters to search</p>
             </div>
           )}
         </div>

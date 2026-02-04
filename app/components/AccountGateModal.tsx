@@ -99,7 +99,7 @@ export function AccountGateModal({
       closeOnOutsideClick={false}
       closeOnEscape={false}
     >
-      <div className="p-8 bg-white">
+      <div className="p-8 bg-gray-900">
         {/* Header */}
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 border border-primary/30 mb-4">
@@ -118,11 +118,11 @@ export function AccountGateModal({
             </svg>
           </div>
 
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          <h2 className="text-2xl font-bold text-gray-50 mb-2">
             Create your account
           </h2>
 
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-400 text-sm">
             Save your scan history, get 3 free scans daily, and unlock all features.
           </p>
         </div>
@@ -134,9 +134,9 @@ export function AccountGateModal({
             disabled={isLoading || oauthLoading !== null}
             className={clsx(
               'w-full px-4 py-3 flex items-center justify-center gap-3',
-              'bg-gray-50 border border-gray-200 rounded-xl',
-              'text-gray-700 font-medium',
-              'hover:bg-gray-100 hover:border-gray-300 transition-colors',
+              'bg-gray-800 border border-gray-700 rounded-xl',
+              'text-gray-200 font-medium',
+              'hover:bg-gray-700 transition-colors',
               'disabled:opacity-50 disabled:cursor-not-allowed'
             )}
           >
@@ -161,9 +161,9 @@ export function AccountGateModal({
             disabled={isLoading || oauthLoading !== null}
             className={clsx(
               'w-full px-4 py-3 flex items-center justify-center gap-3',
-              'bg-gray-50 border border-gray-200 rounded-xl',
-              'text-gray-700 font-medium',
-              'hover:bg-gray-100 hover:border-gray-300 transition-colors',
+              'bg-gray-800 border border-gray-700 rounded-xl',
+              'text-gray-200 font-medium',
+              'hover:bg-gray-700 transition-colors',
               'disabled:opacity-50 disabled:cursor-not-allowed'
             )}
           >
@@ -184,10 +184,10 @@ export function AccountGateModal({
         {/* Divider */}
         <div className="relative mb-6">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-200"></div>
+            <div className="w-full border-t border-gray-800"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">or</span>
+            <span className="px-2 bg-gray-900 text-gray-400">or</span>
           </div>
         </div>
 
@@ -203,11 +203,11 @@ export function AccountGateModal({
               }}
               placeholder="Email address"
               className={clsx(
-                'w-full px-4 py-3 bg-gray-50 border rounded-xl',
-                'text-gray-800 placeholder:text-gray-400',
-                'focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10',
+                'w-full px-4 py-3 bg-gray-800 border rounded-xl',
+                'text-gray-50 placeholder-gray-500',
+                'focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20',
                 'transition-colors',
-                error ? 'border-danger' : 'border-gray-200'
+                error ? 'border-danger' : 'border-gray-700'
               )}
               disabled={isLoading || oauthLoading !== null}
             />
@@ -223,11 +223,11 @@ export function AccountGateModal({
               }}
               placeholder="Password (min 8 characters)"
               className={clsx(
-                'w-full px-4 py-3 bg-gray-50 border rounded-xl',
-                'text-gray-800 placeholder:text-gray-400',
-                'focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10',
+                'w-full px-4 py-3 bg-gray-800 border rounded-xl',
+                'text-gray-50 placeholder-gray-500',
+                'focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20',
                 'transition-colors',
-                error ? 'border-danger' : 'border-gray-200'
+                error ? 'border-danger' : 'border-gray-700'
               )}
               disabled={isLoading || oauthLoading !== null}
             />
@@ -263,7 +263,7 @@ export function AccountGateModal({
         </form>
 
         {/* Login link */}
-        <p className="mt-4 text-sm text-gray-500 text-center">
+        <p className="mt-4 text-sm text-gray-400 text-center">
           Already have an account?{' '}
           <button
             onClick={goToLogin}

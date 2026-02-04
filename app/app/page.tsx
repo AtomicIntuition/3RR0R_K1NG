@@ -184,14 +184,14 @@ export default function HomePage() {
         {/* Ambient gradient orbs */}
         <motion.div
           style={{ y: orbY1, opacity: heroFade }}
-          className="absolute -top-40 -right-40 w-[700px] h-[700px] pointer-events-none"
+          className="absolute -top-40 -right-40 w-[300px] h-[300px] md:w-[700px] md:h-[700px] pointer-events-none hidden sm:block"
           aria-hidden
         >
           <div className="w-full h-full rounded-full bg-emerald-500/[0.07] blur-[120px]" />
         </motion.div>
         <motion.div
           style={{ y: orbY2, opacity: heroFade }}
-          className="absolute -bottom-40 -left-40 w-[500px] h-[500px] pointer-events-none"
+          className="absolute -bottom-40 -left-40 w-[250px] h-[250px] md:w-[500px] md:h-[500px] pointer-events-none hidden sm:block"
           aria-hidden
         >
           <div className="w-full h-full rounded-full bg-blue-500/[0.04] blur-[100px]" />

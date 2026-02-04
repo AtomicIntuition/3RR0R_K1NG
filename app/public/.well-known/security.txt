@@ -1,4 +1,4 @@
-# Security Policy for 3RROR_K1NG
+# Security Policy for Crisp
 # https://securitytxt.org/
 
 Contact: mailto:security@3rr0rk1ng.com

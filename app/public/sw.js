@@ -1,6 +1,6 @@
-// 3RK Service Worker
-const CACHE_NAME = '3rk-v2';
-const STATIC_CACHE = '3rk-static-v2';
+// Crisp Service Worker
+const CACHE_NAME = 'crisp-v2';
+const STATIC_CACHE = 'crisp-static-v2';
 
 // Assets to cache on install
 const STATIC_ASSETS = [

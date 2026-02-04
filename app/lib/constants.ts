@@ -20,12 +20,12 @@ export const RATE_LIMITS = {
 
 // Local storage keys for conversion tracking
 export const STORAGE_KEYS = {
-  SCAN_COUNT: 'errorking_scan_count',
-  EMAIL_CAPTURED: 'errorking_email_captured',
-  ACCOUNT_PROMPTED: 'errorking_account_prompted',
-  EXIT_INTENT_SHOWN: 'errorking_exit_intent_shown',
-  LAST_SCAN_DATE: 'errorking_last_scan_date',
-  DAILY_SCAN_COUNT: 'errorking_daily_scan_count',
+  SCAN_COUNT: 'crisp_scan_count',
+  EMAIL_CAPTURED: 'crisp_email_captured',
+  ACCOUNT_PROMPTED: 'crisp_account_prompted',
+  EXIT_INTENT_SHOWN: 'crisp_exit_intent_shown',
+  LAST_SCAN_DATE: 'crisp_last_scan_date',
+  DAILY_SCAN_COUNT: 'crisp_daily_scan_count',
 } as const;
 
 // Conversion flow stages

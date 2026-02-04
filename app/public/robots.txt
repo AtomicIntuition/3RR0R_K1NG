@@ -1,4 +1,4 @@
-# 3RROR_K1NG robots.txt
+# Crisp robots.txt
 User-agent: *
 Allow: /
 

@@ -7,8 +7,8 @@ import { PRICING } from '@/lib/constants';
 import { useAuth } from '@/lib/auth-context';
 import clsx from 'clsx';
 
-const DISCOUNT_STORAGE_KEY = 'errorking_discount_expiry';
-const DISCOUNT_SHOWN_KEY = 'errorking_discount_shown';
+const DISCOUNT_STORAGE_KEY = 'crisp_discount_expiry';
+const DISCOUNT_SHOWN_KEY = 'crisp_discount_shown';
 const DISCOUNT_DURATION = 15 * 60 * 1000; // 15 minutes in ms
 
 interface PaywallModalProps {

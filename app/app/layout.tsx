@@ -14,11 +14,11 @@ const inter = Inter({
   display: 'swap',
 });
 
-const siteUrl = 'https://crisp.dev';
+const siteUrl = 'https://3rrork1ng.com';
 
 // Viewport configuration with theme color
 export const viewport: Viewport = {
-  themeColor: '#4F46E5',
+  themeColor: '#171717',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,

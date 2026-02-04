@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Generate PWA icons for 3RROR_K1NG
+ * Generate PWA icons for Crisp
  * Run: node scripts/generate-icons.js
  *
  * This creates simple SVG icons that browsers can use.
@@ -13,7 +13,7 @@ const path = require('path');
 
 const ICONS_DIR = path.join(__dirname, '../public/icons');
 
-// SVG template with 3RROR_K1NG branding
+// SVG template with Crisp branding
 const createSvg = (size) => `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
   <defs>

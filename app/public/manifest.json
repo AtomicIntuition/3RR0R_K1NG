@@ -1,6 +1,6 @@
 {
-  "name": "3RK - Website Audit Platform",
-  "short_name": "3RK",
+  "name": "Crisp - Website Audit Platform",
+  "short_name": "Crisp",
   "description": "Professional website audits. Security, performance, SEO, and accessibility analysis with actionable recommendations.",
   "start_url": "/",
   "display": "standalone",

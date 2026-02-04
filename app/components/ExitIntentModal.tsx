@@ -126,7 +126,7 @@ export function ExitIntentModal({ discountPriceId }: ExitIntentModalProps) {
     >
       <div className="relative overflow-hidden bg-white">
         {/* Subtle gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-success/5" />
+        <div className="absolute inset-0 bg-gray-50" />
 
         <div className="relative p-8">
           {/* Header */}

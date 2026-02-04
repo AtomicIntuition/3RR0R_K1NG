@@ -152,7 +152,7 @@ export async function runLinkAudit(page: Page, baseUrl: string): Promise<LinkAud
             signal: controller.signal,
             headers: {
               'User-Agent':
-                'Mozilla/5.0 (compatible; 3RROR_K1NG/1.0; Link Checker)',
+                'Mozilla/5.0 (compatible; Crisp/1.0; Link Checker)',
             },
           });
 

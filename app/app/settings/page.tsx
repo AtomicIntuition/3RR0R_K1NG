@@ -107,7 +107,7 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500">
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4" />
           <p className="text-white/80 font-medium">Loading...</p>
@@ -119,7 +119,7 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Header */}
-      <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-gray-900 relative overflow-hidden">
+      <div className="bg-gray-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl" />
 
@@ -140,7 +140,7 @@ export default function SettingsPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-8">
         {/* Account Info Card */}
         <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-          <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+          <div className="px-6 py-5 border-b border-gray-100 bg-gray-50">
             <h2 className="text-xl font-black text-gray-900">Account</h2>
           </div>
           <div className="p-6 space-y-4">
@@ -152,7 +152,7 @@ export default function SettingsPage() {
               <span className="text-gray-500 font-medium">Plan</span>
               <span className={`px-3 py-1 rounded-full text-sm font-bold ${
                 profile?.tier === 'pro'
-                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white'
+                  ? 'bg-gray-800 text-white'
                   : 'bg-gray-100 text-gray-600'
               }`}>
                 {profile?.tier === 'pro' ? 'Pro' : 'Free'}
@@ -169,7 +169,7 @@ export default function SettingsPage() {
 
         {/* API Keys Section */}
         <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-          <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+          <div className="px-6 py-5 border-b border-gray-100 bg-gray-50">
             <h2 className="text-xl font-black text-gray-900">API Keys</h2>
             <p className="text-gray-500 text-sm mt-1">Use API keys to authenticate with the Crisp CLI</p>
           </div>
@@ -221,7 +221,7 @@ export default function SettingsPage() {
               <button
                 onClick={createApiKey}
                 disabled={creating || apiKeys.filter(k => k.is_active).length >= 5}
-                className="px-6 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 whitespace-nowrap"
+                className="px-6 py-3.5 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 whitespace-nowrap"
               >
                 {creating ? (
                   <span className="flex items-center gap-2">
@@ -247,7 +247,7 @@ export default function SettingsPage() {
             </div>
           ) : apiKeys.filter(k => k.is_active).length === 0 ? (
             <div className="p-12 text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                 </svg>
@@ -287,7 +287,7 @@ export default function SettingsPage() {
 
         {/* CLI Installation */}
         <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-          <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+          <div className="px-6 py-5 border-b border-gray-100 bg-gray-50">
             <h2 className="text-xl font-black text-gray-900">Install the CLI</h2>
           </div>
           <div className="p-6 space-y-4">
@@ -308,7 +308,7 @@ export default function SettingsPage() {
 
         {/* Usage Examples */}
         <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-          <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+          <div className="px-6 py-5 border-b border-gray-100 bg-gray-50">
             <h2 className="text-xl font-black text-gray-900">Usage</h2>
           </div>
           <div className="p-6 space-y-4">

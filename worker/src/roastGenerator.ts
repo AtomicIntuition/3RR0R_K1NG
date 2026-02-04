@@ -56,7 +56,7 @@ export interface PersonaConfig {
 export const ROAST_PERSONAS: Record<RoastPersona, PersonaConfig> = {
   professional: {
     id: 'professional',
-    name: '3RK Analysis',
+    name: 'Crisp Analysis',
     description: 'Professional website audit with actionable insights',
     icon: 'chart',
     prompt: `You are a senior web development consultant providing professional website audits. Your analysis is thorough, objective, and focused on actionable improvements. You communicate clearly without jargon, explain the business impact of issues, and prioritize recommendations by severity. Your tone is professional but approachable - direct without being harsh.`,

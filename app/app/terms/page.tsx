@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | 3RK',
-  description: 'Terms of service for 3RK website audit platform',
+  title: 'Terms of Service | Crisp',
+  description: 'Terms of service for Crisp website audit platform',
   alternates: {
     canonical: '/terms',
   },
@@ -13,7 +13,7 @@ export default function TermsPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="pt-8 pb-12 px-4">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-3xl font-bold text-primary mb-8">Terms of Service</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">Terms of Service</h1>
 
           <div className="space-y-6 text-gray-700">
             <p className="text-gray-500">Last updated: January 2025</p>
@@ -21,7 +21,7 @@ export default function TermsPage() {
             <section>
               <h2 className="text-xl font-bold text-gray-900 mb-3">1. Acceptance of Terms</h2>
               <p className="text-gray-600">
-                By using 3RK, you agree to these terms of service. If you do not agree,
+                By using Crisp, you agree to these terms of service. If you do not agree,
                 please do not use our service.
               </p>
             </section>
@@ -29,7 +29,7 @@ export default function TermsPage() {
             <section>
               <h2 className="text-xl font-bold text-gray-900 mb-3">2. Service Description</h2>
               <p className="text-gray-600">
-                3RK provides website security, performance, SEO, and accessibility auditing
+                Crisp provides website security, performance, SEO, and accessibility auditing
                 services. Our AI generates analysis and recommendations based on automated scans
                 of publicly accessible websites.
               </p>
@@ -49,7 +49,7 @@ export default function TermsPage() {
             <section>
               <h2 className="text-xl font-bold text-gray-900 mb-3">4. About Our Scanning</h2>
               <p className="text-gray-600">
-                3RK performs passive analysis of publicly accessible websites, similar to
+                Crisp performs passive analysis of publicly accessible websites, similar to
                 services like Google PageSpeed Insights or SSL Labs. Our scans only access publicly
                 available information and do not perform penetration testing or exploit vulnerabilities.
                 You may scan any publicly accessible website for educational or informational purposes.
@@ -68,7 +68,7 @@ export default function TermsPage() {
             <section>
               <h2 className="text-xl font-bold text-gray-900 mb-3">6. Disclaimer</h2>
               <p className="text-gray-600">
-                3RK provides automated security analysis for informational purposes only.
+                Crisp provides automated security analysis for informational purposes only.
                 We do not guarantee the detection of all vulnerabilities. Our analysis is meant
                 to provide genuine, actionable feedback. The service is provided
                 &quot;as is&quot; without warranties of any kind.

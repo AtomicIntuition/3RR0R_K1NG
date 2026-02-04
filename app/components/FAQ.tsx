@@ -12,7 +12,7 @@ interface FAQItem {
 
 const faqs: FAQItem[] = [
   {
-    question: 'What exactly does 3RK scan?',
+    question: 'What exactly does Crisp scan?',
     answer: 'We run 50+ checks across 5 categories: Security (headers, HTTPS, vulnerabilities), Performance (Core Web Vitals, load times), SEO (meta tags, structure, crawlability), Accessibility (WCAG compliance, screen reader support), and Code Quality (errors, best practices). You get a detailed report with actionable fixes.',
   },
   {

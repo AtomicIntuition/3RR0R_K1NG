@@ -27,26 +27,22 @@ export function Navbar() {
     }
   }, [pathname, router]);
 
-  // Check if on homepage (hero has dark background)
-  const isHomepage = pathname === '/';
-
   // Static placeholder rendered on both server and client initial render
-  // to prevent hydration mismatch (no <a> tags until after mount)
   if (!mounted) {
     return (
       <nav className="fixed top-0 left-0 right-0 z-50">
-        <div className="px-6 py-4 transition-all duration-300 bg-transparent">
+        <div className="px-6 py-4 transition-all duration-300 bg-white/80 backdrop-blur-xl border-b border-gray-200/60">
           <div className="max-w-7xl mx-auto flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
-                <span className="text-white text-lg font-black">C</span>
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center">
+                <span className="text-white text-sm font-bold">C</span>
               </div>
-              <span className="text-xl font-black text-white">
+              <span className="text-base font-bold text-gray-900">
                 Crisp
               </span>
             </div>
             <div className="flex items-center gap-6">
-              <div className="w-8 h-8 rounded-full bg-gray-200/20 animate-pulse" />
+              <div className="w-8 h-8 rounded-full bg-gray-100 animate-pulse" />
             </div>
           </div>
         </div>
@@ -56,42 +52,27 @@ export function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50">
-      {/* Navbar content */}
-      <div className={`px-6 py-4 transition-all duration-300 ${
-        isHomepage
-          ? 'bg-transparent'
-          : 'bg-white/90 backdrop-blur-xl border-b border-gray-200 shadow-sm'
-      }`}>
+      <div className="px-6 py-4 transition-all duration-300 bg-white/80 backdrop-blur-xl border-b border-gray-200/60">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           {/* Logo */}
           <a
             href="/"
             onClick={handleLogoClick}
-            className="group flex items-center gap-3 transition-all duration-200"
+            className="group flex items-center gap-2.5 transition-all duration-200"
           >
-            {/* Logo icon */}
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-105 transition-all">
-              <span className="text-white text-lg font-black">C</span>
+            <div className="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center group-hover:bg-gray-700 transition-colors">
+              <span className="text-white text-sm font-bold">C</span>
             </div>
-            <span className={`text-xl font-black transition-colors duration-200 ${
-              isHomepage
-                ? 'text-white group-hover:text-white/80'
-                : 'text-gray-900 group-hover:text-indigo-600'
-            }`}>
+            <span className="text-base font-bold text-gray-900">
               Crisp
             </span>
           </a>
 
           {/* Nav links and user menu */}
           <div className="flex items-center gap-6">
-            {/* Pricing link */}
             <Link
               href="/pricing"
-              className={`text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5 ${
-                isHomepage
-                  ? 'text-white/80 hover:text-white'
-                  : 'text-gray-600 hover:text-indigo-600'
-              }`}
+              className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
             >
               Pricing
             </Link>

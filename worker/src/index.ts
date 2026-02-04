@@ -5,7 +5,7 @@ import { runScan, runUploadScan, closeBrowser } from './scanner.js';
 import { updateScan, updateMonitoredSite, recordAlert, getScan } from './lib/supabase.js';
 import { sendScoreDropAlert } from './lib/email.js';
 
-console.log('Starting 3RK Worker...');
+console.log('Starting Crisp Worker...');
 
 // Process scan jobs
 async function processScanJob(job: Job<ScanJobData>): Promise<void> {
@@ -14,7 +14,7 @@ async function processScanJob(job: Job<ScanJobData>): Promise<void> {
     url,
     scanType,
     files,
-    persona = 'professional',
+    persona: rawPersona = 'professional',
     skipRoast = false,
     // Monitoring fields
     isMonitoredScan,
@@ -25,7 +25,10 @@ async function processScanJob(job: Job<ScanJobData>): Promise<void> {
     userEmail,
   } = job.data;
 
-  console.log(`Processing job ${job.id}: ${scanType === 'upload' ? 'File Upload' : url} (persona: ${persona}, skipRoast: ${skipRoast}, monitored: ${isMonitoredScan || false})`);
+  // Always use 'professional' persona regardless of what was sent
+  const persona = 'professional' as const;
+
+  console.log(`Processing job ${job.id}: ${scanType === 'upload' ? 'File Upload' : url} (skipRoast: ${skipRoast}, monitored: ${isMonitoredScan || false})`);
 
   try {
     let scanResult;

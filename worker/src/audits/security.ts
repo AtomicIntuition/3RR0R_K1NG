@@ -199,7 +199,7 @@ async function checkSecurityTxt(baseUrl: string): Promise<SecurityTxtInfo> {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; 3RROR_K1NG/1.0)',
+          'User-Agent': 'Mozilla/5.0 (compatible; Crisp/1.0)',
         },
         signal: controller.signal,
         redirect: 'follow',

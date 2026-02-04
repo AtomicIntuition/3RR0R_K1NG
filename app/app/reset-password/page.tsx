@@ -95,7 +95,7 @@ export default function ResetPasswordPage() {
   // Loading state
   if (checking) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500">
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4" />
           <p className="text-white/80 font-medium">Verifying reset link...</p>
@@ -109,7 +109,7 @@ export default function ResetPasswordPage() {
     return (
       <div className="min-h-screen flex">
         {/* Left side - Error Gradient */}
-        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-red-500 via-rose-500 to-pink-500 relative overflow-hidden">
+        <div className="hidden lg:flex lg:w-1/2 bg-red-600 relative overflow-hidden">
           <div className="absolute top-20 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
           <div className="absolute bottom-20 right-10 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
 
@@ -162,7 +162,7 @@ export default function ResetPasswordPage() {
 
               <Link
                 href="/forgot-password"
-                className="block w-full px-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-center"
+                className="block w-full px-6 py-4 bg-gray-900 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-center"
               >
                 Request new link
               </Link>
@@ -182,7 +182,7 @@ export default function ResetPasswordPage() {
   // Success state
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500">
+      <div className="min-h-screen flex items-center justify-center bg-emerald-600">
         <div className="text-center">
           <div className="w-20 h-20 mx-auto mb-6 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center">
             <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -201,7 +201,7 @@ export default function ResetPasswordPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left side - Gradient */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-gray-900 relative overflow-hidden">
         <div className="absolute top-20 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
         <div className="absolute bottom-20 right-10 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
 
@@ -228,7 +228,7 @@ export default function ResetPasswordPage() {
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-8">
             <Link href="/" className="inline-flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-gray-900 flex items-center justify-center">
                 <span className="text-white text-lg font-black">C</span>
               </div>
               <span className="text-2xl font-black text-gray-900">Crisp</span>
@@ -287,7 +287,7 @@ export default function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-6 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                className="w-full px-6 py-4 bg-gray-900 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">

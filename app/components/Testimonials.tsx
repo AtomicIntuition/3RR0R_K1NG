@@ -37,7 +37,7 @@ const testimonials: Testimonial[] = [
     score: { before: 67, after: 94 },
   },
   {
-    quote: "I was mass-applying to jobs and my portfolio was getting no responses. 3RK showed me my site was broken on mobile. Fixed it, got 3 interviews that week.",
+    quote: "I was mass-applying to jobs and my portfolio was getting no responses. Crisp showed me my site was broken on mobile. Fixed it, got 3 interviews that week.",
     author: "Jordan Park",
     role: "Junior Developer",
     avatar: "JP",
@@ -98,7 +98,7 @@ export function Testimonials() {
                   loading="lazy"
                 />
               ) : (
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center text-sm font-bold text-primary ring-2 ring-primary/10">
+                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-bold text-primary ring-2 ring-primary/10">
                   {testimonial.avatar}
                 </div>
               )}

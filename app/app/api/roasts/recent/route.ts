@@ -38,7 +38,7 @@ export async function GET() {
         domain,
         score: scan.score_overall || 0,
         letterGrade: scan.letter_grade || 'F',
-        roastTitle: scan.roast_title || 'No roast available',
+        roastTitle: scan.roast_title || 'No report available',
         persona: scan.roast_persona || 'professional',
       };
     });

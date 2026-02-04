@@ -127,7 +127,7 @@ function PaymentSuccessContent() {
         {/* Receipt Info */}
         <p className="mt-8 text-xs text-gray-400">
           A receipt has been sent to your email. Questions?{' '}
-          <a href="mailto:support@3rk.dev" className="text-primary hover:underline">
+          <a href="mailto:support@crisp.dev" className="text-primary hover:underline">
             Contact support
           </a>
         </p>

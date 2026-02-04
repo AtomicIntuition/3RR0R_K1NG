@@ -155,7 +155,7 @@ export default function ScanResultsPage() {
           className="relative bg-white rounded-2xl p-4 sm:p-8 pt-4 mb-8 border border-gray-200 shadow-card"
         >
           {/* Promo Banner */}
-          <div className="text-center mb-6 sm:mb-8 py-3 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border border-primary/20 rounded-xl">
+          <div className="text-center mb-6 sm:mb-8 py-3 sm:py-4 px-3 sm:px-6 bg-gray-50 border border-primary/20 rounded-xl">
             <div className="text-base sm:text-xl md:text-2xl font-bold tracking-tight mb-1">
               <span className="text-gray-800">FREE WEBSITE AUDIT</span>
             </div>
@@ -165,7 +165,7 @@ export default function ScanResultsPage() {
             <div className="flex items-center justify-center gap-2 sm:gap-3">
               <div className="h-px w-8 sm:w-12 bg-primary/30"></div>
               <span className="text-primary text-base sm:text-xl md:text-2xl font-bold tracking-wider">
-                3RK.COM
+                CRISP
               </span>
               <div className="h-px w-8 sm:w-12 bg-primary/30"></div>
             </div>
@@ -191,7 +191,7 @@ export default function ScanResultsPage() {
                   id: scan.id,
                   fixes: scan.roastFixes,
                 }}
-                filename={`3rk-audit-${scan.url.replace(/https?:\/\//, '').replace(/[^a-z0-9]/gi, '-').slice(0, 30)}`}
+                filename={`crisp-audit-${scan.url.replace(/https?:\/\//, '').replace(/[^a-z0-9]/gi, '-').slice(0, 30)}`}
               />
             </div>
           </header>
@@ -279,7 +279,7 @@ export default function ScanResultsPage() {
           <section className="mb-12">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
               <span>Category Breakdown</span>
-              <div className="h-px flex-1 bg-gradient-to-r from-gray-200 to-transparent ml-4" />
+              <div className="h-px flex-1 bg-gray-200 ml-4" />
             </h2>
 
             <motion.div
@@ -353,7 +353,7 @@ export default function ScanResultsPage() {
             <section className="mb-12">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
                 <span>Detected Tech Stack</span>
-                <div className="h-px flex-1 bg-gradient-to-r from-gray-200 to-transparent ml-4" />
+                <div className="h-px flex-1 bg-gray-200 ml-4" />
               </h2>
               <StaggerChildren className="flex flex-wrap gap-2" staggerDelay={0.05}>
                 {scan.resultsTechStack.map((tech, i) => (
@@ -389,7 +389,7 @@ export default function ScanResultsPage() {
             <section className="mb-12">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
                 <span>Fix With AI</span>
-                <div className="h-px flex-1 bg-gradient-to-r from-gray-200 to-transparent ml-4" />
+                <div className="h-px flex-1 bg-gray-200 ml-4" />
               </h2>
               <LLMReport report={scan.llmReport} />
             </section>

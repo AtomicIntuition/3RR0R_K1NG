@@ -180,21 +180,21 @@ export default function RootLayout({
             <footer className="relative z-10 py-8 px-4 border-t border-gray-200 bg-white">
               <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
-                    <span className="text-white text-sm font-black">C</span>
+                  <div className="w-7 h-7 rounded-lg bg-gray-900 flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">C</span>
                   </div>
-                  <span className="text-gray-900 font-black">Crisp</span>
+                  <span className="text-gray-900 font-bold">Crisp</span>
                   <span className="text-gray-300">|</span>
                   <span>Website Audit Platform</span>
                 </div>
                 <div className="flex items-center gap-6">
-                  <a href="/privacy" className="hover:text-indigo-600 transition-colors font-medium">Privacy</a>
-                  <a href="/terms" className="hover:text-indigo-600 transition-colors font-medium">Terms</a>
+                  <a href="/privacy" className="hover:text-gray-900 transition-colors font-medium">Privacy</a>
+                  <a href="/terms" className="hover:text-gray-900 transition-colors font-medium">Terms</a>
                   <a
                     href="https://x.com/crisp_dev"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-indigo-600 transition-colors font-medium"
+                    className="hover:text-gray-900 transition-colors font-medium"
                   >
                     @crisp
                   </a>

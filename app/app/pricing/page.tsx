@@ -42,7 +42,7 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 relative overflow-hidden">
+      <div className="bg-gray-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
         <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
@@ -138,7 +138,7 @@ export default function PricingPage() {
           </div>
 
           {/* Pro Plan - Featured */}
-          <div className="relative bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 rounded-3xl shadow-2xl p-8 md:-mt-4 md:mb-4">
+          <div className="relative bg-gray-900 rounded-3xl shadow-2xl p-8 md:-mt-4 md:mb-4">
             {/* Popular badge */}
             <div className="absolute -top-4 left-1/2 -translate-x-1/2">
               <span className="px-6 py-2 bg-amber-400 text-amber-900 text-sm font-black rounded-full shadow-lg">
@@ -245,7 +245,7 @@ export default function PricingPage() {
               key={i}
               className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all"
             >
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center mb-4 text-2xl">
+              <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mb-4 text-2xl">
                 {feature.icon}
               </div>
               <h3 className="text-lg font-black text-gray-900 mb-1">{feature.title}</h3>
@@ -267,7 +267,7 @@ export default function PricingPage() {
               <tr className="border-b border-gray-100 bg-gray-50">
                 <th className="text-left py-5 px-6 text-gray-500 font-bold">Feature</th>
                 <th className="text-center py-5 px-6 text-gray-500 font-bold w-28">Free</th>
-                <th className="text-center py-5 px-6 font-black w-28 bg-gradient-to-br from-indigo-600 to-purple-600 text-white">Pro</th>
+                <th className="text-center py-5 px-6 font-black w-28 bg-gray-900 text-white">Pro</th>
               </tr>
             </thead>
             <tbody>
@@ -311,7 +311,7 @@ export default function PricingPage() {
       </div>
 
       {/* FAQ Section */}
-      <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-24">
+      <div className="bg-gray-900 py-24">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           <h2 className="text-3xl sm:text-4xl font-black text-white text-center mb-12">
             Frequently Asked Questions
@@ -358,7 +358,7 @@ export default function PricingPage() {
           <p className="text-gray-500 mb-6">We&apos;re here to help with any questions about pricing or features.</p>
           <a
             href="mailto:support@crisp.dev"
-            className="inline-block px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
+            className="inline-block px-8 py-4 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
           >
             Contact Support
           </a>

@@ -38,7 +38,7 @@ export async function sendScoreDropAlert({
     const appUrl = process.env.APP_URL || 'https://3rrork1ng.com';
 
     const { error } = await resend.emails.send({
-      from: '3RROR_K1NG <alerts@3rrork1ng.com>',
+      from: 'Crisp <alerts@3rrork1ng.com>',
       to: [to],
       subject: `Score Drop Alert: ${siteName || siteUrl} dropped ${scoreDrop} points`,
       html: `
@@ -48,30 +48,30 @@ export async function sendScoreDropAlert({
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #0a0a0a; padding: 40px 20px;">
+<body style="margin: 0; padding: 0; background-color: #f9fafb; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; padding: 40px 20px;">
     <tr>
       <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #111111; border-radius: 12px; border: 1px solid #222222;">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #e5e7eb;">
           <!-- Header -->
           <tr>
-            <td style="padding: 30px 40px; border-bottom: 1px solid #222222;">
-              <h1 style="margin: 0; color: #00ff88; font-size: 24px; font-weight: bold;">
-                3RROR_K1NG
+            <td style="padding: 30px 40px; border-bottom: 1px solid #e5e7eb;">
+              <h1 style="margin: 0; color: #111827; font-size: 24px; font-weight: bold;">
+                Crisp
               </h1>
             </td>
           </tr>
 
           <!-- Alert Banner -->
           <tr>
-            <td style="padding: 30px 40px; background-color: #1a0a0a; border-bottom: 1px solid #222222;">
+            <td style="padding: 30px 40px; background-color: #fef2f2; border-bottom: 1px solid #e5e7eb;">
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td>
-                    <p style="margin: 0 0 10px 0; color: #ff4444; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+                    <p style="margin: 0 0 10px 0; color: #dc2626; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
                       Score Drop Detected
                     </p>
-                    <h2 style="margin: 0; color: #ffffff; font-size: 28px;">
+                    <h2 style="margin: 0; color: #111827; font-size: 28px;">
                       ${siteName || siteUrl}
                     </h2>
                   </td>
@@ -85,22 +85,22 @@ export async function sendScoreDropAlert({
             <td style="padding: 40px;">
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td width="45%" align="center" style="padding: 20px; background-color: #1a1a1a; border-radius: 8px;">
-                    <p style="margin: 0 0 5px 0; color: #666666; font-size: 12px; text-transform: uppercase;">Previous</p>
-                    <p style="margin: 0; color: #888888; font-size: 48px; font-weight: bold;">${oldScore}</p>
+                  <td width="45%" align="center" style="padding: 20px; background-color: #f9fafb; border-radius: 8px;">
+                    <p style="margin: 0 0 5px 0; color: #6b7280; font-size: 12px; text-transform: uppercase;">Previous</p>
+                    <p style="margin: 0; color: #9ca3af; font-size: 48px; font-weight: bold;">${oldScore}</p>
                   </td>
                   <td width="10%" align="center">
-                    <span style="color: #ff4444; font-size: 24px;">→</span>
+                    <span style="color: #dc2626; font-size: 24px;">→</span>
                   </td>
-                  <td width="45%" align="center" style="padding: 20px; background-color: #1a0a0a; border-radius: 8px; border: 1px solid #ff4444;">
-                    <p style="margin: 0 0 5px 0; color: #666666; font-size: 12px; text-transform: uppercase;">Current</p>
-                    <p style="margin: 0; color: #ff4444; font-size: 48px; font-weight: bold;">${newScore}</p>
-                    <p style="margin: 5px 0 0 0; color: #ff4444; font-size: 14px;">Grade: ${newGrade}</p>
+                  <td width="45%" align="center" style="padding: 20px; background-color: #fef2f2; border-radius: 8px; border: 1px solid #fca5a5;">
+                    <p style="margin: 0 0 5px 0; color: #6b7280; font-size: 12px; text-transform: uppercase;">Current</p>
+                    <p style="margin: 0; color: #dc2626; font-size: 48px; font-weight: bold;">${newScore}</p>
+                    <p style="margin: 5px 0 0 0; color: #dc2626; font-size: 14px;">Grade: ${newGrade}</p>
                   </td>
                 </tr>
               </table>
 
-              <p style="margin: 30px 0 0 0; color: #ff4444; font-size: 20px; text-align: center; font-weight: bold;">
+              <p style="margin: 30px 0 0 0; color: #dc2626; font-size: 20px; text-align: center; font-weight: bold;">
                 ↓ ${scoreDrop} point drop
               </p>
             </td>
@@ -113,7 +113,7 @@ export async function sendScoreDropAlert({
                 <tr>
                   <td align="center">
                     <a href="${appUrl}/scan/${scanId}"
-                       style="display: inline-block; padding: 16px 32px; background-color: #00ff88; color: #0a0a0a; text-decoration: none; font-weight: bold; font-size: 16px; border-radius: 8px;">
+                       style="display: inline-block; padding: 16px 32px; background-color: #111827; color: #ffffff; text-decoration: none; font-weight: bold; font-size: 16px; border-radius: 8px;">
                       View Full Report
                     </a>
                   </td>
@@ -124,11 +124,11 @@ export async function sendScoreDropAlert({
 
           <!-- Footer -->
           <tr>
-            <td style="padding: 20px 40px; border-top: 1px solid #222222;">
-              <p style="margin: 0; color: #666666; font-size: 12px; text-align: center;">
+            <td style="padding: 20px 40px; border-top: 1px solid #e5e7eb;">
+              <p style="margin: 0; color: #6b7280; font-size: 12px; text-align: center;">
                 You're receiving this because you have monitoring enabled for this site.
                 <br>
-                <a href="${appUrl}/dashboard" style="color: #00ff88; text-decoration: none;">Manage your monitored sites</a>
+                <a href="${appUrl}/dashboard" style="color: #111827; text-decoration: none;">Manage your monitored sites</a>
               </p>
             </td>
           </tr>

@@ -76,7 +76,7 @@ export async function GET(
         'Checking SEO configuration...',
         'Testing accessibility...',
         'Detecting tech stack...',
-        'Generating roast...',
+        'Generating report...',
         'Finalizing report...',
       ];
 

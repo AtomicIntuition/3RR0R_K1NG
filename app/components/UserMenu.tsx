@@ -26,7 +26,7 @@ const GuestLinks = () => (
     </Link>
     <Link
       href="/signup"
-      className="text-sm px-4 py-2 bg-gradient-to-b from-primary to-primary-600 text-white rounded-lg font-medium shadow-button hover:shadow-button-hover hover:-translate-y-0.5 transition-all duration-200"
+      className="text-sm px-4 py-2 bg-gray-900 text-white rounded-lg font-medium shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
     >
       Sign Up
     </Link>
@@ -96,7 +96,7 @@ function UserMenuComponent() {
         )}
       >
         {/* Avatar with ring */}
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 ring-2 ring-primary/20 flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full bg-gray-100 ring-2 ring-primary/20 flex items-center justify-center">
           <span className="text-sm font-semibold text-primary">
             {user.email?.[0].toUpperCase() || '?'}
           </span>

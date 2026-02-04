@@ -125,7 +125,7 @@ export function LoadingState({ phase, percentage = 0, completedAudits = [], curr
               <span className="text-sm font-semibold text-primary">{percentage}%</span>
               <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-primary to-primary-400 rounded-full"
+                  className="h-full bg-gray-900 rounded-full"
                   initial={{ width: 0 }}
                   animate={{ width: `${percentage}%` }}
                   transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}

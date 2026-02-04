@@ -111,9 +111,9 @@ export function ShareableReport({
             alignItems: 'center',
             justifyContent: 'center'
           }}>
-            <span style={{ color: '#ffffff', fontSize: '16px', fontWeight: '700' }}>3R</span>
+            <span style={{ color: '#ffffff', fontSize: '16px', fontWeight: '700' }}>C</span>
           </div>
-          <span style={{ fontSize: '24px', fontWeight: '600', color: '#1d1d1f' }}>3RK</span>
+          <span style={{ fontSize: '24px', fontWeight: '600', color: '#1d1d1f' }}>Crisp</span>
         </div>
         <div style={{ fontSize: '14px', color: '#86868b', letterSpacing: '0.5px' }}>
           Website Audit Report
@@ -350,7 +350,7 @@ export function ShareableReport({
             <circle cx="11" cy="11" r="8"/>
             <path d="M21 21l-4.35-4.35"/>
           </svg>
-          <span style={{ fontSize: '14px', color: '#0071E3', fontWeight: '600' }}>3rrork1ng.com</span>
+          <span style={{ fontSize: '14px', color: '#171717', fontWeight: '600' }}>3rrork1ng.com</span>
         </div>
       </div>
 
@@ -374,10 +374,10 @@ export function ShareableReport({
             alignItems: 'center',
             justifyContent: 'center'
           }}>
-            <span style={{ color: '#ffffff', fontSize: '10px', fontWeight: '700' }}>3R</span>
+            <span style={{ color: '#ffffff', fontSize: '10px', fontWeight: '700' }}>C</span>
           </div>
           <span style={{ fontSize: '12px', color: '#86868b' }}>
-            Analyzed by <span style={{ color: '#0071E3', fontWeight: '500' }}>3RK</span>
+            Analyzed by <span style={{ color: '#171717', fontWeight: '500' }}>Crisp</span>
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>

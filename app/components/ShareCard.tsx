@@ -25,7 +25,7 @@ export function ShareCard({ scanId, url, score, twitterRoast, className }: Share
   // Use the custom Twitter roast if available, otherwise fall back to generic message
   const shareText = twitterRoast
     ? `${twitterRoast}\n\nAnalyze your site:`
-    : `I just got my website analyzed by 3RK! ${domain} scored ${score}/100 (Grade: ${grade}). Check out the full report:`;
+    : `I just got my website analyzed by Crisp! ${domain} scored ${score}/100 (Grade: ${grade}). Check out the full report:`;
 
   const handleCopy = async () => {
     try {

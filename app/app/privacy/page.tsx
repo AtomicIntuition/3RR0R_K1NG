@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | 3RK',
-  description: 'Privacy policy for 3RK website audit platform',
+  title: 'Privacy Policy | Crisp',
+  description: 'Privacy policy for Crisp website audit platform',
   alternates: {
     canonical: '/privacy',
   },
@@ -13,14 +13,14 @@ export default function PrivacyPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="pt-8 pb-12 px-4">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-3xl font-bold text-primary mb-8">Privacy Policy</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">Privacy Policy</h1>
 
           <div className="space-y-6 text-gray-700">
             <p className="text-gray-500">Last updated: January 2025</p>
 
             <section>
               <h2 className="text-xl font-bold text-gray-900 mb-3">1. Information We Collect</h2>
-              <p className="mb-3 text-gray-600">When you use 3RK, we collect:</p>
+              <p className="mb-3 text-gray-600">When you use Crisp, we collect:</p>
               <ul className="list-disc list-inside space-y-2 text-gray-600">
                 <li><strong className="text-gray-700">URLs you submit</strong> for scanning and analysis</li>
                 <li><strong className="text-gray-700">Account information</strong> (email, authentication data) if you create an account</li>

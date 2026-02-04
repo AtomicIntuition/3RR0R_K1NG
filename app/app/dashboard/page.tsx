@@ -30,11 +30,11 @@ const getScoreColor = (score: number | null) => {
 const getGradeBg = (grade: string | null) => {
   if (!grade) return 'bg-gray-100';
   switch (grade[0]) {
-    case 'A': return 'bg-gradient-to-br from-emerald-500 to-teal-600';
-    case 'B': return 'bg-gradient-to-br from-blue-500 to-indigo-600';
-    case 'C': return 'bg-gradient-to-br from-amber-400 to-orange-500';
-    case 'D': return 'bg-gradient-to-br from-orange-500 to-red-500';
-    default: return 'bg-gradient-to-br from-red-500 to-rose-600';
+    case 'A': return 'bg-emerald-600';
+    case 'B': return 'bg-blue-600';
+    case 'C': return 'bg-amber-500';
+    case 'D': return 'bg-orange-500';
+    default: return 'bg-red-600';
   }
 };
 
@@ -117,7 +117,7 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500">
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4" />
           <p className="text-white/80 font-medium">Loading...</p>
@@ -129,7 +129,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Header */}
-      <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 relative overflow-hidden">
+      <div className="bg-gray-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
@@ -196,7 +196,7 @@ export default function DashboardPage() {
         {/* Scan History */}
         <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
           {/* Header */}
-          <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+          <div className="px-6 py-5 border-b border-gray-100 bg-gray-50">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <h2 className="text-xl font-black text-gray-900">Scan History</h2>
 
@@ -230,7 +230,7 @@ export default function DashboardPage() {
             </div>
           ) : filteredScans.length === 0 ? (
             <div className="p-12 text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
@@ -242,7 +242,7 @@ export default function DashboardPage() {
               {filter === 'all' && (
                 <Link
                   href="/"
-                  className="inline-block px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
+                  className="inline-block px-6 py-3 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
                 >
                   Run your first scan
                 </Link>

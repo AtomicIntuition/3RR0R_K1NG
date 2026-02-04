@@ -143,7 +143,7 @@ export default function AccountPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500">
+      <div className="min-h-screen flex items-center justify-center bg-gray-900">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4" />
           <p className="text-white/80 font-medium">Loading...</p>
@@ -163,7 +163,7 @@ export default function AccountPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Header */}
-      <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 relative overflow-hidden">
+      <div className="bg-gray-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
 
@@ -196,7 +196,7 @@ export default function AccountPage() {
 
         {/* Profile Card */}
         <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-          <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+          <div className="px-6 py-5 border-b border-gray-100 bg-gray-50">
             <h2 className="text-xl font-black text-gray-900">Profile</h2>
           </div>
           <div className="p-6 space-y-4">
@@ -212,7 +212,7 @@ export default function AccountPage() {
               <span className="text-gray-500 font-medium">Current Tier</span>
               <span className={`px-3 py-1 rounded-full text-sm font-bold ${
                 profile?.tier === 'pro'
-                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white'
+                  ? 'bg-gray-800 text-white'
                   : 'bg-gray-100 text-gray-600'
               }`}>
                 {profile?.tier?.toUpperCase() || 'FREE'}
@@ -223,7 +223,7 @@ export default function AccountPage() {
 
         {/* Subscription Card */}
         <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-          <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+          <div className="px-6 py-5 border-b border-gray-100 bg-gray-50">
             <h2 className="text-xl font-black text-gray-900">Subscription</h2>
           </div>
           <div className="p-6">
@@ -264,7 +264,7 @@ export default function AccountPage() {
                   <div className="flex items-center gap-4">
                     <div className="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all"
+                        className="h-full bg-gray-800 rounded-full transition-all"
                         style={{ width: `${Math.min(100, ((profile.scans_this_month || 0) / PRICING.PRO_SCANS_PER_MONTH) * 100)}%` }}
                       />
                     </div>
@@ -286,7 +286,7 @@ export default function AccountPage() {
                     <button
                       onClick={handleReactivateSubscription}
                       disabled={isProcessing}
-                      className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50"
+                      className="px-6 py-3 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50"
                     >
                       {isProcessing ? 'Processing...' : 'Reactivate Subscription'}
                     </button>
@@ -327,7 +327,7 @@ export default function AccountPage() {
                 )}
                 <Link
                   href="/pricing"
-                  className="inline-block px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
+                  className="inline-block px-6 py-3 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
                 >
                   Upgrade to Pro
                 </Link>

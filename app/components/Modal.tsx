@@ -76,7 +76,7 @@ export function Modal({
         )}
       >
         {/* Top accent gradient line */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gray-200" />
 
         {showCloseButton && (
           <button

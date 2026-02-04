@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-slate-800 via-slate-900 to-gray-900 relative overflow-hidden">
+    <div className="min-h-screen flex bg-gray-900 relative overflow-hidden">
       {/* Background decorations */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-indigo-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
       <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
@@ -12,7 +12,7 @@ export default function NotFound() {
         <div className="text-center max-w-lg">
           {/* Logo */}
           <Link href="/" className="inline-flex items-center gap-3 mb-12">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 rounded-xl bg-gray-900 flex items-center justify-center shadow-lg">
               <span className="text-white text-xl font-black">C</span>
             </div>
             <span className="text-3xl font-black text-white">Crisp</span>
@@ -20,7 +20,7 @@ export default function NotFound() {
 
           {/* 404 Display */}
           <div className="mb-8">
-            <span className="text-[120px] sm:text-[160px] font-black bg-gradient-to-br from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent leading-none block">
+            <span className="text-[120px] sm:text-[160px] font-black text-gray-900 leading-none block">
               404
             </span>
           </div>
@@ -36,7 +36,7 @@ export default function NotFound() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/"
-              className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-lg rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all"
+              className="px-8 py-4 bg-gray-900 text-white font-bold text-lg rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all"
             >
               Go to Homepage
             </Link>

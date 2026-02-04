@@ -116,7 +116,7 @@ function followRedirect(url: string): Promise<{
         method: 'HEAD',
         timeout: REQUEST_TIMEOUT,
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; 3RROR_K1NG/1.0)',
+          'User-Agent': 'Mozilla/5.0 (compatible; Crisp/1.0)',
         },
         rejectUnauthorized: false,
       };

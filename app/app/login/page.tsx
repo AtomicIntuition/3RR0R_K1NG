@@ -103,7 +103,7 @@ function LoginContent() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all"
+                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all"
                   placeholder="you@example.com"
                   required
                 />
@@ -116,7 +116,7 @@ function LoginContent() {
                   </label>
                   <Link
                     href="/forgot-password"
-                    className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+                    className="text-sm text-primary hover:text-primary-700 font-medium"
                   >
                     Forgot password?
                   </Link>
@@ -126,7 +126,7 @@ function LoginContent() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all"
+                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all"
                   placeholder="Enter your password"
                   required
                 />
@@ -160,7 +160,7 @@ function LoginContent() {
 
           <p className="mt-8 text-center text-gray-500">
             Don&apos;t have an account?{' '}
-            <Link href="/signup" className="text-indigo-600 hover:text-indigo-700 font-semibold">
+            <Link href="/signup" className="text-primary hover:text-primary-700 font-semibold">
               Sign up for free
             </Link>
           </p>
@@ -173,7 +173,7 @@ function LoginContent() {
 function LoadingFallback() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
     </div>
   );
 }

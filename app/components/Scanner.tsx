@@ -37,7 +37,6 @@ export function Scanner({ className, autoFocus = false }: ScannerProps) {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [scanPhase, setScanPhase] = useState('');
-  const [skipRoast, setSkipRoast] = useState(false);
   const [showAuthWall, setShowAuthWall] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -67,7 +66,6 @@ export function Scanner({ className, autoFocus = false }: ScannerProps) {
           url: normalizedUrl,
           userId: user?.id || null,
           persona: 'professional',
-          skipRoast,
         }),
       });
 
@@ -121,33 +119,6 @@ export function Scanner({ className, autoFocus = false }: ScannerProps) {
             error && 'border-danger/30'
           )}
         >
-          {/* Header with glass effect */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50/50">
-            <span className="text-sm font-medium text-gray-600">Enter website URL</span>
-
-            {/* Quick Mode Toggle - pill style */}
-            <button
-              type="button"
-              onClick={() => setSkipRoast(!skipRoast)}
-              className={clsx(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-200 text-xs font-medium',
-                skipRoast
-                  ? 'bg-primary text-white ring-2 ring-primary/20'
-                  : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700'
-              )}
-            >
-              <svg
-                className="w-3.5 h-3.5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              <span>Quick Mode</span>
-            </button>
-          </div>
-
           {/* Input container */}
           <div className="flex items-center">
             <div className="pl-4 text-gray-400">

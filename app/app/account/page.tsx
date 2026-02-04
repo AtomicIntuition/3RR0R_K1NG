@@ -229,7 +229,7 @@ export default function AccountPage() {
           <div className="p-6">
             {loadingSubscription ? (
               <div className="flex items-center gap-3 text-gray-500">
-                <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                 Loading subscription info...
               </div>
             ) : profile?.tier === 'pro' && subscription ? (
@@ -277,7 +277,7 @@ export default function AccountPage() {
                 {profile.scan_credits > 0 && (
                   <div className="flex items-center justify-between py-3 border-t border-gray-100">
                     <span className="text-gray-500 font-medium">Bonus Scan Credits</span>
-                    <span className="text-indigo-600 font-bold">{profile.scan_credits}</span>
+                    <span className="text-primary font-bold">{profile.scan_credits}</span>
                   </div>
                 )}
 
@@ -321,7 +321,7 @@ export default function AccountPage() {
                   You&apos;re on the free plan ({PRICING.FREE_SCANS_PER_DAY} scans/day).
                 </p>
                 {profile && profile.scan_credits > 0 && (
-                  <p className="text-indigo-600 font-bold mb-4">
+                  <p className="text-primary font-bold mb-4">
                     {profile.scan_credits} scan credits remaining
                   </p>
                 )}
@@ -357,7 +357,7 @@ export default function AccountPage() {
         {/* Back link */}
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-2 text-gray-500 hover:text-indigo-600 font-medium transition-colors"
+          className="inline-flex items-center gap-2 text-gray-500 hover:text-primary font-medium transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -378,7 +378,7 @@ export default function AccountPage() {
             <select
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
-              className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500"
+              className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-primary"
             >
               <option value="">Select a reason...</option>
               <option value="too_expensive">Too expensive</option>

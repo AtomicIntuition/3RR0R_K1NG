@@ -47,16 +47,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { url, fingerprint, userId: bodyUserId, persona = 'professional', skipRoast = false } = body;
+    const { url, fingerprint, userId: bodyUserId } = body;
 
     // Use API key user ID if authenticated via API key, otherwise use body userId
     const userId = apiKeyUser?.id || bodyUserId;
 
-    // Analysis style (kept for backwards compatibility)
+    // Analysis style
     const selectedPersona = 'professional';
-
-    // Validate skipRoast
-    const shouldSkipRoast = Boolean(skipRoast);
 
     // Validate URL
     if (!url || typeof url !== 'string' || url.length > 2048) {
@@ -281,7 +278,6 @@ export async function POST(request: NextRequest) {
           url: parsedUrl.href,
           userTier,
           persona: selectedPersona,
-          skipRoast: shouldSkipRoast,
         },
         {
           jobId: scan.id,

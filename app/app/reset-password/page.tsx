@@ -169,7 +169,7 @@ export default function ResetPasswordPage() {
             </div>
 
             <p className="mt-8 text-gray-500">
-              <Link href="/login" className="text-indigo-600 hover:text-indigo-700 font-semibold">
+              <Link href="/login" className="text-primary hover:text-primary-700 font-semibold">
                 Back to sign in
               </Link>
             </p>
@@ -305,7 +305,7 @@ export default function ResetPasswordPage() {
           </div>
 
           <p className="mt-8 text-center text-gray-500">
-            <Link href="/login" className="text-indigo-600 hover:text-indigo-700 font-semibold">
+            <Link href="/login" className="text-primary hover:text-primary-700 font-semibold">
               Back to sign in
             </Link>
           </p>

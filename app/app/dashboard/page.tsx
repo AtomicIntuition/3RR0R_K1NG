@@ -143,7 +143,7 @@ export default function DashboardPage() {
             <div className="flex gap-3">
               <Link
                 href="/"
-                className="px-6 py-3 bg-white text-indigo-600 font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
+                className="px-6 py-3 bg-white text-primary font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
               >
                 New Scan
               </Link>
@@ -225,13 +225,13 @@ export default function DashboardPage() {
           {/* Content */}
           {loadingScans ? (
             <div className="p-12 text-center">
-              <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
               <p className="text-gray-500 font-medium">Loading scans...</p>
             </div>
           ) : filteredScans.length === 0 ? (
             <div className="p-12 text-center">
               <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
@@ -266,7 +266,7 @@ export default function DashboardPage() {
                       {scan.status === 'completed' && scan.letter_grade ? (
                         <span className="text-lg font-black text-white">{scan.letter_grade}</span>
                       ) : scan.status === 'processing' ? (
-                        <span className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                        <span className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                       ) : scan.status === 'failed' ? (
                         <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -278,7 +278,7 @@ export default function DashboardPage() {
 
                     {/* URL & Meta */}
                     <div className="flex-1 min-w-0 mr-4">
-                      <p className="text-gray-900 font-bold truncate group-hover:text-indigo-600 transition-colors">
+                      <p className="text-gray-900 font-bold truncate group-hover:text-primary transition-colors">
                         {scan.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
                       </p>
                       <div className="flex items-center gap-3 mt-1">
@@ -305,7 +305,7 @@ export default function DashboardPage() {
                     )}
 
                     {/* Arrow */}
-                    <svg className="w-5 h-5 text-gray-300 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-gray-300 group-hover:text-primary group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </Link>
@@ -317,7 +317,7 @@ export default function DashboardPage() {
                 <div className="px-6 py-4 border-t border-gray-100 text-center bg-gray-50">
                   <button
                     onClick={() => setVisibleCount(prev => prev + SCANS_PER_PAGE)}
-                    className="text-indigo-600 hover:text-indigo-700 font-bold transition-colors"
+                    className="text-primary hover:text-primary-700 font-bold transition-colors"
                   >
                     Load more ({filteredScans.length - visibleCount} remaining)
                   </button>

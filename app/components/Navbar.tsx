@@ -42,7 +42,9 @@ export function Navbar() {
               </span>
             </div>
             <div className="flex items-center gap-6">
-              <div className="w-8 h-8 rounded-full bg-gray-100 animate-pulse" />
+              <span className="text-sm font-medium text-gray-500">Pricing</span>
+              <span className="text-sm font-medium text-gray-600">Sign In</span>
+              <span className="text-sm px-4 py-2 bg-gray-900 text-white rounded-lg font-medium">Sign Up</span>
             </div>
           </div>
         </div>

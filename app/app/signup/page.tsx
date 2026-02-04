@@ -135,7 +135,7 @@ export default function SignUpPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all"
+                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all"
                   placeholder="you@example.com"
                   required
                 />
@@ -150,7 +150,7 @@ export default function SignUpPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all"
+                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all"
                   placeholder="At least 6 characters"
                   required
                 />
@@ -165,7 +165,7 @@ export default function SignUpPage() {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all"
+                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all"
                   placeholder="Confirm your password"
                   required
                 />
@@ -198,11 +198,11 @@ export default function SignUpPage() {
 
             <p className="mt-4 text-xs text-gray-500 text-center">
               By signing up, you agree to our{' '}
-              <Link href="/terms" className="text-purple-600 hover:text-purple-700 font-medium">
+              <Link href="/terms" className="text-primary hover:text-primary-700 font-medium">
                 Terms of Service
               </Link>{' '}
               and{' '}
-              <Link href="/privacy" className="text-purple-600 hover:text-purple-700 font-medium">
+              <Link href="/privacy" className="text-primary hover:text-primary-700 font-medium">
                 Privacy Policy
               </Link>
             </p>
@@ -210,7 +210,7 @@ export default function SignUpPage() {
 
           <p className="mt-8 text-center text-gray-500">
             Already have an account?{' '}
-            <Link href="/login" className="text-purple-600 hover:text-purple-700 font-semibold">
+            <Link href="/login" className="text-primary hover:text-primary-700 font-semibold">
               Sign in
             </Link>
           </p>

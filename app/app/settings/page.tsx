@@ -121,7 +121,7 @@ export default function SettingsPage() {
       {/* Hero Header */}
       <div className="bg-gray-900 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
-        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gray-200/40 rounded-full blur-3xl" />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-12">
           {/* Breadcrumb */}
@@ -161,7 +161,7 @@ export default function SettingsPage() {
             {profile?.scan_credits && profile.scan_credits > 0 && (
               <div className="flex items-center justify-between py-3">
                 <span className="text-gray-500 font-medium">Scan Credits</span>
-                <span className="text-indigo-600 font-bold">{profile.scan_credits}</span>
+                <span className="text-primary font-bold">{profile.scan_credits}</span>
               </div>
             )}
           </div>
@@ -216,7 +216,7 @@ export default function SettingsPage() {
                 value={newKeyName}
                 onChange={(e) => setNewKeyName(e.target.value)}
                 placeholder="Key name (optional)"
-                className="flex-1 px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all"
+                className="flex-1 px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all"
               />
               <button
                 onClick={createApiKey}
@@ -242,7 +242,7 @@ export default function SettingsPage() {
           {/* Keys List */}
           {loadingKeys ? (
             <div className="p-12 text-center">
-              <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
               <p className="text-gray-500 font-medium">Loading keys...</p>
             </div>
           ) : apiKeys.filter(k => k.is_active).length === 0 ? (

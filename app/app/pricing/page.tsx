@@ -71,7 +71,7 @@ export default function PricingPage() {
               onClick={() => handleToggle(false)}
               className={`px-8 py-3 rounded-xl text-sm font-bold transition-all ${
                 !isYearly
-                  ? 'bg-white text-indigo-600 shadow-lg'
+                  ? 'bg-white text-primary shadow-lg'
                   : 'text-white/80 hover:text-white'
               }`}
             >
@@ -82,7 +82,7 @@ export default function PricingPage() {
               onClick={() => handleToggle(true)}
               className={`px-8 py-3 rounded-xl text-sm font-bold flex items-center gap-2 transition-all ${
                 isYearly
-                  ? 'bg-white text-indigo-600 shadow-lg'
+                  ? 'bg-white text-primary shadow-lg'
                   : 'text-white/80 hover:text-white'
               }`}
             >
@@ -186,7 +186,7 @@ export default function PricingPage() {
               priceId={isYearly ? PRICE_IDS.proYearly : PRICE_IDS.proMonthly}
               mode="subscription"
               label="Go Pro"
-              className="[&_button]:bg-white [&_button]:text-indigo-600 [&_button]:hover:bg-gray-100 [&_button]:shadow-xl"
+              className="[&_button]:bg-white [&_button]:text-primary [&_button]:hover:bg-gray-100 [&_button]:shadow-xl"
             />
             <p className="text-white/50 text-xs text-center mt-4">Cancel anytime</p>
           </div>
@@ -294,13 +294,13 @@ export default function PricingPage() {
                       <span className="text-gray-400">{row.free}</span>
                     )}
                   </td>
-                  <td className="text-center py-4 px-6 bg-indigo-50">
+                  <td className="text-center py-4 px-6 bg-primary-50">
                     {typeof row.pro === 'boolean' ? (
-                      <svg className="w-5 h-5 text-indigo-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-primary mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     ) : (
-                      <span className="text-indigo-600 font-bold">{row.pro}</span>
+                      <span className="text-primary font-bold">{row.pro}</span>
                     )}
                   </td>
                 </tr>
@@ -322,7 +322,7 @@ export default function PricingPage() {
               <div
                 key={i}
                 className={`bg-white/5 backdrop-blur rounded-2xl border transition-all ${
-                  openFaq === i ? 'border-indigo-500' : 'border-white/10'
+                  openFaq === i ? 'border-primary-500' : 'border-white/10'
                 }`}
               >
                 <button

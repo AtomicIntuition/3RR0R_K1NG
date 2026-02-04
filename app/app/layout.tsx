@@ -27,7 +27,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: 'Crisp | Website Audit Platform',
-  description: 'Professional website audits for security, performance, SEO, and accessibility. Get actionable insights powered by AI analysis. Scan any URL for free and fix issues fast.',
+  description: 'Professional website audits for security, performance, SEO, and accessibility. Get actionable insights powered by AI. Scan any URL free.',
   keywords: ['website audit', 'security scanner', 'performance testing', 'SEO checker', 'accessibility audit'],
   authors: [{ name: 'Crisp' }],
   alternates: {
@@ -73,7 +73,6 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Crisp | Professional Website Audits',
     description: 'AI-powered security, performance, SEO & accessibility audits. Get actionable insights for your website.',
-    creator: '@3rrork1ng',
     images: [`${siteUrl}/images/og-image.png`],
   },
   robots: {
@@ -190,14 +189,6 @@ export default function RootLayout({
                 <div className="flex items-center gap-6">
                   <a href="/privacy" className="hover:text-gray-200 transition-colors font-medium">Privacy</a>
                   <a href="/terms" className="hover:text-gray-200 transition-colors font-medium">Terms</a>
-                  <a
-                    href="https://x.com/3rrork1ng"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-gray-200 transition-colors font-medium"
-                  >
-                    @3rrork1ng
-                  </a>
                 </div>
               </div>
             </footer>

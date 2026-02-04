@@ -171,7 +171,7 @@ export default function SettingsPage() {
         <div className="bg-gray-900 rounded-2xl shadow-xl border border-gray-800 overflow-hidden">
           <div className="px-6 py-5 border-b border-gray-800 bg-gray-900">
             <h2 className="text-xl font-black text-gray-50">API Keys</h2>
-            <p className="text-gray-400 text-sm mt-1">Use API keys to authenticate with the Crisp CLI</p>
+            <p className="text-gray-400 text-sm mt-1">Use API keys to authenticate with the error-king CLI</p>
           </div>
 
           {/* New Key Alert */}
@@ -292,9 +292,9 @@ export default function SettingsPage() {
           </div>
           <div className="p-6 space-y-4">
             {[
-              { label: 'npm (Node.js)', cmd: 'npm install -g crisp' },
-              { label: 'npx (no install)', cmd: 'npx crisp scan https://example.com' },
-              { label: 'Homebrew (macOS/Linux)', cmd: 'brew install crisp' },
+              { label: 'npm (Node.js)', cmd: 'npm install -g error-king' },
+              { label: 'npx (no install)', cmd: 'npx error-king scan https://example.com' },
+              { label: 'Homebrew (macOS/Linux)', cmd: 'brew install error-king' },
             ].map((item, i) => (
               <div key={i}>
                 <p className="text-xs text-gray-400 mb-2 font-bold uppercase tracking-wide">{item.label}</p>
@@ -313,10 +313,10 @@ export default function SettingsPage() {
           </div>
           <div className="p-6 space-y-4">
             {[
-              { label: 'Set your API key', cmd: 'export CRISP_API_KEY=sk_...' },
-              { label: 'Verify your key', cmd: 'crisp auth' },
-              { label: 'Scan a website', cmd: 'crisp scan https://example.com' },
-              { label: 'Search previous scans', cmd: 'crisp search stripe.com' },
+              { label: 'Set your API key', cmd: 'export ERROR_KING_API_KEY=sk_...' },
+              { label: 'Verify your key', cmd: 'error-king auth' },
+              { label: 'Scan a website', cmd: 'error-king scan https://example.com' },
+              { label: 'Search previous scans', cmd: 'error-king search stripe.com' },
             ].map((item, i) => (
               <div key={i}>
                 <p className="text-sm text-gray-400 mb-2">{item.label}</p>

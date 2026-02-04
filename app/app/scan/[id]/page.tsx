@@ -1,6 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ScoreRing } from '@/components/ScoreRing';
@@ -39,6 +40,7 @@ const itemVariants = {
 export default function ScanResultsPage() {
   const params = useParams();
   const scanId = params.id as string;
+  const startedAtRef = useRef(Date.now());
 
   // Use real-time Supabase subscription instead of polling
   const { scan, progress, error, isLoading } = useScanRealtime(scanId);
@@ -78,53 +80,14 @@ export default function ScanResultsPage() {
   // Loading state
   if (isLoading || !scan || scan.status === 'pending' || scan.status === 'processing') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-4 pt-20 bg-gray-950">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-6"
-        >
-          <div className="inline-flex items-center gap-3 px-5 py-3 bg-gray-900 border border-gray-800 rounded-2xl shadow-sm">
-            <div className="relative flex-shrink-0">
-              <div className="w-8 h-8 rounded-lg bg-gray-800 border border-gray-700 flex items-center justify-center overflow-hidden">
-                {scan?.url ? (
-                  <img
-                    src={`https://www.google.com/s2/favicons?domain=${(() => { try { return new URL(scan.url).hostname; } catch { return ''; } })()}&sz=32`}
-                    alt=""
-                    className="w-4 h-4"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                  />
-                ) : null}
-                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
-                </svg>
-              </div>
-              <span className="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
-              </span>
-            </div>
-            <div className="flex flex-col min-w-0">
-              <span className="text-[10px] uppercase tracking-widest text-emerald-500 font-bold">Scanning Target</span>
-              <span className="text-sm font-mono font-medium text-gray-200 truncate max-w-[250px] sm:max-w-[400px]">
-                {scan?.url ? (() => { try { return new URL(scan.url).hostname; } catch { return scan.url; } })() : 'Loading...'}
-              </span>
-            </div>
-            <div className="flex-shrink-0 hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-gray-800 rounded-lg border border-gray-700">
-              <svg className="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
-                {scan?.url?.startsWith('https') ? 'HTTPS' : 'HTTP'}
-              </span>
-            </div>
-          </div>
-        </motion.div>
+      <div className="min-h-screen flex flex-col items-start justify-start px-3 sm:px-4 pt-24 bg-gray-950">
         <LoadingState
           phase={progress.phase}
           percentage={progress.percentage}
           completedAudits={progress.completedAudits}
           currentPhase={progress.currentPhase}
+          url={scan?.url}
+          startedAt={startedAtRef.current}
         />
       </div>
     );

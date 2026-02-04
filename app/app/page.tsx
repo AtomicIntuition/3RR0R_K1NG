@@ -235,10 +235,10 @@ export default function HomePage() {
               transition={{ duration: 0.8, ease, delay: 0.1 }}
               className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight mb-7 leading-[0.95]"
             >
-              <span className="text-gray-50">Is your website</span>
+              <span className="text-gray-50">Know what&apos;s broken.</span>
               <br />
               <span className="bg-gradient-to-r from-emerald-400 via-emerald-300 to-teal-400 bg-clip-text text-transparent">
-                actually good?
+                Ship the fix.
               </span>
             </motion.h1>
 

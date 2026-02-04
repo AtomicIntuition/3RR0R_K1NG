@@ -109,24 +109,24 @@ export function FileUpload({ className }: FileUploadProps) {
 
   return (
     <div className={clsx('w-full max-w-2xl mx-auto', className)}>
-      {/* Terminal-style header */}
-      <div className="flex items-center gap-2 px-4 py-2 bg-void-100 rounded-t-lg border border-b-0 border-void-200">
+      {/* Header */}
+      <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-t-xl border border-b-0 border-gray-200">
         <div className="flex gap-1.5">
           <span className="w-3 h-3 rounded-full bg-danger/80" />
-          <span className="w-3 h-3 rounded-full bg-neon-yellow/80" />
-          <span className="w-3 h-3 rounded-full bg-terminal/80" />
+          <span className="w-3 h-3 rounded-full bg-warning/80" />
+          <span className="w-3 h-3 rounded-full bg-success/80" />
         </div>
-        <span className="text-xs text-gray-400 ml-2">code_analyzer.exe</span>
+        <span className="text-xs text-gray-500 ml-2">code_analyzer</span>
       </div>
 
       {/* Dropzone container */}
       <div
         {...getRootProps()}
         className={clsx(
-          'relative bg-void-50 border border-void-200 rounded-b-lg overflow-hidden',
+          'relative bg-white border border-gray-200 rounded-b-xl overflow-hidden',
           'cursor-pointer transition-all duration-200',
-          'focus:outline-none focus:ring-2 focus:ring-terminal/50',
-          isDragActive && !isDragReject && 'border-terminal bg-terminal/5',
+          'focus:outline-none focus:ring-2 focus:ring-primary/50',
+          isDragActive && !isDragReject && 'border-primary bg-primary/5',
           isDragReject && 'border-danger bg-danger/5',
           isUploading && 'opacity-75 cursor-not-allowed'
         )}
@@ -137,7 +137,7 @@ export function FileUpload({ className }: FileUploadProps) {
           {isUploading ? (
             <div className="space-y-4">
               <div className="flex justify-center">
-                <svg className="animate-spin h-10 w-10 text-terminal" viewBox="0 0 24 24">
+                <svg className="animate-spin h-10 w-10 text-primary" viewBox="0 0 24 24">
                   <circle
                     className="opacity-25"
                     cx="12"
@@ -154,14 +154,14 @@ export function FileUpload({ className }: FileUploadProps) {
                   />
                 </svg>
               </div>
-              <p className="text-terminal font-mono">{uploadPhase}</p>
+              <p className="text-primary font-medium">{uploadPhase}</p>
               {uploadStats && (
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-gray-500">
                   {uploadStats.filesCount} files ({(uploadStats.totalSize / 1024).toFixed(1)} KB)
                 </p>
               )}
-              <div className="h-1 bg-void-200 rounded-full overflow-hidden max-w-xs mx-auto">
-                <div className="h-full bg-terminal animate-pulse w-2/3" />
+              <div className="h-1 bg-gray-200 rounded-full overflow-hidden max-w-xs mx-auto">
+                <div className="h-full bg-primary animate-pulse w-2/3" />
               </div>
             </div>
           ) : (
@@ -171,7 +171,7 @@ export function FileUpload({ className }: FileUploadProps) {
                 <svg
                   className={clsx(
                     'w-16 h-16 mx-auto transition-colors',
-                    isDragActive ? 'text-terminal' : 'text-gray-500'
+                    isDragActive ? 'text-primary' : 'text-gray-400'
                   )}
                   fill="none"
                   stroke="currentColor"
@@ -187,26 +187,26 @@ export function FileUpload({ className }: FileUploadProps) {
               </div>
 
               {isDragActive ? (
-                <p className="text-terminal font-mono text-lg">
+                <p className="text-primary font-medium text-lg">
                   {isDragReject ? 'Invalid file type!' : 'Drop files here...'}
                 </p>
               ) : (
                 <>
-                  <p className="text-gray-200 mb-2 text-lg">
+                  <p className="text-gray-900 mb-2 text-lg">
                     Drag & drop your project ZIP or code files
                   </p>
                   <p className="text-gray-500 text-sm mb-4">or click to browse</p>
                   <div className="flex flex-wrap justify-center gap-2">
-                    <span className="px-2 py-1 text-xs bg-void-200 rounded text-gray-400">
+                    <span className="px-2 py-1 text-xs bg-gray-100 rounded text-gray-500">
                       .zip
                     </span>
-                    <span className="px-2 py-1 text-xs bg-void-200 rounded text-gray-400">
+                    <span className="px-2 py-1 text-xs bg-gray-100 rounded text-gray-500">
                       package.json
                     </span>
-                    <span className="px-2 py-1 text-xs bg-void-200 rounded text-gray-400">
+                    <span className="px-2 py-1 text-xs bg-gray-100 rounded text-gray-500">
                       .js / .ts
                     </span>
-                    <span className="px-2 py-1 text-xs bg-void-200 rounded text-gray-400">
+                    <span className="px-2 py-1 text-xs bg-gray-100 rounded text-gray-500">
                       .jsx / .tsx
                     </span>
                   </div>
@@ -219,22 +219,22 @@ export function FileUpload({ className }: FileUploadProps) {
 
       {/* Error message */}
       {error && (
-        <div className="mt-3 px-4 py-2 bg-danger/10 border border-danger/30 rounded text-danger text-sm">
+        <div className="mt-3 px-4 py-2 bg-danger/10 border border-danger/30 rounded-xl text-danger text-sm">
           <span className="font-bold">ERROR:</span> {error}
         </div>
       )}
 
       {/* Info section */}
       <div className="mt-6 text-center">
-        <p className="text-xs text-gray-400 mb-2">What we analyze:</p>
+        <p className="text-xs text-gray-500 mb-2">What we analyze:</p>
         <div className="flex flex-wrap justify-center gap-2 text-xs">
-          <span className="px-3 py-1 bg-void-100 rounded border border-void-200 text-gray-400">
+          <span className="px-3 py-1 bg-gray-50 rounded-lg border border-gray-200 text-gray-500">
             Dependency vulnerabilities
           </span>
-          <span className="px-3 py-1 bg-void-100 rounded border border-void-200 text-gray-400">
+          <span className="px-3 py-1 bg-gray-50 rounded-lg border border-gray-200 text-gray-500">
             Exposed secrets
           </span>
-          <span className="px-3 py-1 bg-void-100 rounded border border-void-200 text-gray-400">
+          <span className="px-3 py-1 bg-gray-50 rounded-lg border border-gray-200 text-gray-500">
             Code patterns
           </span>
         </div>

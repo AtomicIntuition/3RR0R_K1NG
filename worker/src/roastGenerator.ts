@@ -40,68 +40,26 @@ export interface RoastResult {
 }
 
 // ============================================
-// Roast Personas - User-Selectable Styles
+// Analysis Configuration - Professional Voice
 // ============================================
 
-export type RoastPersona = 'hacker' | 'gordon' | 'parent' | 'interviewer' | 'drill' | 'meme' | 'therapist';
+export type RoastPersona = 'professional';
 
 export interface PersonaConfig {
   id: RoastPersona;
   name: string;
   description: string;
-  emoji: string;
+  icon: string; // Icon identifier for UI
   prompt: string;
 }
 
 export const ROAST_PERSONAS: Record<RoastPersona, PersonaConfig> = {
-  hacker: {
-    id: 'hacker',
-    name: '3RROR_K1NG',
-    description: 'Classic hacker roast with security metaphors',
-    emoji: '💀',
-    prompt: `You are 3RROR_K1NG, a legendary hacker who reviews websites with brutal honesty. You speak with a mix of technical expertise and devastating wit. Use hacking/security metaphors and terminology. Your reviews are memorable, shareable, and actually helpful. Reference penetration testing, exploits, and security culture.`,
-  },
-  gordon: {
-    id: 'gordon',
-    name: 'Gordon Websy',
-    description: 'Kitchen nightmare but for websites',
-    emoji: '👨‍🍳',
-    prompt: `You are Gordon Websy, a world-famous website chef who treats bad websites like a disastrous kitchen. You're absolutely APPALLED by what you're seeing. Use cooking metaphors - this code is RAW, the CSS is BURNT, the JavaScript is BLAND. Yell (IN CAPS) when appropriate. Ask rhetorical questions like "WHERE'S THE LAMB SAUCE?" but for web elements. Be dramatic but ultimately want to help them improve. Call them "donkey" when they mess up basics.`,
-  },
-  parent: {
-    id: 'parent',
-    name: 'Disappointed Parent',
-    description: 'Guilt-trip style disappointment',
-    emoji: '😔',
-    prompt: `You are a disappointed parent reviewing your child's website. You're not angry, just... disappointed. Use phrases like "I'm not mad, I'm just disappointed", "Your sibling's website got an A+", "We raised you better than this", "This isn't the code I thought I raised". Sigh heavily through the text. Reference how you expected more. Guilt-trip them into fixing issues. End with something like "I still love you, but please fix this."`,
-  },
-  interviewer: {
-    id: 'interviewer',
-    name: 'Tech Interviewer',
-    description: 'FAANG interviewer energy',
-    emoji: '🤔',
-    prompt: `You are a senior FAANG tech interviewer reviewing a candidate's portfolio website. Be condescending in a professional way. Use phrases like "Can you walk me through your thought process here?", "Interesting choice...", "At Google, we would never...", "I see you went with the... creative approach". Ask probing questions they can't answer. Rate their "culture fit" based on their code. Mention that other candidates' sites loaded faster. End with "We'll be in touch" (they won't).`,
-  },
-  drill: {
-    id: 'drill',
-    name: 'Drill Sergeant',
-    description: 'Military-style tough love',
-    emoji: '🎖️',
-    prompt: `You are a Drill Sergeant for websites. YELL EVERYTHING. Drop and give me 20 Lighthouse points! This website is OUT OF SHAPE and needs DISCIPLINE. Use military metaphors - the JavaScript is AWOL, the CSS went DESERTER, the security has GONE SOFT. Call the website "maggot" or "private". Demand they "FIX THOSE HEADERS, SOLDIER!" Give orders, not suggestions. End with "NOW MOVE IT, MOVE IT, MOVE IT!"`,
-  },
-  meme: {
-    id: 'meme',
-    name: 'Meme Lord',
-    description: 'Internet culture and Gen-Z speak',
-    emoji: '🗿',
-    prompt: `You are a chronically online zoomer meme lord reviewing this website. Use current internet slang - "no cap", "it's giving...", "that's so sus", "big yikes energy", "main character syndrome but make it broken". Reference popular memes. The website is either "bussin" or "mid" (it's probably mid). Rate things on a scale of "slay" to "flop". Use emojis ironically. Everything is either "iconic" or "the Roman Empire of bad decisions". Compare bad code to popular meme formats.`,
-  },
-  therapist: {
-    id: 'therapist',
-    name: 'Website Therapist',
-    description: 'Gentle but devastating analysis',
-    emoji: '🛋️',
-    prompt: `You are a therapist... but for websites. Speak softly but say devastating things. "Let's unpack that performance score, shall we?" "I'm sensing some unresolved JavaScript trauma here." "Have you considered that your security headers might be a cry for help?" Use therapy-speak but make it cutting. Create a safe space while absolutely destroying them. "This is a judgment-free zone, but I am judging this code." End sessions with homework assignments for fixing issues.`,
+  professional: {
+    id: 'professional',
+    name: '3RK Analysis',
+    description: 'Professional website audit with actionable insights',
+    icon: 'chart',
+    prompt: `You are a senior web development consultant providing professional website audits. Your analysis is thorough, objective, and focused on actionable improvements. You communicate clearly without jargon, explain the business impact of issues, and prioritize recommendations by severity. Your tone is professional but approachable - direct without being harsh.`,
   },
 };
 
@@ -139,7 +97,7 @@ export interface RoastInput {
   pwa?: PWAAuditResult;
   structuredData?: StructuredDataAuditResult;
   links?: LinkAuditResult;
-  // Persona selection
+  // Analysis style (kept for backwards compatibility)
   persona?: RoastPersona;
 }
 
@@ -267,7 +225,7 @@ ${finding.value ? `- **Current Value:** \`${finding.value}\`` : ''}
   // Performance metrics
   report += `### PERFORMANCE METRICS\n\n`;
   for (const metric of input.performanceMetrics) {
-    const status = metric.score >= 90 ? '✅' : metric.score >= 50 ? '⚠️' : '❌';
+    const status = metric.score >= 90 ? '[PASS]' : metric.score >= 50 ? '[WARN]' : '[FAIL]';
     report += `- ${status} **${metric.name}:** ${metric.displayValue} (score: ${metric.score}/100)\n`;
   }
 
@@ -284,8 +242,8 @@ ${finding.value ? `- **Current Value:** \`${finding.value}\`` : ''}
     if (ra.thirdParty.domains.length > 0) {
       report += `**Third-Party Domains (by impact):**\n\n`;
       for (const domain of ra.thirdParty.domains.slice(0, 5)) {
-        const impactEmoji = domain.impact === 'high' ? '🔴' : domain.impact === 'medium' ? '🟡' : '🟢';
-        report += `${impactEmoji} **${domain.domain}** (${domain.category || 'unknown'})\n`;
+        const impactLabel = domain.impact === 'high' ? '[HIGH]' : domain.impact === 'medium' ? '[MED]' : '[LOW]';
+        report += `${impactLabel} **${domain.domain}** (${domain.category || 'unknown'})\n`;
         report += `   - Resources: ${domain.resourceCount}, Size: ${(domain.totalSize / 1024).toFixed(1)}KB, Time: ${domain.totalDuration.toFixed(0)}ms\n`;
       }
       report += `\n`;
@@ -792,25 +750,24 @@ export const metadata: Metadata = {
   return fixes;
 }
 
-function getRoastIntensity(score: number): string {
-  if (score >= 90) return 'mild teasing with genuine compliments';
-  if (score >= 70) return 'playful roasting with constructive criticism';
-  if (score >= 50) return 'firm roasting with clear disappointment';
-  if (score >= 30) return 'brutal honesty with dramatic flair';
-  return 'scorched earth devastation, absolutely savage';
+function getAnalysisDepth(score: number): string {
+  if (score >= 90) return 'highlight strengths with minor optimization suggestions';
+  if (score >= 70) return 'balanced analysis with clear improvement priorities';
+  if (score >= 50) return 'detailed analysis focusing on key issues';
+  if (score >= 30) return 'comprehensive review with urgent recommendations';
+  return 'thorough assessment with critical action items';
 }
 
 function buildPrompt(input: RoastInput): string {
   const failedSecurity = input.securityFindings.filter(f => !f.passed);
   const failedSeo = input.seoFindings.filter(f => !f.passed);
 
-  // Get persona config (default to hacker)
-  const persona = input.persona || 'hacker';
-  const personaConfig = ROAST_PERSONAS[persona];
+  // Use professional analysis voice
+  const personaConfig = ROAST_PERSONAS['professional'];
 
   return `${personaConfig.prompt}
 
-Your reviews are memorable, shareable, and actually helpful despite the persona.
+Your analysis should be clear, actionable, and focused on business impact.
 
 WEBSITE: ${input.url}
 
@@ -869,15 +826,14 @@ LINKS:
 - Broken: ${input.links?.brokenLinks.length || 0}
 - Insecure HTTP: ${input.links?.insecureLinks.length || 0}
 
-ROAST INTENSITY: ${getRoastIntensity(input.scores.overall)}
-PERSONA: ${personaConfig.name} (${personaConfig.description})
+ANALYSIS DEPTH: ${getAnalysisDepth(input.scores.overall)}
 
-Generate a roast in the following JSON format. The roast should be memorable, technically accurate, and include specific references to the actual issues found. STAY IN CHARACTER for your persona throughout. Be creative with the title - it should be punchy and shareable.
+Generate an analysis report in the following JSON format. The analysis should be professional, technically accurate, and include specific references to the actual issues found. Be direct and actionable.
 
 {
-  "title": "A devastating one-liner roast title (max 80 chars, complete the thought)",
-  "body": "2-3 paragraph roast that references specific findings. Be savage but helpful. End with either praise (if deserved) or a call to action.",
-  "twitterRoast": "A punchy 280-char max roast perfect for Twitter. Include the score and 1 devastating observation. Make it viral-worthy.",
+  "title": "A clear summary headline (max 80 chars, complete the thought)",
+  "body": "2-3 paragraph professional analysis that references specific findings. Start with the overall assessment, highlight key issues, and end with a prioritized recommendation.",
+  "twitterRoast": "A concise 280-char summary suitable for sharing. Include the score and key finding.",
   "fixes": [
     {
       "priority": "critical|high|medium|low",
@@ -891,14 +847,14 @@ Generate a roast in the following JSON format. The roast should be memorable, te
 
 RULES:
 - Title must be under 80 characters and complete (no cut-off words)
-- twitterRoast must be under 280 characters (for Twitter sharing)
+- twitterRoast must be under 280 characters (for sharing)
 - Include 3-5 of the most impactful fixes
 - Fixes should be ordered by priority (critical first)
 - Be specific - reference actual URLs, headers, or metrics found
-- If the site actually scores well (85+), acknowledge it while still finding something to roast
+- If the site scores well (85+), acknowledge strengths while noting areas for improvement
 - Use technical terms correctly
 - The body should be 100-200 words
-- STAY IN CHARACTER for your ${personaConfig.name} persona - use the style and vocabulary from your character description
+- Maintain a professional, consultative tone
 - Do NOT use markdown formatting in the body text
 
 Return ONLY the JSON, no other text.`;
@@ -1055,9 +1011,9 @@ export async function generateRoast(input: RoastInput): Promise<RoastResult> {
   // Generate LLM-ready report
   result.llmReport = generateLLMReport(input);
   result.isFallback = false;
-  result.persona = input.persona || 'hacker';
+  result.persona = 'professional';
 
-  console.log(`AI roast generated successfully with ${result.persona} persona`);
+  console.log('AI analysis generated successfully');
   return result;
 }
 
@@ -1148,20 +1104,20 @@ export function generateQuickAuditFixes(input: RoastInput): RoastFix[] {
 function generateFallbackRoast(input: RoastInput, reason?: string): RoastResult {
   const { scores } = input;
 
-  console.log(`Using fallback roast${reason ? `: ${reason}` : ''}`);
+  console.log(`Using fallback analysis${reason ? `: ${reason}` : ''}`);
 
   let title: string;
   let body: string;
 
   if (scores.overall >= 80) {
-    title = 'Not Bad, But I Found Your Secrets';
-    body = `Your site scored ${scores.overall}/100, which means you're doing better than most of the internet. But don't get cocky - I still found some vulnerabilities that would make a script kiddie smile. Your security score of ${scores.security} tells me you've done some homework, but there's always room for improvement in this game.`;
+    title = 'Strong Foundation with Room for Optimization';
+    body = `Your site scored ${scores.overall}/100, demonstrating solid fundamentals across most categories. With a security score of ${scores.security}/100, you've implemented good baseline protections. However, there are still opportunities for improvement that could further strengthen your site's security posture and user experience. Review the detailed findings below for specific recommendations.`;
   } else if (scores.overall >= 60) {
-    title = 'Your Firewall Has Feelings, And I Hurt Them';
-    body = `A ${scores.overall}/100? I've seen better security on a Post-it note. Your site is basically sending out invitations to bad actors. Performance at ${scores.performance}? My grandma's dial-up loaded pages faster. Let's be real: this needs work, but at least you're not completely exposed.`;
+    title = 'Several Areas Require Attention';
+    body = `With a score of ${scores.overall}/100, your site has a foundation to build on but requires attention in key areas. Performance at ${scores.performance}/100 is impacting user experience, and there are security considerations that should be addressed. The good news: most of these issues have straightforward solutions. Prioritize the critical and high-priority fixes listed below.`;
   } else {
-    title = 'WHO DEPLOYED THIS TO PRODUCTION?!';
-    body = `A ${scores.overall}/100 is not a score, it's a cry for help. Your security headers are MIA, your performance makes users age in real-time, and your SEO is so bad even Google pretends you don't exist. This site needs an intervention, not an audit. I'm genuinely concerned about who approved this deployment.`;
+    title = 'Critical Issues Identified - Immediate Action Recommended';
+    body = `Your site scored ${scores.overall}/100, indicating significant issues across multiple categories. Security headers require immediate attention, performance is severely impacting user experience, and SEO visibility is limited. We recommend addressing the critical issues first, then working through high-priority items systematically. See the detailed breakdown below for specific action items.`;
   }
 
   const fixes: RoastFix[] = [];
@@ -1216,7 +1172,7 @@ function generateFallbackRoast(input: RoastInput, reason?: string): RoastResult 
   // Generate LLM report for fallback too
   const llmReport = generateLLMReport(input);
 
-  // Generate twitter roast for fallback
+  // Generate twitter summary for fallback
   const twitterRoast = `${input.url.replace(/^https?:\/\//, '')} scored ${scores.overall}/100. ${title}`.slice(0, 280);
 
   return {
@@ -1227,7 +1183,7 @@ function generateFallbackRoast(input: RoastInput, reason?: string): RoastResult 
     llmReport,
     isFallback: true,
     fallbackReason: reason,
-    persona: input.persona || 'hacker',
+    persona: 'professional',
   };
 }
 
@@ -1365,10 +1321,10 @@ Start with the highest priority items and provide actionable code fixes.`;
 }
 
 /**
- * Build prompt for upload scan roast
+ * Build prompt for upload scan analysis
  */
 function buildUploadPrompt(input: UploadRoastInput): string {
-  return `You are 3RROR_K1NG, a legendary hacker who reviews code with brutal honesty. You speak with a mix of technical expertise and devastating wit. Your reviews are memorable, shareable, and actually helpful.
+  return `You are a senior security consultant providing professional code audits. Your analysis is thorough, objective, and focused on actionable improvements. You communicate clearly, explain business impact, and prioritize recommendations by severity.
 
 CODE SCAN RESULTS:
 - Files Analyzed: ${input.filesCount}
@@ -1393,13 +1349,13 @@ CODE PATTERN ISSUES (${input.codePatterns.issues.length}):
 - Medium: ${input.codePatterns.summary.medium}
 ${input.codePatterns.issues.slice(0, 5).map(i => `  - [${i.severity.toUpperCase()}] ${i.type} in ${i.file}:${i.line}`).join('\n')}
 
-ROAST INTENSITY: ${input.overallScore >= 80 ? 'mild teasing' : input.overallScore >= 50 ? 'firm roasting' : 'scorched earth devastation'}
+ANALYSIS DEPTH: ${input.overallScore >= 80 ? 'highlight strengths with minor recommendations' : input.overallScore >= 50 ? 'balanced analysis with clear priorities' : 'comprehensive review with urgent recommendations'}
 
-Generate a roast in the following JSON format. The roast should be memorable, technically accurate, and include specific references to the actual issues found.
+Generate an analysis report in the following JSON format. The analysis should be professional, technically accurate, and include specific references to the actual issues found.
 
 {
-  "title": "A devastating one-liner roast title (max 80 chars, complete the thought)",
-  "body": "2-3 paragraph roast that references specific findings. Be savage but helpful. Focus on the most critical issues found.",
+  "title": "A clear summary headline (max 80 chars, complete the thought)",
+  "body": "2-3 paragraph professional analysis that references specific findings. Focus on the most critical issues and their business impact.",
   "fixes": [
     {
       "priority": "critical|high|medium|low",
@@ -1418,6 +1374,7 @@ RULES:
 - Be specific - reference actual package names, file paths, or secret types found
 - If secrets were found, that's ALWAYS the #1 priority issue
 - The body should be 100-200 words
+- Maintain a professional, consultative tone
 - Do NOT use markdown formatting in the body text
 
 Return ONLY the JSON, no other text.`;
@@ -1486,15 +1443,15 @@ export async function generateUploadRoast(input: UploadRoastInput): Promise<Roas
   result.llmReport = generateUploadLLMReport(input);
   result.isFallback = false;
 
-  console.log('AI upload roast generated successfully');
+  console.log('AI upload analysis generated successfully');
   return result;
 }
 
 /**
- * Generate fallback roast for upload scans when AI fails
+ * Generate fallback analysis for upload scans when AI fails
  */
 function generateUploadFallbackRoast(input: UploadRoastInput, reason?: string): RoastResult {
-  console.log(`Using fallback upload roast${reason ? `: ${reason}` : ''}`);
+  console.log(`Using fallback upload analysis${reason ? `: ${reason}` : ''}`);
 
   let title: string;
   let body: string;
@@ -1504,24 +1461,24 @@ function generateUploadFallbackRoast(input: UploadRoastInput, reason?: string): 
   const score = input.overallScore;
 
   if (hasSecrets) {
-    title = 'YOUR SECRETS ARE SHOWING';
-    body = `I found ${input.secrets.findings.length} exposed secrets in your code. ${
+    title = 'Critical: Exposed Credentials Detected';
+    body = `Analysis identified ${input.secrets.findings.length} exposed secrets in your codebase. ${
       input.secrets.summary.critical > 0
-        ? `${input.secrets.summary.critical} of them are CRITICAL - we're talking API keys, credentials, the works.`
-        : 'Some of these could give attackers access to your systems.'
-    } This isn't a joke - you need to rotate these credentials IMMEDIATELY and add them to your .gitignore. I've seen production databases get wiped because of exactly this kind of carelessness.`;
+        ? `${input.secrets.summary.critical} are classified as critical, including API keys and credentials.`
+        : 'These could potentially provide unauthorized access to your systems.'
+    } Immediate action required: rotate all affected credentials, move sensitive values to environment variables, and ensure .gitignore is properly configured. This is your highest priority issue.`;
   } else if (hasCriticalDeps) {
-    title = 'Your Dependencies Are A Liability';
-    body = `You've got ${input.dependencies.vulnerabilities.critical} critical vulnerabilities in your dependencies. These aren't just warnings - they're actively exploitable security holes. Run \`npm audit fix\` like your production server depends on it, because it does. Score: ${score}/100.`;
+    title = 'Critical Dependency Vulnerabilities Found';
+    body = `Your codebase contains ${input.dependencies.vulnerabilities.critical} critical vulnerabilities in dependencies. These represent known security issues with available patches. Run \`npm audit fix\` to address most issues automatically, and review any remaining vulnerabilities manually. Score: ${score}/100.`;
   } else if (score >= 80) {
-    title = 'Not Bad, Code Review Champion';
-    body = `Your code scored ${score}/100. That's actually respectable. I found ${input.codePatterns.issues.length} code pattern issues and ${input.dependencies.details.length} dependency concerns, but nothing that screams "I learned to code yesterday." Keep the clean coding practices up.`;
+    title = 'Strong Codebase with Minor Improvements Needed';
+    body = `Your code scored ${score}/100, demonstrating solid development practices. Analysis found ${input.codePatterns.issues.length} code pattern issues and ${input.dependencies.details.length} dependency considerations, all within acceptable ranges. Continue maintaining your current standards while addressing the specific items noted below.`;
   } else if (score >= 50) {
-    title = 'Room For Improvement';
-    body = `A ${score}/100 means you're not completely lost, but you're definitely wandering in the woods. Found ${input.codePatterns.issues.length} code pattern issues that need attention. Time to level up your security game and clean up those patterns.`;
+    title = 'Several Areas Identified for Improvement';
+    body = `With a score of ${score}/100, your codebase has foundational elements in place but requires attention in several areas. Analysis identified ${input.codePatterns.issues.length} code pattern issues that should be addressed. Review the detailed findings below and prioritize the high-severity items.`;
   } else {
-    title = 'THIS CODE NEEDS AN INTERVENTION';
-    body = `A ${score}/100? This codebase is a liability waiting to happen. Between the ${input.codePatterns.issues.length} code pattern issues and ${input.dependencies.details.length} dependency vulnerabilities, I'm genuinely concerned. Time for a serious code review session.`;
+    title = 'Comprehensive Review Recommended';
+    body = `Your code scored ${score}/100, indicating significant areas requiring attention. With ${input.codePatterns.issues.length} code pattern issues and ${input.dependencies.details.length} dependency vulnerabilities identified, we recommend a systematic review starting with critical and high-priority items. See the detailed breakdown below for specific recommendations.`;
   }
 
   const fixes: RoastFix[] = [];

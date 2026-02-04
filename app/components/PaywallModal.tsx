@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Modal } from './Modal';
-import { GlitchText } from './GlitchText';
 import { PRICING } from '@/lib/constants';
 import { useAuth } from '@/lib/auth-context';
 import clsx from 'clsx';
@@ -150,25 +149,18 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
     return (
       <Modal isOpen={isOpen} onClose={handleClose} showCloseButton={false} className="max-w-md max-h-[90vh] overflow-y-auto">
         <div className="relative overflow-hidden">
-          {/* Animated background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-terminal/10 via-transparent to-neon-cyan/10 animate-pulse" />
-
           <div className="relative p-6 sm:p-8">
             {/* Header */}
             <div className="text-center mb-5">
-              <div className="inline-block px-3 py-1 bg-danger/20 text-danger text-xs font-bold rounded-full mb-3 animate-pulse">
+              <div className="inline-block px-3 py-1 bg-danger/10 text-danger text-xs font-bold rounded-full mb-3">
                 WAIT — EXCLUSIVE OFFER
               </div>
 
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-100 mb-2">
-                <GlitchText
-                  text="One Last Chance!"
-                  glitchIntensity="medium"
-                  as="span"
-                />
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                One Last Chance!
               </h2>
 
-              <p className="text-gray-400 text-sm sm:text-base">
+              <p className="text-gray-500 text-sm sm:text-base">
                 Get your first month of Pro for just
               </p>
             </div>
@@ -176,23 +168,23 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             {/* Price display */}
             <div className="text-center mb-5">
               <div className="inline-flex items-baseline gap-2">
-                <span className="text-xl sm:text-2xl text-gray-500 line-through">
+                <span className="text-xl sm:text-2xl text-gray-400 line-through">
                   ${PRICING.PRO_MONTHLY}
                 </span>
-                <span className="text-4xl sm:text-5xl font-bold text-terminal">
+                <span className="text-4xl sm:text-5xl font-bold text-success">
                   ${PRICING.EXIT_INTENT_DISCOUNT_PRICE}
                 </span>
               </div>
               <div className="mt-2">
-                <span className="inline-block px-3 py-1 bg-terminal/20 text-terminal text-sm font-bold rounded-full">
+                <span className="inline-block px-3 py-1 bg-success/10 text-success text-sm font-bold rounded-full">
                   {PRICING.EXIT_INTENT_DISCOUNT_PERCENT}% OFF
                 </span>
               </div>
             </div>
 
             {/* What you get */}
-            <div className="bg-void-100 rounded-lg p-4 mb-5">
-              <p className="text-sm text-gray-400 font-medium mb-2">What you get:</p>
+            <div className="bg-gray-50 rounded-xl p-4 mb-5 border border-gray-100">
+              <p className="text-sm text-gray-500 font-medium mb-2">What you get:</p>
               <ul className="space-y-1.5">
                 {[
                   `${PRICING.PRO_SCANS_PER_MONTH} scans per month`,
@@ -200,8 +192,8 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                   'Full security, SEO & accessibility audits',
                   'Cancel anytime',
                 ].map((feature, i) => (
-                  <li key={i} className="flex items-center gap-2 text-sm text-gray-300">
-                    <svg className="w-4 h-4 text-terminal flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <li key={i} className="flex items-center gap-2 text-sm text-gray-700">
+                    <svg className="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <span>{feature}</span>
@@ -236,10 +228,10 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                 onClick={() => handleCheckout('discount')}
                 disabled={isLoading !== null}
                 className={clsx(
-                  'w-full px-6 py-3 sm:py-4 font-bold rounded-lg transition-all duration-200',
-                  'bg-gradient-to-r from-terminal to-neon-cyan text-void',
-                  'hover:from-terminal-bright hover:to-neon-cyan',
-                  'hover:shadow-lg hover:shadow-terminal/25',
+                  'w-full px-6 py-3 sm:py-4 font-bold rounded-xl transition-all duration-200',
+                  'bg-primary text-white',
+                  'hover:bg-primary-600',
+                  'hover:shadow-lg',
                   'disabled:opacity-50 disabled:cursor-not-allowed',
                   'active:scale-[0.98]'
                 )}
@@ -259,7 +251,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
 
               <button
                 onClick={handleDecline}
-                className="w-full px-6 py-2 text-gray-500 hover:text-gray-400 transition-colors text-sm"
+                className="w-full px-6 py-2 text-gray-500 hover:text-gray-700 transition-colors text-sm"
               >
                 No thanks, I&apos;ll pay full price later
               </button>
@@ -292,18 +284,14 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             </svg>
           </div>
 
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-100 mb-2">
-            <GlitchText
-              text="Daily Limit Reached"
-              glitchIntensity="medium"
-              as="span"
-            />
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+            Daily Limit Reached
           </h2>
 
-          <p className="text-gray-400 text-sm sm:text-base">
+          <p className="text-gray-500 text-sm sm:text-base">
             You&apos;ve used all {PRICING.FREE_SCANS_PER_DAY} free scans for today.
             <br />
-            Upgrade to keep roasting.
+            Upgrade to keep analyzing.
           </p>
         </div>
 
@@ -321,8 +309,8 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             onClick={() => handleCheckout('monthly')}
             disabled={isLoading !== null}
             className={clsx(
-              'w-full p-4 rounded-lg border-2 border-terminal bg-terminal/5',
-              'hover:bg-terminal/10 transition-all',
+              'w-full p-4 rounded-xl border-2 border-primary bg-primary/5',
+              'hover:bg-primary/10 transition-all',
               'disabled:opacity-50 disabled:cursor-not-allowed',
               'group'
             )}
@@ -330,24 +318,24 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             <div className="flex items-center justify-between">
               <div className="text-left">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-terminal text-base sm:text-lg">Pro Monthly</span>
-                  <span className="px-2 py-0.5 text-xs font-bold bg-terminal text-void rounded">
+                  <span className="font-bold text-primary text-base sm:text-lg">Pro Monthly</span>
+                  <span className="px-2 py-0.5 text-xs font-bold bg-primary text-white rounded">
                     BEST
                   </span>
                 </div>
-                <p className="text-xs sm:text-sm text-gray-400 mt-1">
+                <p className="text-xs sm:text-sm text-gray-500 mt-1">
                   {PRICING.PRO_SCANS_PER_MONTH} scans/month + priority queue
                 </p>
               </div>
               <div className="text-right">
                 {isLoading === 'monthly' ? (
-                  <svg className="animate-spin h-6 w-6 text-terminal" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-6 w-6 text-primary" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
                 ) : (
                   <>
-                    <span className="text-xl sm:text-2xl font-bold text-terminal">${PRICING.PRO_MONTHLY}</span>
+                    <span className="text-xl sm:text-2xl font-bold text-primary">${PRICING.PRO_MONTHLY}</span>
                     <span className="text-gray-500 text-sm">/mo</span>
                   </>
                 )}
@@ -360,32 +348,32 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             onClick={() => handleCheckout('yearly')}
             disabled={isLoading !== null}
             className={clsx(
-              'w-full p-4 rounded-lg border border-void-200 bg-void-100',
-              'hover:border-neon-cyan/50 hover:bg-void-100/80 transition-all',
+              'w-full p-4 rounded-xl border border-gray-200 bg-white',
+              'hover:border-primary/50 hover:bg-gray-50 transition-all',
               'disabled:opacity-50 disabled:cursor-not-allowed'
             )}
           >
             <div className="flex items-center justify-between">
               <div className="text-left">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-gray-100 text-base sm:text-lg">Pro Yearly</span>
-                  <span className="px-2 py-0.5 text-xs font-bold bg-neon-cyan/20 text-neon-cyan rounded">
+                  <span className="font-bold text-gray-900 text-base sm:text-lg">Pro Yearly</span>
+                  <span className="px-2 py-0.5 text-xs font-bold bg-success/10 text-success rounded">
                     SAVE 43%
                   </span>
                 </div>
-                <p className="text-xs sm:text-sm text-gray-400 mt-1">
+                <p className="text-xs sm:text-sm text-gray-500 mt-1">
                   {PRICING.PRO_SCANS_PER_MONTH} scans/month, billed annually
                 </p>
               </div>
               <div className="text-right">
                 {isLoading === 'yearly' ? (
-                  <svg className="animate-spin h-6 w-6 text-neon-cyan" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-6 w-6 text-success" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
                 ) : (
                   <>
-                    <span className="text-xl sm:text-2xl font-bold text-gray-100">${PRICING.PRO_YEARLY}</span>
+                    <span className="text-xl sm:text-2xl font-bold text-gray-900">${PRICING.PRO_YEARLY}</span>
                     <span className="text-gray-500 text-sm">/yr</span>
                   </>
                 )}
@@ -398,27 +386,27 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             onClick={() => handleCheckout('pack')}
             disabled={isLoading !== null}
             className={clsx(
-              'w-full p-4 rounded-lg border border-void-200 bg-void-100',
-              'hover:border-neon-purple/50 hover:bg-void-100/80 transition-all',
+              'w-full p-4 rounded-xl border border-gray-200 bg-white',
+              'hover:border-primary/50 hover:bg-gray-50 transition-all',
               'disabled:opacity-50 disabled:cursor-not-allowed'
             )}
           >
             <div className="flex items-center justify-between">
               <div className="text-left">
-                <span className="font-bold text-gray-100 text-base sm:text-lg">Scan Pack</span>
-                <p className="text-xs sm:text-sm text-gray-400 mt-1">
+                <span className="font-bold text-gray-900 text-base sm:text-lg">Scan Pack</span>
+                <p className="text-xs sm:text-sm text-gray-500 mt-1">
                   {PRICING.SCAN_PACK_SCANS} scans, one-time purchase
                 </p>
               </div>
               <div className="text-right">
                 {isLoading === 'pack' ? (
-                  <svg className="animate-spin h-6 w-6 text-neon-purple" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-6 w-6 text-primary" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
                 ) : (
                   <>
-                    <span className="text-xl sm:text-2xl font-bold text-gray-100">${PRICING.SCAN_PACK}</span>
+                    <span className="text-xl sm:text-2xl font-bold text-gray-900">${PRICING.SCAN_PACK}</span>
                     <span className="text-gray-500 text-sm"> once</span>
                   </>
                 )}
@@ -431,7 +419,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
         <div className="mt-5 text-center">
           <button
             onClick={handleDecline}
-            className="text-sm text-gray-500 hover:text-gray-400 transition-colors"
+            className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
           >
             {discountExpired ? 'Close' : 'Come back tomorrow for free scans'}
           </button>

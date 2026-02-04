@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Modal } from './Modal';
-import { GlitchText } from './GlitchText';
 import { useAuth } from '@/lib/auth-context';
 
 const STORAGE_KEY = 'exit_intent_scan_shown';
@@ -92,37 +91,32 @@ export function ExitIntentScan({ onScanUrl }: ExitIntentScanProps) {
       <div className="p-6 sm:p-8">
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="text-5xl mb-4">
-            <GlitchText
-              text="WAIT"
-              glitchIntensity="high"
-              as="span"
-              className="text-danger"
-            />
+          <div className="text-5xl mb-4 font-bold text-danger">
+            WAIT
           </div>
 
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-100 mb-2">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
             Try one scan free
           </h2>
 
-          <p className="text-gray-400 text-sm">
+          <p className="text-gray-500 text-sm">
             See how your favorite site scores. No signup required.
           </p>
         </div>
 
         {/* URL Selection */}
         <div className="mb-6">
-          <p className="text-xs text-gray-500 mb-3 text-center">Pick a site to roast:</p>
+          <p className="text-xs text-gray-500 mb-3 text-center">Pick a site to analyze:</p>
           <div className="grid grid-cols-2 gap-2">
             {EXAMPLE_URLS.map((url) => (
               <button
                 key={url}
                 type="button"
                 onClick={() => setSelectedUrl(url)}
-                className={`px-4 py-3 rounded-lg border text-sm font-medium transition-all ${
+                className={`px-4 py-3 rounded-xl border text-sm font-medium transition-all ${
                   selectedUrl === url
-                    ? 'bg-terminal/20 border-terminal text-terminal'
-                    : 'bg-void-100 border-void-200 text-gray-400 hover:border-gray-500'
+                    ? 'bg-primary/10 border-primary text-primary'
+                    : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-300'
                 }`}
               >
                 {url}
@@ -134,7 +128,7 @@ export function ExitIntentScan({ onScanUrl }: ExitIntentScanProps) {
         {/* CTA */}
         <button
           onClick={handleTryScan}
-          className="w-full px-6 py-4 bg-terminal text-void font-bold rounded-lg hover:bg-terminal-bright transition-colors active:scale-[0.98]"
+          className="w-full px-6 py-4 bg-primary text-white font-bold rounded-xl hover:bg-primary-600 transition-colors active:scale-[0.98]"
         >
           Scan {selectedUrl}
         </button>

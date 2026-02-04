@@ -2,7 +2,6 @@
 
 import { useState, FormEvent } from 'react';
 import { Modal } from './Modal';
-import { GlitchText } from './GlitchText';
 import { setEmailCaptured } from '@/lib/conversion-tracking';
 import clsx from 'clsx';
 
@@ -62,12 +61,12 @@ export function EmailCaptureModal({
       closeOnOutsideClick={false}
       closeOnEscape={false}
     >
-      <div className="p-8">
+      <div className="p-8 bg-white">
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-terminal/10 border border-terminal/30 mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 border border-primary/30 mb-4">
             <svg
-              className="w-8 h-8 text-terminal"
+              className="w-8 h-8 text-primary"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -81,15 +80,11 @@ export function EmailCaptureModal({
             </svg>
           </div>
 
-          <h2 className="text-2xl font-bold text-gray-100 mb-2">
-            <GlitchText
-              text="One more thing..."
-              glitchIntensity="low"
-              as="span"
-            />
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            One more thing...
           </h2>
 
-          <p className="text-gray-400 text-sm">
+          <p className="text-gray-500 text-sm">
             Enter your email to continue scanning. We&apos;ll save your results and
             send you security alerts if we find critical issues.
           </p>
@@ -109,13 +104,13 @@ export function EmailCaptureModal({
                 setEmail(e.target.value);
                 setError('');
               }}
-              placeholder="hacker@example.com"
+              placeholder="you@example.com"
               className={clsx(
-                'w-full px-4 py-3 bg-void-100 border rounded-lg',
-                'text-gray-100 placeholder:text-gray-600',
-                'focus:outline-none focus:border-terminal focus:ring-1 focus:ring-terminal',
+                'w-full px-4 py-3 bg-gray-50 border rounded-xl',
+                'text-gray-800 placeholder:text-gray-400',
+                'focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10',
                 'transition-colors',
-                error ? 'border-danger' : 'border-void-200'
+                error ? 'border-danger' : 'border-gray-200'
               )}
               autoFocus
               disabled={isLoading}
@@ -129,9 +124,9 @@ export function EmailCaptureModal({
             type="submit"
             disabled={isLoading || !email}
             className={clsx(
-              'w-full px-6 py-3 font-bold rounded-lg transition-all duration-200',
-              'bg-terminal text-void',
-              'hover:bg-terminal-bright hover:shadow-lg hover:shadow-terminal/25',
+              'w-full px-6 py-3 font-semibold rounded-xl transition-all duration-200',
+              'bg-primary text-white',
+              'hover:bg-primary-600 hover:shadow-lg hover:shadow-primary/25',
               'disabled:opacity-50 disabled:cursor-not-allowed',
               'active:scale-[0.98]'
             )}
@@ -163,7 +158,7 @@ export function EmailCaptureModal({
         </form>
 
         {/* Privacy note */}
-        <p className="mt-4 text-xs text-gray-600 text-center">
+        <p className="mt-4 text-xs text-gray-500 text-center">
           No spam, ever. We only email about critical security issues.
         </p>
       </div>

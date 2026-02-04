@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from 'react';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
-import { GlitchText } from './GlitchText';
 
 interface LoadingStateProps {
   phase?: string;
@@ -13,61 +12,67 @@ interface LoadingStateProps {
   className?: string;
 }
 
-interface TerminalLine {
-  text: string;
-  type: 'command' | 'info' | 'success' | 'warning' | 'error' | 'progress';
-  timestamp?: string;
-}
+// SVG icons for each audit type
+const AuditIcon = ({ type, className }: { type: string; className?: string }) => {
+  const iconClass = clsx('w-5 h-5', className);
 
-// Map phase names to CLI-style descriptions
-const PHASE_CLI_INFO: Record<string, { start: string; detail: string }> = {
-  security: {
-    start: 'Running security audit...',
-    detail: 'Checking headers, HTTPS, CSP, HSTS, XSS protection',
-  },
-  seo: {
-    start: 'Running SEO audit...',
-    detail: 'Analyzing meta tags, OpenGraph, structured data',
-  },
-  accessibility: {
-    start: 'Running accessibility audit...',
-    detail: 'Testing WCAG 2.1 compliance with axe-core',
-  },
-  code_quality: {
-    start: 'Running code quality audit...',
-    detail: 'Checking console errors, deprecated APIs, bundle size',
-  },
-  tech_stack: {
-    start: 'Detecting tech stack...',
-    detail: 'Identifying frameworks, libraries, CDNs',
-  },
-  resources: {
-    start: 'Analyzing resources...',
-    detail: 'Auditing network waterfall, asset optimization',
-  },
-  extended_audits: {
-    start: 'Running deep scan...',
-    detail: 'Extended security and performance checks',
-  },
-  performance: {
-    start: 'Running Lighthouse audit...',
-    detail: 'Measuring Core Web Vitals, LCP, FID, CLS',
-  },
-  roast: {
-    start: 'Generating AI roast...',
-    detail: 'Claude is judging your website...',
-  },
-};
-
-const AUDIT_ICONS: Record<string, string> = {
-  'Security': '🛡️',
-  'SEO': '🔍',
-  'Accessibility': '♿',
-  'Code Quality': '🧹',
-  'Tech Stack': '⚙️',
-  'Resources': '📊',
-  'Deep Scan': '🔬',
-  'Performance': '⚡',
+  switch (type) {
+    case 'Security':
+      return (
+        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+      );
+    case 'SEO':
+      return (
+        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      );
+    case 'Accessibility':
+      return (
+        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      );
+    case 'Code Quality':
+      return (
+        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+        </svg>
+      );
+    case 'Tech Stack':
+      return (
+        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      );
+    case 'Resources':
+      return (
+        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      );
+    case 'Deep Scan':
+      return (
+        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+        </svg>
+      );
+    case 'Performance':
+      return (
+        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      );
+    default:
+      return (
+        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      );
+  }
 };
 
 const ALL_AUDITS = ['Security', 'SEO', 'Accessibility', 'Code Quality', 'Tech Stack', 'Resources', 'Deep Scan', 'Performance'];
@@ -83,62 +88,7 @@ const DISPLAY_TO_PHASE: Record<string, string> = {
   'Performance': 'performance',
 };
 
-function getTimestamp(): string {
-  return new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-}
-
 export function LoadingState({ phase, percentage = 0, completedAudits = [], currentPhase = '', className }: LoadingStateProps) {
-  const [terminalLines, setTerminalLines] = useState<TerminalLine[]>([]);
-  const [lastPhase, setLastPhase] = useState<string>('');
-  const [lastCompleted, setLastCompleted] = useState<string[]>([]);
-  const terminalRef = useRef<HTMLDivElement>(null);
-
-  // Initialize terminal
-  useEffect(() => {
-    setTerminalLines([
-      { text: '$ 3rror scan --verbose', type: 'command', timestamp: getTimestamp() },
-      { text: 'Initializing scan engine...', type: 'info', timestamp: getTimestamp() },
-    ]);
-  }, []);
-
-  // Track phase changes and add real terminal output
-  useEffect(() => {
-    if (currentPhase && currentPhase !== lastPhase && currentPhase !== 'pending') {
-      const phaseInfo = PHASE_CLI_INFO[currentPhase];
-      if (phaseInfo) {
-        setTerminalLines(prev => [
-          ...prev,
-          { text: '', type: 'info' },
-          { text: phaseInfo.start, type: 'progress', timestamp: getTimestamp() },
-          { text: `  └─ ${phaseInfo.detail}`, type: 'info' },
-        ]);
-      }
-      setLastPhase(currentPhase);
-    }
-  }, [currentPhase, lastPhase]);
-
-  // Track completed audits
-  useEffect(() => {
-    const newCompleted = completedAudits.filter(a => !lastCompleted.includes(a));
-    if (newCompleted.length > 0) {
-      const newLines: TerminalLine[] = newCompleted.map(audit => ({
-        text: `✓ ${audit} audit complete`,
-        type: 'success' as const,
-        timestamp: getTimestamp(),
-      }));
-      setTerminalLines(prev => [...prev, ...newLines]);
-      setLastCompleted(completedAudits);
-    }
-  }, [completedAudits, lastCompleted]);
-
-  // Auto-scroll terminal
-  useEffect(() => {
-    if (terminalRef.current) {
-      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
-    }
-  }, [terminalLines]);
-
-  // Calculate ring properties
   const circumference = 2 * Math.PI * 54;
   const strokeDashoffset = circumference - (circumference * percentage) / 100;
 
@@ -155,97 +105,60 @@ export function LoadingState({ phase, percentage = 0, completedAudits = [], curr
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-6"
       >
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-100 mb-1">
-          <GlitchText text="SCANNING" glitchIntensity="low" />
+        <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1 font-display">
+          Analyzing Website
         </h2>
-        <p className="text-terminal font-mono text-xs sm:text-sm">{phase}</p>
+        <p className="text-primary text-sm">{phase}</p>
       </motion.div>
 
-      {/* Main Terminal */}
+      {/* Main Progress Card */}
       <motion.div
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         className="w-full mb-6"
       >
-        <div className="bg-[#0a0a0a] rounded-xl border border-void-100 overflow-hidden shadow-2xl">
-          {/* Terminal header */}
-          <div className="flex items-center justify-between px-4 py-2.5 bg-[#151515] border-b border-void-100">
-            <div className="flex items-center gap-3">
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-[#ff5f57]" />
-                <div className="w-3 h-3 rounded-full bg-[#febc2e]" />
-                <div className="w-3 h-3 rounded-full bg-[#28c840]" />
-              </div>
-              <span className="text-xs text-gray-500 font-mono">3rror_k1ng — scan</span>
-            </div>
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-card overflow-hidden">
+          {/* Progress header */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50/50">
+            <span className="text-sm font-medium text-gray-600">Audit Progress</span>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono text-terminal">{percentage}%</span>
-              <div className="w-20 h-1.5 bg-void-100 rounded-full overflow-hidden">
+              <span className="text-sm font-semibold text-primary">{percentage}%</span>
+              <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-terminal"
+                  className="h-full bg-gradient-to-r from-primary to-primary-400 rounded-full"
                   initial={{ width: 0 }}
                   animate={{ width: `${percentage}%` }}
-                  transition={{ duration: 0.5 }}
+                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                 />
               </div>
             </div>
           </div>
 
-          {/* Terminal content */}
-          <div
-            ref={terminalRef}
-            className="p-4 font-mono text-xs sm:text-sm h-48 sm:h-56 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-void-100"
-          >
-            <div className="space-y-0.5">
-              {terminalLines.map((line, i) => (
-                <div
-                  key={i}
-                  className={clsx(
-                    'flex gap-2',
-                    line.type === 'command' && 'text-gray-300',
-                    line.type === 'info' && 'text-gray-500',
-                    line.type === 'success' && 'text-terminal',
-                    line.type === 'warning' && 'text-neon-yellow',
-                    line.type === 'error' && 'text-danger',
-                    line.type === 'progress' && 'text-neon-cyan',
-                  )}
-                >
-                  {line.timestamp && (
-                    <span className="text-gray-600 flex-shrink-0">[{line.timestamp}]</span>
-                  )}
-                  <span className="whitespace-pre-wrap">{line.text}</span>
-                </div>
-              ))}
-
-              {/* Current activity indicator */}
-              {currentPhase && currentPhase !== 'complete' && (
-                <div className="flex gap-2 text-neon-cyan">
-                  <span className="text-gray-600">[{getTimestamp()}]</span>
-                  <span className="flex items-center gap-1">
-                    <span className="animate-pulse">●</span>
-                    <span>Processing...</span>
-                  </span>
-                </div>
-              )}
-
-              {/* Cursor - CSS animation instead of Framer Motion */}
-              <div className="flex items-center gap-1 text-gray-400 mt-1">
-                <span className="text-terminal">$</span>
-                <span className="w-2 h-4 bg-terminal cursor-blink" />
-              </div>
+          {/* Current activity */}
+          <div className="p-6">
+            <div className="flex items-center justify-center gap-3">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-primary" />
+              </span>
+              <span className="text-gray-600">
+                {currentPhase === 'roast' ? 'Generating AI analysis...' :
+                 currentPhase === 'complete' ? 'Finalizing report...' :
+                 `Running ${currentPhase.replace('_', ' ')} audit...`}
+              </span>
             </div>
           </div>
         </div>
       </motion.div>
 
-      {/* Compact Audit Grid */}
+      {/* Audit Grid */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
+        transition={{ delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
         className="w-full"
       >
-        <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 sm:gap-2">
+        <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
           {ALL_AUDITS.map((audit) => {
             const isComplete = completedAudits.includes(audit);
             const isCurrent = isCurrentAudit(audit);
@@ -254,24 +167,38 @@ export function LoadingState({ phase, percentage = 0, completedAudits = [], curr
               <div
                 key={audit}
                 className={clsx(
-                  'flex flex-col items-center p-2 rounded-lg border transition-all duration-300',
-                  isComplete && 'bg-terminal/10 border-terminal/40',
-                  isCurrent && 'bg-neon-cyan/10 border-neon-cyan/40',
-                  !isComplete && !isCurrent && 'bg-void-50/30 border-void-100/50 opacity-40'
+                  'flex flex-col items-center p-3 rounded-xl border transition-all duration-300',
+                  isComplete && 'bg-success/5 border-success/30',
+                  isCurrent && 'bg-primary/5 border-primary/30 shadow-sm',
+                  !isComplete && !isCurrent && 'bg-gray-50 border-gray-100 opacity-50'
                 )}
               >
-                <span className="text-lg sm:text-xl">{AUDIT_ICONS[audit]}</span>
+                <AuditIcon
+                  type={audit}
+                  className={clsx(
+                    isComplete && 'text-success',
+                    isCurrent && 'text-primary',
+                    !isComplete && !isCurrent && 'text-gray-400'
+                  )}
+                />
                 <span className={clsx(
-                  'text-[8px] sm:text-[10px] font-medium text-center leading-tight mt-0.5',
-                  isComplete && 'text-terminal',
-                  isCurrent && 'text-neon-cyan',
-                  !isComplete && !isCurrent && 'text-gray-600'
+                  'text-[9px] sm:text-[10px] font-medium text-center leading-tight mt-1',
+                  isComplete && 'text-success',
+                  isCurrent && 'text-primary',
+                  !isComplete && !isCurrent && 'text-gray-400'
                 )}>
                   {audit.split(' ')[0]}
                 </span>
-                {isComplete && <span className="text-terminal text-[10px]">✓</span>}
+                {isComplete && (
+                  <svg className="w-3 h-3 text-success mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
                 {isCurrent && (
-                  <span className="text-neon-cyan text-[10px] animate-pulse">●</span>
+                  <span className="relative flex h-2 w-2 mt-0.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+                  </span>
                 )}
               </div>
             );
@@ -279,7 +206,7 @@ export function LoadingState({ phase, percentage = 0, completedAudits = [], curr
         </div>
       </motion.div>
 
-      {/* Circular Progress - Compact */}
+      {/* Circular Progress */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -287,7 +214,15 @@ export function LoadingState({ phase, percentage = 0, completedAudits = [], curr
         className="mt-6 flex items-center justify-center gap-4"
       >
         <div className="relative">
-          <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 120 120">
+          {/* Ambient glow */}
+          <div
+            className="absolute inset-0 rounded-full blur-xl"
+            style={{
+              background: `radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, transparent 70%)`,
+              transform: 'scale(1.5)',
+            }}
+          />
+          <svg className="w-16 h-16 transform -rotate-90 relative" viewBox="0 0 120 120">
             <circle
               cx="60"
               cy="60"
@@ -295,34 +230,29 @@ export function LoadingState({ phase, percentage = 0, completedAudits = [], curr
               stroke="currentColor"
               strokeWidth="4"
               fill="transparent"
-              className="text-void-100"
+              strokeDasharray="4 4"
+              className="text-gray-200"
             />
             <circle
               cx="60"
               cy="60"
               r="54"
-              stroke="url(#scanGradient)"
+              stroke="currentColor"
               strokeWidth="4"
               fill="transparent"
               strokeDasharray={circumference}
               strokeDashoffset={strokeDashoffset}
-              className="transition-all duration-500 ease-out"
+              className="text-primary transition-all duration-500 ease-premium"
               strokeLinecap="round"
             />
-            <defs>
-              <linearGradient id="scanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#00FF41" />
-                <stop offset="100%" stopColor="#00E5FF" />
-              </linearGradient>
-            </defs>
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-terminal font-mono text-sm font-bold">{percentage}%</span>
+            <span className="text-primary font-semibold text-sm font-display">{percentage}%</span>
           </div>
         </div>
         <div className="text-left">
           <p className="text-xs text-gray-400">Completed</p>
-          <p className="text-sm font-bold text-gray-200">{completedAudits.length} / 8 audits</p>
+          <p className="text-sm font-semibold text-gray-700">{completedAudits.length} / 8 audits</p>
         </div>
       </motion.div>
     </div>

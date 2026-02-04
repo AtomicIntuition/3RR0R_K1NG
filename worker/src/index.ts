@@ -5,7 +5,7 @@ import { runScan, runUploadScan, closeBrowser } from './scanner.js';
 import { updateScan, updateMonitoredSite, recordAlert, getScan } from './lib/supabase.js';
 import { sendScoreDropAlert } from './lib/email.js';
 
-console.log('Starting 3RROR_K1NG Worker...');
+console.log('Starting 3RK Worker...');
 
 // Process scan jobs
 async function processScanJob(job: Job<ScanJobData>): Promise<void> {
@@ -14,7 +14,7 @@ async function processScanJob(job: Job<ScanJobData>): Promise<void> {
     url,
     scanType,
     files,
-    persona = 'hacker',
+    persona = 'professional',
     skipRoast = false,
     // Monitoring fields
     isMonitoredScan,

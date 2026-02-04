@@ -38,7 +38,7 @@ interface ScreenshotButtonProps {
 
 export function ScreenshotButton({
   scanData,
-  filename = 'roast',
+  filename = 'report',
   className,
 }: ScreenshotButtonProps) {
   const [isCapturing, setIsCapturing] = useState(false);
@@ -78,7 +78,7 @@ export function ScreenshotButton({
       }
 
       const canvas = await html2canvas(element as HTMLElement, {
-        backgroundColor: '#0a0a0f',
+        backgroundColor: '#ffffff',
         scale: 2, // 2x for high quality (1200px output)
         useCORS: true,
         logging: false,
@@ -114,7 +114,7 @@ export function ScreenshotButton({
     <button
       onClick={captureScreenshot}
       disabled={isCapturing}
-      className={`screenshot-ignore flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-terminal/10 border border-terminal/30 text-terminal rounded-lg hover:bg-terminal/20 transition-all disabled:opacity-50 ${className || ''}`}
+      className={`screenshot-ignore flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-primary/10 border border-primary/30 text-primary rounded-xl hover:bg-primary/20 transition-all disabled:opacity-50 ${className || ''}`}
       title="Download shareable screenshot"
     >
       {isCapturing ? (

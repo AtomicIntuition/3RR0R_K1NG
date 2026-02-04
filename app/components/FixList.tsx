@@ -2,55 +2,79 @@
 
 import clsx from 'clsx';
 import type { RoastFix } from '@/types/scan';
+import {
+  AlertCircle,
+  AlertTriangle,
+  FileText,
+  Lightbulb,
+  Zap,
+  Shield,
+  Search,
+  Accessibility,
+  Code,
+  Clock,
+  Wrench,
+  CheckCircle,
+} from 'lucide-react';
 
 interface FixListProps {
   fixes: RoastFix[];
   className?: string;
 }
 
-const PRIORITY_STYLES = {
+const PRIORITY_CONFIG = {
   critical: {
-    badge: 'bg-danger/20 text-danger border-danger/50',
-    icon: '🚨',
-    glow: 'hover:shadow-danger/10',
+    badge: 'bg-danger/10 text-danger border-danger/30',
+    Icon: AlertCircle,
   },
   high: {
-    badge: 'bg-neon-orange/20 text-neon-orange border-neon-orange/50',
-    icon: '⚠️',
-    glow: 'hover:shadow-neon-orange/10',
+    badge: 'bg-warning/10 text-warning border-warning/30',
+    Icon: AlertTriangle,
   },
   medium: {
-    badge: 'bg-neon-yellow/20 text-neon-yellow border-neon-yellow/50',
-    icon: '📝',
-    glow: 'hover:shadow-neon-yellow/10',
+    badge: 'bg-primary/10 text-primary border-primary/30',
+    Icon: FileText,
   },
   low: {
-    badge: 'bg-neon-cyan/20 text-neon-cyan border-neon-cyan/50',
-    icon: '💡',
-    glow: 'hover:shadow-neon-cyan/10',
+    badge: 'bg-gray-100 text-gray-500 border-gray-200',
+    Icon: Lightbulb,
   },
 };
 
-const EFFORT_LABELS = {
-  quick: { text: '~15 min', color: 'text-terminal' },
-  medium: { text: '~1 hour', color: 'text-neon-yellow' },
-  significant: { text: '~1 day+', color: 'text-neon-orange' },
+const EFFORT_CONFIG = {
+  quick: {
+    text: 'Quick fix',
+    color: 'text-success',
+    Icon: Zap,
+  },
+  medium: {
+    text: 'Moderate effort',
+    color: 'text-warning',
+    Icon: Clock,
+  },
+  significant: {
+    text: 'Significant effort',
+    color: 'text-danger',
+    Icon: Wrench,
+  },
 };
 
 const CATEGORY_ICONS = {
-  performance: '⚡',
-  security: '🛡️',
-  seo: '🔍',
-  accessibility: '♿',
-  code_quality: '🧹',
+  performance: Zap,
+  security: Shield,
+  seo: Search,
+  accessibility: Accessibility,
+  code_quality: Code,
 };
 
 export function FixList({ fixes, className }: FixListProps) {
   if (!fixes || fixes.length === 0) {
     return (
-      <div className={clsx('text-center py-8 text-gray-500', className)}>
-        <span className="text-4xl mb-4 block">🎉</span>
-        <p>No critical issues found. Nice work!</p>
+      <div className={clsx('text-center py-8', className)}>
+        <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-success/10 flex items-center justify-center">
+          <CheckCircle className="w-6 h-6 text-success" />
+        </div>
+        <p className="text-gray-500">No critical issues found. Nice work!</p>
       </div>
     );
   }
@@ -58,29 +82,29 @@ export function FixList({ fixes, className }: FixListProps) {
   return (
     <div className={className}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-bold text-gray-100">
-          <span className="text-terminal">&gt;</span> Priority Fixes
+        <h3 className="text-lg font-semibold text-gray-900">
+          Priority Fixes
         </h3>
-        <span className="text-xs text-gray-500 font-mono">
+        <span className="text-sm text-gray-500">
           {fixes.length} item{fixes.length !== 1 ? 's' : ''}
         </span>
       </div>
 
       <ul className="space-y-3">
         {fixes.map((fix, index) => {
-          const priorityStyle = PRIORITY_STYLES[fix.priority];
-          const effortLabel = EFFORT_LABELS[fix.effort];
-          const categoryIcon = CATEGORY_ICONS[fix.category];
+          const priorityConfig = PRIORITY_CONFIG[fix.priority];
+          const effortConfig = EFFORT_CONFIG[fix.effort];
+          const CategoryIcon = CATEGORY_ICONS[fix.category] || Code;
+          const PriorityIcon = priorityConfig.Icon;
+          const EffortIcon = effortConfig.Icon;
 
           return (
             <li
               key={index}
               className={clsx(
-                'group p-4 rounded-lg bg-void-50 border border-void-100',
+                'group p-4 rounded-xl bg-white border border-gray-200',
                 'transition-all duration-200',
-                'hover:border-void-200',
-                'hover:shadow-lg',
-                priorityStyle.glow
+                'hover:border-gray-300 hover:shadow-sm'
               )}
             >
               {/* Header */}
@@ -89,56 +113,55 @@ export function FixList({ fixes, className }: FixListProps) {
                   {/* Priority badge */}
                   <span
                     className={clsx(
-                      'inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-mono uppercase shrink-0',
+                      'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium uppercase shrink-0',
                       'border',
-                      priorityStyle.badge
+                      priorityConfig.badge
                     )}
                   >
-                    <span>{priorityStyle.icon}</span>
+                    <PriorityIcon size={14} />
                     <span>{fix.priority}</span>
                   </span>
 
                   {/* Title */}
-                  <h4 className="font-medium text-gray-200 leading-tight">
+                  <h4 className="font-medium text-gray-900 leading-tight pt-0.5">
                     {fix.title}
                   </h4>
                 </div>
 
                 {/* Category icon */}
-                <span
-                  className="text-lg shrink-0"
+                <div
+                  className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center shrink-0"
                   title={fix.category.replace('_', ' ')}
                 >
-                  {categoryIcon}
-                </span>
+                  <CategoryIcon size={16} className="text-gray-600" />
+                </div>
               </div>
 
               {/* Description */}
-              <p className="text-sm text-gray-400 mb-3 pl-0 sm:pl-[72px]">
+              <p className="text-sm text-gray-600 mb-3 pl-0 sm:pl-[100px]">
                 {fix.description}
               </p>
 
               {/* Footer */}
-              <div className="flex items-center gap-4 pl-0 sm:pl-[72px] text-xs">
+              <div className="flex items-center gap-4 pl-0 sm:pl-[100px] text-xs">
                 {/* Effort estimate */}
                 <div className="flex items-center gap-1.5">
-                  <span className="text-gray-500">Effort:</span>
-                  <span className={effortLabel.color}>{effortLabel.text}</span>
+                  <EffortIcon size={14} className={effortConfig.color} />
+                  <span className={effortConfig.color}>{effortConfig.text}</span>
                 </div>
 
                 {/* Category */}
-                <div className="flex items-center gap-1.5">
-                  <span className="text-gray-500">Category:</span>
-                  <span className="text-gray-400 capitalize">
+                <div className="flex items-center gap-1.5 text-gray-400">
+                  <span className="capitalize">
                     {fix.category.replace('_', ' ')}
                   </span>
                 </div>
               </div>
 
               {/* Hover hint */}
-              <div className="mt-3 pt-3 border-t border-void-100 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="mt-3 pt-3 border-t border-gray-100 opacity-0 group-hover:opacity-100 transition-opacity">
                 <p className="text-xs text-gray-500">
-                  <span className="text-terminal">Tip:</span> Fixing {fix.priority} priority issues first will have the biggest impact on your score.
+                  <span className="text-primary font-medium">Tip:</span> Fixing {fix.priority} priority issues first will have the biggest impact on your score.
                 </p>
               </div>
             </li>

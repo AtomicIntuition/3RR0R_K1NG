@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown } from 'lucide-react';
+import clsx from 'clsx';
 
 interface FAQItem {
   question: string;
@@ -10,7 +12,7 @@ interface FAQItem {
 
 const faqs: FAQItem[] = [
   {
-    question: 'What exactly does 3RROR_K1NG scan?',
+    question: 'What exactly does 3RK scan?',
     answer: 'We run 50+ checks across 5 categories: Security (headers, HTTPS, vulnerabilities), Performance (Core Web Vitals, load times), SEO (meta tags, structure, crawlability), Accessibility (WCAG compliance, screen reader support), and Code Quality (errors, best practices). You get a detailed report with actionable fixes.',
   },
   {
@@ -19,7 +21,7 @@ const faqs: FAQItem[] = [
   },
   {
     question: 'How is this different from Lighthouse?',
-    answer: "Lighthouse is great, but it's just performance. We combine Lighthouse with security audits, SEO analysis, accessibility checks, and code quality scanning - then have AI generate a brutally honest roast with specific fixes you can copy into your IDE.",
+    answer: "Lighthouse is great, but it's just performance. We combine Lighthouse with security audits, SEO analysis, accessibility checks, and code quality scanning - then have AI generate actionable recommendations with specific fixes you can implement immediately.",
   },
   {
     question: 'What do I get with Pro?',
@@ -30,8 +32,8 @@ const faqs: FAQItem[] = [
     answer: 'Yes! Pro users get API access and our CLI tool. Run scans from GitHub Actions, GitLab CI, or any pipeline. Fail builds if scores drop below your threshold.',
   },
   {
-    question: 'Why should I trust a website roaster to roast websites?',
-    answer: "Fair question. Run us through our own scanner - we score 95+. We practice what we preach. If we can't build a fast, secure, accessible site, why would you trust our advice?",
+    question: 'How accurate are the audits?',
+    answer: "We use industry-standard tools: Lighthouse for performance, axe-core for accessibility, and custom security scanners. Run us through our own scanner - we score 95+. We practice what we preach.",
   },
 ];
 
@@ -40,28 +42,34 @@ export function FAQ() {
 
   return (
     <div className="w-full max-w-3xl mx-auto">
-      <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8">
-        <span className="text-terminal">&gt;</span> Frequently Asked Questions
+      <h2 className="text-display-sm sm:text-display-md text-center mb-8 text-gray-900 text-shadow-heading">
+        Frequently Asked Questions
       </h2>
 
       <div className="space-y-3">
         {faqs.map((faq, index) => (
           <div
             key={index}
-            className="bg-void-50 border border-void-100 rounded-lg overflow-hidden"
+            className={clsx(
+              'bg-white border rounded-xl overflow-hidden shadow-card transition-all duration-200',
+              openIndex === index ? 'border-primary/30' : 'border-gray-200'
+            )}
           >
             <button
               onClick={() => setOpenIndex(openIndex === index ? null : index)}
-              className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-void-100/50 transition-colors"
+              className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-gray-50/50 transition-colors"
             >
-              <span className="font-medium text-gray-200 pr-4">{faq.question}</span>
-              <motion.span
-                animate={{ rotate: openIndex === index ? 45 : 0 }}
-                transition={{ duration: 0.2 }}
-                className="text-terminal text-xl flex-shrink-0"
+              <span className="font-medium text-gray-900 pr-4">{faq.question}</span>
+              <motion.div
+                animate={{ rotate: openIndex === index ? 180 : 0 }}
+                transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                className={clsx(
+                  'flex-shrink-0 transition-colors',
+                  openIndex === index ? 'text-primary' : 'text-gray-400'
+                )}
               >
-                +
-              </motion.span>
+                <ChevronDown size={20} />
+              </motion.div>
             </button>
 
             <AnimatePresence>
@@ -70,9 +78,9 @@ export function FAQ() {
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
+                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  <div className="px-5 pb-4 text-gray-400 text-sm leading-relaxed border-t border-void-100 pt-4">
+                  <div className="px-5 pb-4 text-gray-600 text-sm leading-relaxed border-t border-gray-100 pt-4">
                     {faq.answer}
                   </div>
                 </motion.div>

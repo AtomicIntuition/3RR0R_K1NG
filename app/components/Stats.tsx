@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 interface StatsData {
   totalScans: number;
   checksPerScan: number;
-  brutality: number;
+  accuracy: number;
 }
 
 interface StatsProps {
@@ -17,7 +17,7 @@ export function Stats({ variant = 'default', className = '' }: StatsProps) {
   const [stats, setStats] = useState<StatsData>({
     totalScans: 0,
     checksPerScan: 50,
-    brutality: 100,
+    accuracy: 99,
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -30,7 +30,7 @@ export function Stats({ variant = 'default', className = '' }: StatsProps) {
           setStats({
             totalScans: data.totalScans || 0,
             checksPerScan: data.checksPerScan || 50,
-            brutality: 100,
+            accuracy: 99,
           });
         }
       } catch {
@@ -58,11 +58,11 @@ export function Stats({ variant = 'default', className = '' }: StatsProps) {
   if (variant === 'inline') {
     return (
       <div className={`text-sm text-gray-500 ${className}`}>
-        <span className="text-terminal font-bold">
+        <span className="text-primary font-semibold">
           {isLoading ? '...' : formatNumber(stats.totalScans)}
         </span>
-        {' '}sites roasted with{' '}
-        <span className="text-neon-cyan font-bold">{stats.checksPerScan}+</span>
+        {' '}sites audited with{' '}
+        <span className="text-primary font-semibold">{stats.checksPerScan}+</span>
         {' '}checks each
       </div>
     );
@@ -73,20 +73,20 @@ export function Stats({ variant = 'default', className = '' }: StatsProps) {
     return (
       <div className={`flex items-center justify-center gap-6 text-center ${className}`}>
         <div className="flex items-center gap-2">
-          <span className="text-xl font-bold text-terminal">
+          <span className="text-xl font-bold text-primary">
             {isLoading ? '...' : formatNumber(stats.totalScans)}
           </span>
-          <span className="text-xs text-gray-500">roasted</span>
+          <span className="text-xs text-gray-400">audited</span>
         </div>
-        <div className="w-px h-4 bg-void-200" />
+        <div className="w-px h-4 bg-gray-200" />
         <div className="flex items-center gap-2">
-          <span className="text-xl font-bold text-neon-cyan">{stats.checksPerScan}+</span>
-          <span className="text-xs text-gray-500">checks</span>
+          <span className="text-xl font-bold text-primary">{stats.checksPerScan}+</span>
+          <span className="text-xs text-gray-400">checks</span>
         </div>
-        <div className="w-px h-4 bg-void-200" />
+        <div className="w-px h-4 bg-gray-200" />
         <div className="flex items-center gap-2">
-          <span className="text-xl font-bold text-neon-purple">{stats.brutality}%</span>
-          <span className="text-xs text-gray-500">brutal</span>
+          <span className="text-xl font-bold text-success">{stats.accuracy}%</span>
+          <span className="text-xs text-gray-400">accuracy</span>
         </div>
       </div>
     );
@@ -96,22 +96,22 @@ export function Stats({ variant = 'default', className = '' }: StatsProps) {
   return (
     <div className={`flex flex-wrap justify-center gap-8 text-center ${className}`}>
       <div>
-        <div className="text-3xl font-bold text-terminal">
+        <div className="text-3xl font-bold text-primary">
           {isLoading ? (
             <span className="animate-pulse">---</span>
           ) : (
             formatNumber(stats.totalScans)
           )}
         </div>
-        <div className="text-xs text-gray-500">Sites Roasted</div>
+        <div className="text-xs text-gray-400">Sites Audited</div>
       </div>
       <div>
-        <div className="text-3xl font-bold text-neon-cyan">{stats.checksPerScan}+</div>
-        <div className="text-xs text-gray-500">Security Checks</div>
+        <div className="text-3xl font-bold text-primary">{stats.checksPerScan}+</div>
+        <div className="text-xs text-gray-400">Security Checks</div>
       </div>
       <div>
-        <div className="text-3xl font-bold text-neon-purple">{stats.brutality}%</div>
-        <div className="text-xs text-gray-500">Brutal Honesty</div>
+        <div className="text-3xl font-bold text-success">{stats.accuracy}%</div>
+        <div className="text-xs text-gray-400">Accuracy Rate</div>
       </div>
     </div>
   );

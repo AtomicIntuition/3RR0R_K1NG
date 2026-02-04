@@ -47,14 +47,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { url, fingerprint, userId: bodyUserId, persona = 'hacker', skipRoast = false } = body;
+    const { url, fingerprint, userId: bodyUserId, persona = 'professional', skipRoast = false } = body;
 
     // Use API key user ID if authenticated via API key, otherwise use body userId
     const userId = apiKeyUser?.id || bodyUserId;
 
-    // Validate persona
-    const validPersonas = ['hacker', 'gordon', 'parent', 'interviewer', 'drill', 'meme', 'therapist'];
-    const selectedPersona = validPersonas.includes(persona) ? persona : 'hacker';
+    // Analysis style (kept for backwards compatibility)
+    const selectedPersona = 'professional';
 
     // Validate skipRoast
     const shouldSkipRoast = Boolean(skipRoast);

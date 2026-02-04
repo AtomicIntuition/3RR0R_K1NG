@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, ReactNode } from 'react';
+import { useEffect, useRef, useState, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
 
@@ -24,6 +24,11 @@ export function Modal({
   closeOnEscape = true,
 }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!closeOnEscape) return;
@@ -61,19 +66,22 @@ export function Modal({
     <div
       ref={overlayRef}
       onClick={handleOverlayClick}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-void/90 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-in fade-in duration-200"
     >
       <div
         className={clsx(
-          'relative w-full max-w-md bg-void-50 border border-void-200 rounded-lg shadow-2xl',
+          'relative w-full max-w-md bg-white border border-gray-200 rounded-2xl shadow-elevated overflow-hidden',
           'animate-in zoom-in-95 slide-in-from-bottom-4 duration-300',
           className
         )}
       >
+        {/* Top accent gradient line */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent" />
+
         {showCloseButton && (
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-1 text-gray-500 hover:text-gray-300 transition-colors"
+            className="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
             aria-label="Close modal"
           >
             <svg
@@ -97,9 +105,7 @@ export function Modal({
   );
 
   // Use portal to render modal at document body level
-  if (typeof window !== 'undefined') {
-    return createPortal(modalContent, document.body);
-  }
+  if (!mounted) return null;
 
-  return null;
+  return createPortal(modalContent, document.body);
 }

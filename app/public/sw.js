@@ -1,6 +1,6 @@
-// 3RROR_K1NG Service Worker
-const CACHE_NAME = '3rror-k1ng-v1';
-const STATIC_CACHE = '3rror-k1ng-static-v1';
+// 3RK Service Worker
+const CACHE_NAME = '3rk-v2';
+const STATIC_CACHE = '3rk-static-v2';
 
 // Assets to cache on install
 const STATIC_ASSETS = [

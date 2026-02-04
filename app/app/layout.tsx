@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
-import { JetBrains_Mono, Space_Grotesk } from 'next/font/google';
+import { Inter } from 'next/font/google';
+import { GeistSans } from 'geist/font/sans';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Providers } from '@/components/Providers';
@@ -7,23 +8,17 @@ import { Navbar } from '@/components/Navbar';
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration';
 import './globals.css';
 
-const jetbrainsMono = JetBrains_Mono({
+const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-mono',
+  variable: '--font-inter',
   display: 'swap',
 });
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  variable: '--font-sans',
-  display: 'swap',
-});
-
-const siteUrl = 'https://3rrork1ng.com';
+const siteUrl = 'https://crisp.dev';
 
 // Viewport configuration with theme color
 export const viewport: Viewport = {
-  themeColor: '#00ff41',
+  themeColor: '#4F46E5',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -31,10 +26,10 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: '3RROR_K1NG | Website Roast Machine',
-  description: 'Get your website brutally roasted. Security, performance, SEO, and accessibility audits delivered as savage truths with actionable fixes.',
+  title: 'Crisp | Website Audit Platform',
+  description: 'Professional website audits for security, performance, SEO, and accessibility. Get actionable insights powered by AI.',
   keywords: ['website audit', 'security scanner', 'performance testing', 'SEO checker', 'accessibility audit'],
-  authors: [{ name: '3RROR_K1NG' }],
+  authors: [{ name: 'Crisp' }],
   alternates: {
     canonical: '/',
   },
@@ -55,30 +50,30 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
-    title: '3RROR_K1NG',
+    statusBarStyle: 'default',
+    title: 'Crisp',
   },
   openGraph: {
-    title: '3RROR_K1NG | Get Your Website Brutally Roasted',
-    description: 'AI-powered security, performance, SEO & accessibility audits. Savage truths with actionable fixes. Try free - 3 scans/day.',
+    title: 'Crisp | Professional Website Audits',
+    description: 'AI-powered security, performance, SEO & accessibility audits. Get actionable insights for your website.',
     type: 'website',
     locale: 'en_US',
-    siteName: '3RROR_K1NG',
+    siteName: 'Crisp',
     url: siteUrl,
     images: [
       {
         url: `${siteUrl}/images/og-image.png`,
         width: 1200,
         height: 630,
-        alt: '3RROR_K1NG - Website Roast Machine',
+        alt: 'Crisp - Website Audit Platform',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: '3RROR_K1NG | Get Your Website Brutally Roasted',
-    description: 'AI-powered security, performance, SEO & accessibility audits. Savage truths with actionable fixes. Try free - 3 scans/day.',
-    creator: '@3rrork1ng',
+    title: 'Crisp | Professional Website Audits',
+    description: 'AI-powered security, performance, SEO & accessibility audits. Get actionable insights for your website.',
+    creator: '@crisp_dev',
     images: [`${siteUrl}/images/og-image.png`],
   },
   robots: {
@@ -95,8 +90,8 @@ const jsonLd = {
       '@type': 'WebSite',
       '@id': `${siteUrl}/#website`,
       url: siteUrl,
-      name: '3RROR_K1NG',
-      description: 'Website Roast Machine - Security, performance, SEO, and accessibility audits',
+      name: 'Crisp',
+      description: 'Website Audit Platform - Security, performance, SEO, and accessibility audits',
       publisher: {
         '@id': `${siteUrl}/#organization`,
       },
@@ -112,7 +107,7 @@ const jsonLd = {
     {
       '@type': 'Organization',
       '@id': `${siteUrl}/#organization`,
-      name: '3RROR_K1NG',
+      name: 'Crisp',
       url: siteUrl,
       logo: {
         '@type': 'ImageObject',
@@ -131,7 +126,7 @@ const jsonLd = {
     {
       '@type': 'SoftwareApplication',
       '@id': `${siteUrl}/#app`,
-      name: '3RROR_K1NG',
+      name: 'Crisp',
       applicationCategory: 'DeveloperApplication',
       operatingSystem: 'Web',
       offers: {
@@ -139,7 +134,7 @@ const jsonLd = {
         price: '0',
         priceCurrency: 'USD',
       },
-      description: 'Get your website brutally roasted with actionable fixes for security, performance, SEO, and accessibility issues.',
+      description: 'Professional website audits with actionable insights for security, performance, SEO, and accessibility.',
     },
     {
       '@type': 'BreadcrumbList',
@@ -162,14 +157,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${jetbrainsMono.variable} ${spaceGrotesk.variable}`}>
+    <html lang="en" className={`${inter.variable} ${GeistSans.variable}`} suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-screen font-mono">
+      <body className="min-h-screen font-sans antialiased" suppressHydrationWarning>
         <ServiceWorkerRegistration />
         <Providers>
           <div className="relative min-h-screen flex flex-col">
@@ -182,25 +177,26 @@ export default function RootLayout({
             </main>
 
             {/* Footer */}
-            <footer className="relative z-10 py-6 px-4 border-t border-void-100">
+            <footer className="relative z-10 py-8 px-4 border-t border-gray-200 bg-white">
               <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
                 <div className="flex items-center gap-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/images/logo.png" alt="" aria-hidden="true" className="w-6 h-6" />
-                  <span className="text-terminal font-bold">3RROR_K1NG</span>
-                  <span className="text-gray-400">|</span>
-                  <span>Website Roast Machine</span>
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
+                    <span className="text-white text-sm font-black">C</span>
+                  </div>
+                  <span className="text-gray-900 font-black">Crisp</span>
+                  <span className="text-gray-300">|</span>
+                  <span>Website Audit Platform</span>
                 </div>
-                <div className="flex items-center gap-4">
-                  <a href="/privacy" className="hover:text-terminal transition-colors">Privacy</a>
-                  <a href="/terms" className="hover:text-terminal transition-colors">Terms</a>
+                <div className="flex items-center gap-6">
+                  <a href="/privacy" className="hover:text-indigo-600 transition-colors font-medium">Privacy</a>
+                  <a href="/terms" className="hover:text-indigo-600 transition-colors font-medium">Terms</a>
                   <a
-                    href="https://x.com/3RROR_K1NG"
+                    href="https://x.com/crisp_dev"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-terminal transition-colors"
+                    className="hover:text-indigo-600 transition-colors font-medium"
                   >
-                    @3RROR_K1NG
+                    @crisp
                   </a>
                 </div>
               </div>

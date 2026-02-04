@@ -4,6 +4,9 @@ import { useEffect } from 'react';
 
 export function ServiceWorkerRegistration() {
   useEffect(() => {
+    // Skip SW registration in development to avoid stale cache issues
+    if (process.env.NODE_ENV === 'development') return;
+
     // Register service worker immediately when component mounts
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
       navigator.serviceWorker

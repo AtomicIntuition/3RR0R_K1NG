@@ -36,8 +36,8 @@ function generateDemoActivity(): ActivityItem[] {
 }
 
 function getScoreColor(score: number): string {
-  if (score >= 80) return 'text-terminal';
-  if (score >= 60) return 'text-neon-yellow';
+  if (score >= 80) return 'text-success';
+  if (score >= 60) return 'text-warning';
   return 'text-danger';
 }
 
@@ -50,8 +50,10 @@ export function LiveActivity({ className = '', compact = false }: LiveActivityPr
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     // Initialize with demo data
     setActivities(generateDemoActivity());
 
@@ -78,21 +80,50 @@ export function LiveActivity({ className = '', compact = false }: LiveActivityPr
 
   const current = activities[currentIndex];
 
+  // Don't render dynamic content until mounted to prevent hydration mismatch
+  if (!mounted) {
+    if (compact) {
+      return (
+        <div className={`flex items-center justify-center gap-2 text-sm min-h-[24px] ${className}`}>
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
+          </span>
+          <span className="text-gray-400">Loading activity...</span>
+        </div>
+      );
+    }
+    return (
+      <div className={`bg-white border border-gray-200 rounded-xl p-3 min-h-[52px] ${className}`}>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
+            </span>
+            <span className="text-xs text-gray-400 uppercase tracking-wider">Live</span>
+          </div>
+          <span className="text-sm text-gray-400">Loading activity...</span>
+        </div>
+      </div>
+    );
+  }
+
   if (compact) {
     return (
       <div className={`flex items-center justify-center gap-2 text-sm min-h-[24px] ${className}`}>
         <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-terminal opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-terminal"></span>
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
         </span>
         {current && (
           <span
             className={`transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
           >
-            <span className="text-gray-500">
-              <span className="text-gray-300 font-medium">{current.domain}</span>
+            <span className="text-gray-400">
+              <span className="text-gray-600 font-medium">{current.domain}</span>
               {' '}scored{' '}
-              <span className={`font-bold ${getScoreColor(current.score)}`}>{current.score}</span>
+              <span className={`font-semibold ${getScoreColor(current.score)}`}>{current.score}</span>
               {' '}{current.timeAgo}
             </span>
           </span>
@@ -102,14 +133,14 @@ export function LiveActivity({ className = '', compact = false }: LiveActivityPr
   }
 
   return (
-    <div className={`bg-void-50/50 border border-void-100 rounded-lg p-3 min-h-[52px] ${className}`}>
+    <div className={`bg-white border border-gray-200 rounded-xl p-3 min-h-[52px] ${className}`}>
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-terminal opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-terminal"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
           </span>
-          <span className="text-xs text-gray-500 uppercase tracking-wider">Live</span>
+          <span className="text-xs text-gray-400 uppercase tracking-wider">Live</span>
         </div>
 
         {current && (
@@ -118,10 +149,10 @@ export function LiveActivity({ className = '', compact = false }: LiveActivityPr
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
             }`}
           >
-            <span className="text-sm text-gray-400">
-              <span className="text-gray-200 font-medium">{current.domain}</span>
-              {' '}just got roasted —{' '}
-              <span className={`font-bold ${getScoreColor(current.score)}`}>
+            <span className="text-sm text-gray-500">
+              <span className="text-gray-700 font-medium">{current.domain}</span>
+              {' '}just got audited —{' '}
+              <span className={`font-semibold ${getScoreColor(current.score)}`}>
                 {current.score}/100
               </span>
             </span>

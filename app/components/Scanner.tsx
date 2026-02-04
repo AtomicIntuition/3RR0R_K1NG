@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import clsx from 'clsx';
 import { useAuth } from '@/lib/auth-context';
-import { PersonaSelector, type RoastPersona } from './PersonaSelector';
 import { PaywallModal } from './PaywallModal';
 import { toast } from 'sonner';
 
@@ -38,10 +37,10 @@ export function Scanner({ className, autoFocus = false }: ScannerProps) {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [scanPhase, setScanPhase] = useState('');
-  const [persona, setPersona] = useState<RoastPersona>('hacker');
   const [skipRoast, setSkipRoast] = useState(false);
   const [showAuthWall, setShowAuthWall] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -55,11 +54,8 @@ export function Scanner({ className, autoFocus = false }: ScannerProps) {
       return;
     }
 
-    // Allow anonymous users to scan - API handles rate limiting (2/hour)
-    // Auth wall only shows after rate limit hit
-
     setIsLoading(true);
-    setScanPhase('Initializing scan...');
+    setScanPhase('Initializing audit...');
 
     try {
       const response = await fetch('/api/scan', {
@@ -70,7 +66,7 @@ export function Scanner({ className, autoFocus = false }: ScannerProps) {
         body: JSON.stringify({
           url: normalizedUrl,
           userId: user?.id || null,
-          persona,
+          persona: 'professional',
           skipRoast,
         }),
       });
@@ -78,9 +74,7 @@ export function Scanner({ className, autoFocus = false }: ScannerProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        // Check if it's a rate limit error
         if (response.status === 429 && data.requiresUpgrade) {
-          // For anonymous users, show auth wall instead of paywall
           if (!user) {
             toast.error('Free scans used', { description: 'Create a free account to continue scanning' });
             setShowAuthWall(true);
@@ -96,8 +90,6 @@ export function Scanner({ className, autoFocus = false }: ScannerProps) {
       }
 
       setScanPhase('Redirecting to results...');
-
-      // Navigate to results page
       router.push(`/scan/${data.scanId}`);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Something went wrong';
@@ -111,44 +103,58 @@ export function Scanner({ className, autoFocus = false }: ScannerProps) {
   return (
     <div className={clsx('w-full max-w-2xl mx-auto', className)}>
       <form onSubmit={handleSubmit} className="relative">
-        {/* Terminal-style header */}
-        <div className="flex items-center justify-between px-4 py-2 bg-void-100 rounded-t-lg border border-b-0 border-void-200">
-          <div className="flex items-center gap-2">
-            <div className="flex gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-danger/80" />
-              <span className="w-3 h-3 rounded-full bg-neon-yellow/80" />
-              <span className="w-3 h-3 rounded-full bg-terminal/80" />
-            </div>
-            <span className="text-xs text-gray-400 ml-2">target_scanner.exe</span>
+        {/* Outer glow on focus */}
+        <div
+          className={clsx(
+            'absolute -inset-1 rounded-3xl transition-all duration-300 pointer-events-none',
+            isFocused && !error
+              ? 'bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 blur-xl opacity-100'
+              : 'opacity-0'
+          )}
+        />
+
+        {/* Card with premium styling */}
+        <div
+          className={clsx(
+            'relative bg-white rounded-2xl shadow-card border overflow-hidden transition-all duration-200',
+            isFocused && !error ? 'border-primary/30 shadow-card-hover' : 'border-gray-200',
+            error && 'border-danger/30'
+          )}
+        >
+          {/* Header with glass effect */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50/50">
+            <span className="text-sm font-medium text-gray-600">Enter website URL</span>
+
+            {/* Quick Mode Toggle - pill style */}
+            <button
+              type="button"
+              onClick={() => setSkipRoast(!skipRoast)}
+              className={clsx(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-200 text-xs font-medium',
+                skipRoast
+                  ? 'bg-primary text-white ring-2 ring-primary/20'
+                  : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700'
+              )}
+            >
+              <svg
+                className="w-3.5 h-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <span>Quick Mode</span>
+            </button>
           </div>
 
-          {/* Quick Audit Toggle */}
-          <button
-            type="button"
-            onClick={() => setSkipRoast(!skipRoast)}
-            className={clsx(
-              'flex items-center gap-1.5 px-3 py-1 rounded border transition-all text-xs font-medium',
-              skipRoast
-                ? 'bg-neon-cyan/20 border-neon-cyan/50 text-neon-cyan'
-                : 'bg-void-50 border-void-200 text-gray-400 hover:border-gray-300 hover:text-gray-200'
-            )}
-          >
-            <svg
-              className="w-3 h-3"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-            <span>Quick Mode</span>
-          </button>
-        </div>
-
-        {/* Input container */}
-        <div className="relative bg-void-50 border border-void-200 rounded-b-lg overflow-hidden">
+          {/* Input container */}
           <div className="flex items-center">
-            <span className="pl-4 text-terminal font-bold select-none">$</span>
+            <div className="pl-4 text-gray-400">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+              </svg>
+            </div>
             <input
               type="text"
               value={url}
@@ -157,12 +163,14 @@ export function Scanner({ className, autoFocus = false }: ScannerProps) {
                 setError('');
                 setShowAuthWall(false);
               }}
-              placeholder="Enter target URL (e.g., example.com)"
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              placeholder="example.com"
               className={clsx(
-                'flex-1 px-3 py-4 bg-transparent text-gray-100',
-                'placeholder:text-gray-500',
+                'flex-1 px-3 py-4 bg-transparent text-gray-800',
+                'placeholder:text-gray-400',
                 'focus:outline-none',
-                'font-mono text-lg',
+                'text-lg',
                 error && 'text-danger'
               )}
               disabled={isLoading}
@@ -172,11 +180,11 @@ export function Scanner({ className, autoFocus = false }: ScannerProps) {
               type="submit"
               disabled={isLoading || !url.trim()}
               className={clsx(
-                'px-6 py-4 font-bold transition-all duration-200',
+                'px-6 py-4 font-semibold transition-all duration-200 rounded-r-xl',
                 'disabled:opacity-50 disabled:cursor-not-allowed',
                 isLoading
-                  ? 'bg-neon-yellow text-void'
-                  : 'bg-terminal text-void hover:bg-terminal-bright'
+                  ? 'bg-primary-400 text-white'
+                  : 'bg-gradient-to-b from-primary to-primary-600 text-white hover:shadow-button-hover hover:-translate-y-0.5 active:scale-[0.98]'
               )}
             >
               {isLoading ? (
@@ -197,53 +205,57 @@ export function Scanner({ className, autoFocus = false }: ScannerProps) {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-                  SCANNING
+                  Analyzing
                 </span>
               ) : (
-                'SCAN'
+                'Analyze'
               )}
             </button>
           </div>
 
-          {/* Loading state */}
+          {/* Premium shimmer loading bar */}
           {isLoading && (
-            <div className="px-4 pb-3">
-              <div className="h-1 bg-void-200 rounded-full overflow-hidden">
-                <div className="h-full bg-terminal animate-pulse w-1/3" />
+            <div className="px-4 pb-4">
+              <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-full loading-bar-premium rounded-full" />
               </div>
-              <p className="text-xs text-gray-500 mt-2 font-mono">{scanPhase}</p>
+              <p className="text-xs text-gray-500 mt-2">{scanPhase}</p>
             </div>
           )}
         </div>
 
         {/* Error message */}
         {error && (
-          <div className="mt-3 px-4 py-2 bg-danger/10 border border-danger/30 rounded text-danger text-sm">
-            <span className="font-bold">ERROR:</span> {error}
+          <div className="mt-3 px-4 py-3 bg-danger/5 border border-danger/20 rounded-xl text-danger text-sm animate-fade-in">
+            {error}
           </div>
         )}
 
-        {/* Auth Wall - shows after rate limit or when encouraged to sign up */}
+        {/* Auth Wall */}
         {showAuthWall && (
-          <div className="mt-4 p-6 bg-gradient-to-b from-terminal/10 to-terminal/5 border border-terminal/30 rounded-lg">
+          <div className="mt-4 p-6 bg-white border border-gray-200 rounded-2xl shadow-card animate-slide-up">
             <div className="text-center">
-              <div className="text-4xl mb-3">🔥</div>
-              <h3 className="text-xl font-bold text-white mb-2">
-                Want More Roasts?
+              <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                Want More Scans?
               </h3>
-              <p className="text-gray-400 text-sm mb-4">
-                Create a free account to get <span className="text-terminal font-bold">3 scans per day</span>, save your results, and track improvements over time.
+              <p className="text-gray-500 text-sm mb-6">
+                Create a free account to get <span className="text-primary font-semibold">3 scans per day</span>, save your results, and track improvements over time.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
                   href={`/signup?redirect=${encodeURIComponent(`/?url=${encodeURIComponent(url)}`)}`}
-                  className="px-6 py-3 bg-terminal text-void font-bold rounded hover:bg-terminal-bright transition-colors active:scale-95"
+                  className="btn-premium text-center"
                 >
                   Create Free Account
                 </Link>
                 <Link
                   href={`/login?redirect=${encodeURIComponent(`/?url=${encodeURIComponent(url)}`)}`}
-                  className="px-6 py-3 bg-void-100 text-gray-300 font-bold rounded border border-void-200 hover:border-terminal/50 hover:text-terminal transition-colors active:scale-95"
+                  className="btn-secondary-premium text-center"
                 >
                   Sign In
                 </Link>
@@ -251,46 +263,36 @@ export function Scanner({ className, autoFocus = false }: ScannerProps) {
               <button
                 type="button"
                 onClick={() => setShowAuthWall(false)}
-                className="mt-4 text-xs text-gray-500 hover:text-gray-400 transition-colors"
+                className="mt-4 text-xs text-gray-400 hover:text-gray-600 transition-colors"
               >
                 Maybe later
               </button>
             </div>
           </div>
         )}
-
-        {/* Persona Selector - only show when URL is entered and auth wall not showing */}
-        {!showAuthWall && url.trim().length > 0 && (
-          <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300">
-            <PersonaSelector
-              selected={persona}
-              onSelect={setPersona}
-              compact={true}
-              disabled={skipRoast}
-            />
-          </div>
-        )}
       </form>
 
-      {/* Example URLs - hide when auth wall is showing */}
-      {!showAuthWall && <div className="mt-6 text-center">
-        <p className="text-xs text-gray-400 mb-2">Try scanning:</p>
-        <div className="flex flex-wrap justify-center gap-2">
-          {['github.com', 'notion.com', 'vercel.com'].map((example) => (
-            <button
-              key={example}
-              type="button"
-              onClick={() => setUrl(example)}
-              className="px-3 py-1 text-xs text-gray-400 bg-void-100 rounded border border-void-200 hover:border-terminal/50 hover:text-terminal transition-colors"
-              disabled={isLoading}
-            >
-              {example}
-            </button>
-          ))}
+      {/* Example URLs */}
+      {!showAuthWall && (
+        <div className="mt-6 text-center">
+          <p className="text-xs text-gray-400 mb-2">Try scanning:</p>
+          <div className="flex flex-wrap justify-center gap-2">
+            {['github.com', 'notion.com', 'vercel.com'].map((example) => (
+              <button
+                key={example}
+                type="button"
+                onClick={() => setUrl(example)}
+                className="px-3 py-1.5 text-xs text-gray-500 bg-white rounded-lg border border-gray-200 hover:border-primary/30 hover:text-primary hover:-translate-y-0.5 transition-all duration-200"
+                disabled={isLoading}
+              >
+                {example}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>}
+      )}
 
-      {/* Paywall Modal for rate limited users */}
+      {/* Paywall Modal */}
       <PaywallModal
         isOpen={showPaywall}
         onClose={() => setShowPaywall(false)}

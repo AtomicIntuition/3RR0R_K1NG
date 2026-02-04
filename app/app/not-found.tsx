@@ -1,58 +1,53 @@
 import Link from 'next/link';
-import { GlitchText } from '@/components/GlitchText';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4">
-      <div className="text-center max-w-lg">
-        {/* ASCII Art 404 */}
-        <pre className="text-terminal font-mono text-xs sm:text-sm mb-8 select-none">
-{`
-    ██╗  ██╗ ██████╗ ██╗  ██╗
-    ██║  ██║██╔═████╗██║  ██║
-    ███████║██║██╔██║███████║
-    ╚════██║████╔╝██║╚════██║
-         ██║╚██████╔╝     ██║
-         ╚═╝ ╚═════╝      ╚═╝
-`}
-        </pre>
+    <div className="min-h-screen flex bg-gradient-to-br from-slate-800 via-slate-900 to-gray-900 relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-indigo-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
 
-        <h1 className="text-3xl sm:text-4xl font-bold mb-4">
-          <GlitchText
-            text="PAGE NOT FOUND"
-            className="text-danger"
-            glitchIntensity="medium"
-          />
-        </h1>
+      <div className="relative z-10 flex-1 flex items-center justify-center px-4">
+        <div className="text-center max-w-lg">
+          {/* Logo */}
+          <Link href="/" className="inline-flex items-center gap-3 mb-12">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+              <span className="text-white text-xl font-black">C</span>
+            </div>
+            <span className="text-3xl font-black text-white">Crisp</span>
+          </Link>
 
-        <p className="text-gray-400 mb-8">
-          The page you're looking for has been moved, deleted, or never existed.
-          Perhaps it's hiding in the void.
-        </p>
+          {/* 404 Display */}
+          <div className="mb-8">
+            <span className="text-[120px] sm:text-[160px] font-black bg-gradient-to-br from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent leading-none block">
+              404
+            </span>
+          </div>
 
-        {/* Terminal-style message */}
-        <div className="bg-void-50 rounded-lg border border-void-100 p-4 mb-8 text-left font-mono text-sm">
-          <p className="text-gray-500">
-            <span className="text-danger">[ERROR]</span> Resource not found
+          <h1 className="text-3xl sm:text-4xl font-black text-white mb-4">
+            Page not found
+          </h1>
+
+          <p className="text-xl text-white/60 mb-10">
+            The page you&apos;re looking for doesn&apos;t exist or has been moved.
           </p>
-          <p className="text-gray-500">
-            <span className="text-neon-yellow">[WARN]</span> Check URL for typos
-          </p>
-          <p className="text-gray-500">
-            <span className="text-terminal">[INFO]</span> Redirecting to home...
-          </p>
-          <p className="mt-2">
-            <span className="text-terminal">$</span>
-            <span className="cursor-blink"> </span>
-          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/"
+              className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-lg rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all"
+            >
+              Go to Homepage
+            </Link>
+            <Link
+              href="/dashboard"
+              className="px-8 py-4 bg-white/10 backdrop-blur text-white font-bold text-lg rounded-xl border border-white/20 hover:bg-white/20 transition-all"
+            >
+              View Dashboard
+            </Link>
+          </div>
         </div>
-
-        <Link
-          href="/"
-          className="btn-primary inline-block"
-        >
-          Return to Home
-        </Link>
       </div>
     </div>
   );

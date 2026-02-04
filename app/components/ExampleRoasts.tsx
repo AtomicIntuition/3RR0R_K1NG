@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import clsx from 'clsx';
 
-interface ExampleRoast {
+interface ExampleReport {
   id: string;
   url: string;
   domain: string;
@@ -14,16 +14,15 @@ interface ExampleRoast {
   persona?: string;
 }
 
-// Fallback example roasts for when the API isn't available
-const FALLBACK_ROASTS: ExampleRoast[] = [
+// Fallback example reports
+const FALLBACK_REPORTS: ExampleReport[] = [
   {
     id: 'example-1',
     url: 'https://example.com',
     domain: 'example.com',
     score: 42,
     letterGrade: 'F',
-    roastTitle: 'WHO DEPLOYED THIS TO PRODUCTION?!',
-    persona: 'hacker',
+    roastTitle: 'Critical security and performance issues detected',
   },
   {
     id: 'example-2',
@@ -31,8 +30,7 @@ const FALLBACK_ROASTS: ExampleRoast[] = [
     domain: 'slow-site.com',
     score: 58,
     letterGrade: 'D+',
-    roastTitle: 'Your Firewall Has Feelings, And I Hurt Them',
-    persona: 'gordon',
+    roastTitle: 'Multiple security headers missing',
   },
   {
     id: 'example-3',
@@ -40,116 +38,91 @@ const FALLBACK_ROASTS: ExampleRoast[] = [
     domain: 'almost-good.io',
     score: 76,
     letterGrade: 'C+',
-    roastTitle: 'I Expected More From You',
-    persona: 'parent',
+    roastTitle: 'Good foundation with room for improvement',
   },
 ];
 
-const PERSONA_EMOJI: Record<string, string> = {
-  hacker: '💀',
-  gordon: '👨‍🍳',
-  parent: '😔',
-  interviewer: '🤔',
-  drill: '🎖️',
-  meme: '🗿',
-  therapist: '🛋️',
-};
-
 function getGradeColor(grade: string): string {
-  if (grade.startsWith('A')) return 'text-terminal';
-  if (grade.startsWith('B')) return 'text-neon-yellow';
-  if (grade.startsWith('C')) return 'text-neon-orange';
+  if (grade.startsWith('A')) return 'text-success';
+  if (grade.startsWith('B')) return 'text-warning';
+  if (grade.startsWith('C')) return 'text-warning-dark';
   return 'text-danger';
 }
 
 export function ExampleRoasts() {
-  const [roasts, setRoasts] = useState<ExampleRoast[]>(FALLBACK_ROASTS);
+  const [reports, setReports] = useState<ExampleReport[]>(FALLBACK_REPORTS);
   const [isLoading, setIsLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    async function fetchRecentRoasts() {
+    async function fetchRecentReports() {
       try {
         const response = await fetch('/api/roasts/recent');
         if (response.ok) {
           const data = await response.json();
           if (data.roasts && data.roasts.length > 0) {
-            setRoasts(data.roasts);
+            setReports(data.roasts);
           }
         }
       } catch {
-        // Use fallback roasts
+        // Use fallback reports
       } finally {
         setIsLoading(false);
       }
     }
 
-    fetchRecentRoasts();
+    fetchRecentReports();
   }, []);
 
-  // Auto-rotate carousel
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % roasts.length);
+      setCurrentIndex((prev) => (prev + 1) % reports.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, [roasts.length]);
+  }, [reports.length]);
 
-  const currentRoast = roasts[currentIndex];
+  const currentReport = reports[currentIndex];
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      <h2 className="text-lg font-bold text-center mb-4">
-        <span className="text-terminal">&gt;</span> Recent Roasts
+      <h2 className="text-lg font-semibold text-center mb-4 text-gray-800">
+        Recent Reports
       </h2>
 
       {/* Carousel */}
-      <div className="relative bg-void-50/50 rounded-lg border border-void-100 p-6 overflow-hidden">
-        {/* Background pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'linear-gradient(rgba(0, 255, 65, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 65, 0.1) 1px, transparent 1px)',
-            backgroundSize: '20px 20px',
-          }} />
-        </div>
-
+      <div className="relative bg-white rounded-2xl border border-gray-200 shadow-card p-6 overflow-hidden">
         <div className="relative">
-          {/* Roast card */}
+          {/* Report card */}
           <div className="flex items-start gap-4">
             {/* Score circle */}
             <div className={clsx(
               'flex-shrink-0 w-16 h-16 rounded-full border-4 flex items-center justify-center font-bold text-xl',
-              currentRoast.score >= 70 ? 'border-terminal text-terminal' :
-              currentRoast.score >= 50 ? 'border-neon-yellow text-neon-yellow' :
+              currentReport.score >= 70 ? 'border-success text-success' :
+              currentReport.score >= 50 ? 'border-warning text-warning' :
               'border-danger text-danger'
             )}>
-              {currentRoast.score}
+              {currentReport.score}
             </div>
 
             {/* Content */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <span className={clsx('text-2xl font-black', getGradeColor(currentRoast.letterGrade))}>
-                  {currentRoast.letterGrade}
+                <span className={clsx('text-2xl font-bold', getGradeColor(currentReport.letterGrade))}>
+                  {currentReport.letterGrade}
                 </span>
-                <span className="text-sm text-gray-500">
-                  {currentRoast.domain}
+                <span className="text-sm text-gray-400">
+                  {currentReport.domain}
                 </span>
-                {currentRoast.persona && (
-                  <span className="text-sm" title={`Roasted by ${currentRoast.persona}`}>
-                    {PERSONA_EMOJI[currentRoast.persona] || '💀'}
-                  </span>
-                )}
               </div>
-              <p className="text-gray-300 font-medium text-sm line-clamp-2">
-                "{currentRoast.roastTitle}"
+              <p className="text-gray-600 font-medium text-sm line-clamp-2">
+                "{currentReport.roastTitle}"
               </p>
-              {currentRoast.id && !currentRoast.id.startsWith('example') && (
+              {currentReport.id && !currentReport.id.startsWith('example') && (
                 <Link
-                  href={`/scan/${currentRoast.id}`}
-                  className="text-xs text-terminal hover:underline mt-2 inline-block"
+                  href={`/scan/${currentReport.id}`}
+                  className="text-xs text-primary hover:underline mt-2 inline-block"
                 >
-                  View full roast →
+                  View full report →
                 </Link>
               )}
             </div>
@@ -157,26 +130,29 @@ export function ExampleRoasts() {
 
           {/* Navigation dots */}
           <div className="flex justify-center gap-2 mt-4">
-            {roasts.map((_, index) => (
+            {reports.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
                 className={clsx(
                   'w-2 h-2 rounded-full transition-all',
                   index === currentIndex
-                    ? 'bg-terminal w-4'
-                    : 'bg-void-100 hover:bg-terminal/50'
+                    ? 'bg-primary w-4'
+                    : 'bg-gray-200 hover:bg-gray-300'
                 )}
-                aria-label={`Go to roast ${index + 1}`}
+                aria-label={`Go to report ${index + 1}`}
               />
             ))}
           </div>
         </div>
       </div>
 
-      <p className="text-center text-xs text-gray-500 mt-3">
-        Real scans from our users. Your site could be next.
+      <p className="text-center text-xs text-gray-400 mt-3">
+        Real audits from our users. Your site could be next.
       </p>
     </div>
   );
 }
+
+// Alias for new naming convention
+export const RecentReports = ExampleRoasts;

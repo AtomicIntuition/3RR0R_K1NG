@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo, memo, startTransition } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
@@ -19,37 +19,25 @@ interface Scan {
 type FilterType = 'all' | 'completed' | 'failed';
 const SCANS_PER_PAGE = 10;
 
-// Helper functions outside component to avoid recreation
 const getScoreColor = (score: number | null) => {
-  if (score === null) return 'text-gray-500';
-  if (score >= 80) return 'text-terminal';
-  if (score >= 60) return 'text-neon-yellow';
-  if (score >= 40) return 'text-neon-orange';
-  return 'text-danger';
+  if (score === null) return 'text-gray-400';
+  if (score >= 80) return 'text-emerald-600';
+  if (score >= 60) return 'text-amber-500';
+  if (score >= 40) return 'text-orange-500';
+  return 'text-red-500';
 };
 
-const getStatusBadge = (status: string) => {
-  const styles: Record<string, string> = {
-    pending: 'bg-gray-500/20 text-gray-400',
-    processing: 'bg-neon-yellow/20 text-neon-yellow',
-    completed: 'bg-terminal/20 text-terminal',
-    failed: 'bg-danger/20 text-danger',
-  };
-  return styles[status] || styles.pending;
-};
-
-const getGradeColor = (grade: string | null) => {
-  if (!grade) return 'text-gray-500';
+const getGradeBg = (grade: string | null) => {
+  if (!grade) return 'bg-gray-100';
   switch (grade[0]) {
-    case 'A': return 'text-terminal';
-    case 'B': return 'text-neon-cyan';
-    case 'C': return 'text-yellow-400';
-    case 'D': return 'text-orange-400';
-    default: return 'text-danger';
+    case 'A': return 'bg-gradient-to-br from-emerald-500 to-teal-600';
+    case 'B': return 'bg-gradient-to-br from-blue-500 to-indigo-600';
+    case 'C': return 'bg-gradient-to-br from-amber-400 to-orange-500';
+    case 'D': return 'bg-gradient-to-br from-orange-500 to-red-500';
+    default: return 'bg-gradient-to-br from-red-500 to-rose-600';
   }
 };
 
-// Memoized date formatter
 const formatDate = (dateStr: string) => {
   return new Date(dateStr).toLocaleDateString('en-US', {
     month: 'short',
@@ -58,59 +46,6 @@ const formatDate = (dateStr: string) => {
     minute: '2-digit',
   });
 };
-
-// Memoized scan row component
-const ScanRow = memo(function ScanRow({ scan }: { scan: Scan }) {
-  const formattedDate = useMemo(() => formatDate(scan.created_at), [scan.created_at]);
-
-  return (
-    <Link
-      href={`/scan/${scan.id}`}
-      className="flex items-center px-4 sm:px-6 py-3 sm:py-4 hover:bg-void-100/50 transition-colors gap-4"
-    >
-      {/* Grade Badge */}
-      <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-void flex items-center justify-center">
-        {scan.status === 'completed' && scan.letter_grade ? (
-          <span className={`text-lg sm:text-xl font-bold ${getGradeColor(scan.letter_grade)}`}>
-            {scan.letter_grade}
-          </span>
-        ) : scan.status === 'processing' ? (
-          <span className="text-neon-yellow text-sm">...</span>
-        ) : scan.status === 'failed' ? (
-          <span className="text-danger text-lg">!</span>
-        ) : (
-          <span className="text-gray-500 text-sm">--</span>
-        )}
-      </div>
-
-      {/* URL & Meta */}
-      <div className="flex-1 min-w-0">
-        <p className="text-sm sm:text-base text-gray-200 truncate">{scan.url}</p>
-        <div className="flex items-center gap-2 mt-1">
-          <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${getStatusBadge(scan.status)}`}>
-            {scan.status}
-          </span>
-          <span className="text-[10px] sm:text-xs text-gray-500">{formattedDate}</span>
-        </div>
-      </div>
-
-      {/* Score */}
-      {scan.status === 'completed' && scan.score_overall !== null && (
-        <div className="text-right hidden sm:block">
-          <span className={`text-xl font-bold ${getScoreColor(scan.score_overall)}`}>
-            {scan.score_overall}
-          </span>
-          <p className="text-[10px] text-gray-500">score</p>
-        </div>
-      )}
-
-      {/* Arrow */}
-      <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-      </svg>
-    </Link>
-  );
-});
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -135,21 +70,18 @@ export default function DashboardPage() {
     setLoadingScans(false);
   }, []);
 
-  // Redirect if not logged in
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login');
     }
   }, [loading, user, router]);
 
-  // Fetch scans when user is available
   useEffect(() => {
     if (user) {
       fetchScans(user.id);
     }
   }, [user, fetchScans]);
 
-  // Re-fetch when page becomes visible (user navigates back)
   useEffect(() => {
     const handleVisibility = () => {
       if (document.visibilityState === 'visible' && user) {
@@ -161,30 +93,6 @@ export default function DashboardPage() {
     return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, [user, fetchScans]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-terminal">Loading...</div>
-      </div>
-    );
-  }
-
-  // Memoized filter handler
-  const handleFilterChange = useCallback((newFilter: FilterType) => {
-    startTransition(() => {
-      setFilter(newFilter);
-      setVisibleCount(SCANS_PER_PAGE);
-    });
-  }, []);
-
-  // Memoized load more handler
-  const handleLoadMore = useCallback(() => {
-    startTransition(() => {
-      setVisibleCount(prev => prev + SCANS_PER_PAGE);
-    });
-  }, []);
-
-  // Memoized calculations
   const { filteredScans, visibleScans, hasMore, completedCount, failedCount, avgScore } = useMemo(() => {
     const completed = scans.filter(s => s.status === 'completed');
     const failed = scans.filter(s => s.status === 'failed');
@@ -207,129 +115,216 @@ export default function DashboardPage() {
     };
   }, [scans, filter, visibleCount]);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-white/80 font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen">
-      <div className="pt-4 pb-12 px-3 sm:px-4">
-        <div className="max-w-5xl mx-auto">
-          {/* Header */}
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-100">Dashboard</h1>
-            <p className="text-sm sm:text-base text-gray-400 mt-1 sm:mt-2 truncate">
-              Welcome back, {user?.email}
-            </p>
-          </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Header */}
+      <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6 sm:mb-8">
-            <div className="bg-void-50 rounded-lg border border-void-100 p-3 sm:p-6">
-              <div className="text-xl sm:text-3xl font-bold text-terminal">
-                {completedCount}
-              </div>
-              <div className="text-[10px] sm:text-sm text-gray-400">Completed</div>
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-black text-white mb-2">Dashboard</h1>
+              <p className="text-white/70">Welcome back, {user?.email?.split('@')[0]}</p>
             </div>
-
-            <div className="bg-void-50 rounded-lg border border-void-100 p-3 sm:p-6">
-              <div className="text-xl sm:text-3xl font-bold text-neon-cyan">
-                {profile?.tier === 'pro' ? 'Pro' : profile?.tier === 'free' ? 'Free' : 'Anon'}
-              </div>
-              <div className="text-[10px] sm:text-sm text-gray-400">Plan</div>
-            </div>
-
-            <div className="bg-void-50 rounded-lg border border-void-100 p-3 sm:p-6">
-              <div className="text-xl sm:text-3xl font-bold text-gray-100">
-                {avgScore !== null ? avgScore : '-'}
-              </div>
-              <div className="text-[10px] sm:text-sm text-gray-400">Avg Score</div>
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="flex flex-wrap gap-2 sm:gap-4 mb-6 sm:mb-8">
-            <Link
-              href="/"
-              className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-terminal text-void font-bold rounded-lg hover:bg-terminal-bright transition-colors"
-            >
-              New Scan
-            </Link>
-
-            {profile?.tier !== 'pro' && (
+            <div className="flex gap-3">
               <Link
-                href="/pricing"
-                className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base border border-neon-cyan text-neon-cyan font-bold rounded-lg hover:bg-neon-cyan/10 transition-colors"
+                href="/"
+                className="px-6 py-3 bg-white text-indigo-600 font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
               >
-                Upgrade to Pro
+                New Scan
               </Link>
-            )}
+              {profile?.tier !== 'pro' && (
+                <Link
+                  href="/pricing"
+                  className="px-6 py-3 bg-white/20 backdrop-blur text-white font-bold rounded-xl hover:bg-white/30 transition-all"
+                >
+                  Upgrade
+                </Link>
+              )}
+            </div>
           </div>
 
-          {/* Monitored Sites */}
-          <div className="mb-6 sm:mb-8">
-            <MonitoredSites />
+          {/* Stats Grid */}
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-white/20">
+              <div className="text-3xl sm:text-4xl font-black text-white mb-1">{completedCount}</div>
+              <div className="text-white/70 text-sm font-medium">Scans Completed</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-white/20">
+              <div className={`text-3xl sm:text-4xl font-black mb-1 ${
+                profile?.tier === 'pro' ? 'text-amber-300' : 'text-white'
+              }`}>
+                {profile?.tier === 'pro' ? 'Pro' : 'Free'}
+              </div>
+              <div className="text-white/70 text-sm font-medium">Current Plan</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 sm:p-6 border border-white/20">
+              <div className={`text-3xl sm:text-4xl font-black mb-1 ${
+                avgScore !== null && avgScore >= 80 ? 'text-emerald-300' :
+                avgScore !== null && avgScore >= 60 ? 'text-amber-300' :
+                avgScore !== null ? 'text-red-300' : 'text-white/50'
+              }`}>
+                {avgScore !== null ? avgScore : '—'}
+              </div>
+              <div className="text-white/70 text-sm font-medium">Average Score</div>
+            </div>
           </div>
+        </div>
+      </div>
 
-          {/* Scan History */}
-          <div className="bg-void-50 rounded-lg border border-void-100 overflow-hidden">
-            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-void-100">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <h2 className="text-lg sm:text-xl font-bold text-gray-100">Scan History</h2>
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+        {/* Monitored Sites */}
+        <div className="mb-8">
+          <MonitoredSites />
+        </div>
 
-                {/* Filter Tabs */}
-                <div className="flex gap-1 bg-void rounded-lg p-1">
-                  {(['all', 'completed', 'failed'] as FilterType[]).map((f) => (
-                    <button
-                      key={f}
-                      onClick={() => handleFilterChange(f)}
-                      className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors capitalize ${
-                        filter === f
-                          ? 'bg-void-100 text-gray-100'
-                          : 'text-gray-400 hover:text-gray-200'
-                      }`}
-                    >
-                      {f} {f === 'all' ? `(${scans.length})` : f === 'completed' ? `(${completedCount})` : `(${failedCount})`}
-                    </button>
-                  ))}
-                </div>
+        {/* Scan History */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+          {/* Header */}
+          <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <h2 className="text-xl font-black text-gray-900">Scan History</h2>
+
+              {/* Filter Tabs */}
+              <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
+                {(['all', 'completed', 'failed'] as FilterType[]).map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => {
+                      setFilter(f);
+                      setVisibleCount(SCANS_PER_PAGE);
+                    }}
+                    className={`px-4 py-2 text-sm font-bold rounded-lg transition-all capitalize ${
+                      filter === f
+                        ? 'bg-white text-gray-900 shadow-md'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    {f} ({f === 'all' ? scans.length : f === 'completed' ? completedCount : failedCount})
+                  </button>
+                ))}
               </div>
             </div>
-
-            {loadingScans ? (
-              <div className="p-6 sm:p-8 text-center text-gray-500">Loading scans...</div>
-            ) : filteredScans.length === 0 ? (
-              <div className="p-6 sm:p-8 text-center">
-                <p className="text-gray-500 mb-4">
-                  {filter === 'all' ? 'No scans yet' : `No ${filter} scans`}
-                </p>
-                {filter === 'all' && (
-                  <Link
-                    href="/"
-                    className="text-terminal hover:text-terminal-bright transition-colors"
-                  >
-                    Run your first scan
-                  </Link>
-                )}
-              </div>
-            ) : (
-              <>
-                <div className="divide-y divide-void-100">
-                  {visibleScans.map((scan) => (
-                    <ScanRow key={scan.id} scan={scan} />
-                  ))}
-                </div>
-
-                {/* Load More */}
-                {hasMore && (
-                  <div className="px-4 sm:px-6 py-4 border-t border-void-100 text-center">
-                    <button
-                      onClick={handleLoadMore}
-                      className="text-sm text-terminal hover:text-terminal-bright transition-colors"
-                    >
-                      Load more ({filteredScans.length - visibleCount} remaining)
-                    </button>
-                  </div>
-                )}
-              </>
-            )}
           </div>
+
+          {/* Content */}
+          {loadingScans ? (
+            <div className="p-12 text-center">
+              <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-gray-500 font-medium">Loading scans...</p>
+            </div>
+          ) : filteredScans.length === 0 ? (
+            <div className="p-12 text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <p className="text-gray-900 font-bold text-lg mb-2">
+                {filter === 'all' ? 'No scans yet' : `No ${filter} scans`}
+              </p>
+              <p className="text-gray-500 mb-6">Start scanning websites to see them here</p>
+              {filter === 'all' && (
+                <Link
+                  href="/"
+                  className="inline-block px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
+                >
+                  Run your first scan
+                </Link>
+              )}
+            </div>
+          ) : (
+            <>
+              <div className="divide-y divide-gray-100">
+                {visibleScans.map((scan) => (
+                  <Link
+                    key={scan.id}
+                    href={`/scan/${scan.id}`}
+                    className="flex items-center px-6 py-4 hover:bg-gray-50 transition-all group"
+                  >
+                    {/* Grade Badge */}
+                    <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center mr-4 ${
+                      scan.status === 'completed' && scan.letter_grade
+                        ? getGradeBg(scan.letter_grade)
+                        : 'bg-gray-100'
+                    }`}>
+                      {scan.status === 'completed' && scan.letter_grade ? (
+                        <span className="text-lg font-black text-white">{scan.letter_grade}</span>
+                      ) : scan.status === 'processing' ? (
+                        <span className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                      ) : scan.status === 'failed' ? (
+                        <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      ) : (
+                        <span className="text-gray-400 text-sm font-bold">—</span>
+                      )}
+                    </div>
+
+                    {/* URL & Meta */}
+                    <div className="flex-1 min-w-0 mr-4">
+                      <p className="text-gray-900 font-bold truncate group-hover:text-indigo-600 transition-colors">
+                        {scan.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                      </p>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold capitalize ${
+                          scan.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
+                          scan.status === 'processing' ? 'bg-amber-100 text-amber-700' :
+                          scan.status === 'failed' ? 'bg-red-100 text-red-700' :
+                          'bg-gray-100 text-gray-600'
+                        }`}>
+                          {scan.status}
+                        </span>
+                        <span className="text-xs text-gray-400">{formatDate(scan.created_at)}</span>
+                      </div>
+                    </div>
+
+                    {/* Score */}
+                    {scan.status === 'completed' && scan.score_overall !== null && (
+                      <div className="hidden sm:block text-right mr-4">
+                        <span className={`text-2xl font-black ${getScoreColor(scan.score_overall)}`}>
+                          {scan.score_overall}
+                        </span>
+                        <p className="text-xs text-gray-400">score</p>
+                      </div>
+                    )}
+
+                    {/* Arrow */}
+                    <svg className="w-5 h-5 text-gray-300 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                ))}
+              </div>
+
+              {/* Load More */}
+              {hasMore && (
+                <div className="px-6 py-4 border-t border-gray-100 text-center bg-gray-50">
+                  <button
+                    onClick={() => setVisibleCount(prev => prev + SCANS_PER_PAGE)}
+                    className="text-indigo-600 hover:text-indigo-700 font-bold transition-colors"
+                  >
+                    Load more ({filteredScans.length - visibleCount} remaining)
+                  </button>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>

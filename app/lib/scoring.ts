@@ -58,9 +58,9 @@ export function getGrade(score: number): string {
  * Get grade color class
  */
 export function getGradeColor(grade: string): string {
-  if (grade.startsWith('A')) return 'text-terminal';
-  if (grade.startsWith('B')) return 'text-neon-yellow';
-  if (grade.startsWith('C')) return 'text-neon-orange';
+  if (grade.startsWith('A')) return 'text-success';
+  if (grade.startsWith('B')) return 'text-warning';
+  if (grade.startsWith('C')) return 'text-warning-dark';
   return 'text-danger';
 }
 
@@ -68,19 +68,19 @@ export function getGradeColor(grade: string): string {
  * Get grade background color class
  */
 export function getGradeBgColor(grade: string): string {
-  if (grade.startsWith('A')) return 'bg-terminal/20 border-terminal/50';
-  if (grade.startsWith('B')) return 'bg-neon-yellow/20 border-neon-yellow/50';
-  if (grade.startsWith('C')) return 'bg-neon-orange/20 border-neon-orange/50';
-  return 'bg-danger/20 border-danger/50';
+  if (grade.startsWith('A')) return 'bg-success/10 border-success/30';
+  if (grade.startsWith('B')) return 'bg-warning/10 border-warning/30';
+  if (grade.startsWith('C')) return 'bg-warning/10 border-warning-dark/30';
+  return 'bg-danger/10 border-danger/30';
 }
 
 /**
  * Get color class based on score
  */
 export function getScoreColor(score: number): string {
-  if (score >= 90) return 'text-terminal';
-  if (score >= 70) return 'text-neon-yellow';
-  if (score >= 50) return 'text-neon-orange';
+  if (score >= 90) return 'text-success';
+  if (score >= 70) return 'text-warning';
+  if (score >= 50) return 'text-warning-dark';
   return 'text-danger';
 }
 
@@ -88,15 +88,23 @@ export function getScoreColor(score: number): string {
  * Get background color class based on score
  */
 export function getScoreBgColor(score: number): string {
-  if (score >= 90) return 'bg-terminal/20 border-terminal/50';
-  if (score >= 70) return 'bg-neon-yellow/20 border-neon-yellow/50';
-  if (score >= 50) return 'bg-neon-orange/20 border-neon-orange/50';
-  return 'bg-danger/20 border-danger/50';
+  if (score >= 90) return 'bg-success/10 text-success';
+  if (score >= 70) return 'bg-warning/10 text-warning';
+  if (score >= 50) return 'bg-warning/10 text-warning-dark';
+  return 'bg-danger/10 text-danger';
 }
 
 /**
- * Get roast severity based on score
+ * Get severity level based on score
  */
+export function getSeverity(score: number): 'excellent' | 'good' | 'needs-attention' | 'critical' {
+  if (score >= 85) return 'excellent';
+  if (score >= 65) return 'good';
+  if (score >= 40) return 'needs-attention';
+  return 'critical';
+}
+
+// Keep old function for backwards compatibility
 export function getRoastSeverity(score: number): 'mild' | 'medium' | 'brutal' | 'nuclear' {
   if (score >= 85) return 'mild';
   if (score >= 65) return 'medium';
@@ -114,14 +122,15 @@ export function formatScore(score: number | undefined | null): string {
 
 /**
  * Get icon for category
+ * @deprecated Use CategoryIcon component from @/components/icons/CategoryIcon instead
  */
 export function getCategoryIcon(category: keyof CategoryScores): string {
   const icons: Record<keyof CategoryScores, string> = {
-    performance: '⚡',
-    security: '🛡️',
-    seo: '🔍',
-    accessibility: '♿',
-    codeQuality: '🧹',
+    performance: 'performance',
+    security: 'security',
+    seo: 'seo',
+    accessibility: 'accessibility',
+    codeQuality: 'code',
   };
   return icons[category];
 }

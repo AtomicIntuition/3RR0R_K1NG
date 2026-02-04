@@ -24,7 +24,7 @@ export default function SettingsPage() {
   const [newKey, setNewKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -107,216 +107,224 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-terminal">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-white/80 font-medium">Loading...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="pt-4 pb-12 px-3 sm:px-4">
-        <div className="max-w-3xl mx-auto">
-          {/* Header */}
-          <div className="mb-6 sm:mb-8">
-            <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
-              <Link href="/dashboard" className="hover:text-terminal transition-colors">
-                Dashboard
-              </Link>
-              <span>/</span>
-              <span className="text-gray-200">Settings</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-100">Settings</h1>
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Header */}
+      <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-gray-900 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl" />
+
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-12">
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-2 text-sm text-white/50 mb-4">
+            <Link href="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
+            <span>/</span>
+            <span className="text-white font-medium">Settings</span>
           </div>
 
-          {/* Account Info */}
-          <div className="bg-void-50 rounded-lg border border-void-100 p-4 sm:p-6 mb-6">
-            <h2 className="text-lg font-bold text-gray-100 mb-4">Account</h2>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-400">Email</span>
-                <span className="text-gray-200">{user?.email}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-400">Plan</span>
-                <span className={profile?.tier === 'pro' ? 'text-terminal font-bold' : 'text-gray-200'}>
-                  {profile?.tier === 'pro' ? 'Pro' : 'Free'}
-                </span>
-              </div>
-              {profile?.scan_credits && profile.scan_credits > 0 && (
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-400">Scan Credits</span>
-                  <span className="text-neon-cyan">{profile.scan_credits}</span>
-                </div>
-              )}
-            </div>
+          <h1 className="text-3xl sm:text-4xl font-black text-white mb-2">Settings</h1>
+          <p className="text-white/60">Manage your API keys and integrations</p>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+        {/* Account Info Card */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+          <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+            <h2 className="text-xl font-black text-gray-900">Account</h2>
           </div>
-
-          {/* API Keys Section */}
-          <div className="bg-void-50 rounded-lg border border-void-100 overflow-hidden">
-            <div className="px-4 sm:px-6 py-4 border-b border-void-100">
-              <h2 className="text-lg font-bold text-gray-100">API Keys</h2>
-              <p className="text-sm text-gray-400 mt-1">
-                Use API keys to authenticate with the 3RROR CLI or external integrations.
-              </p>
+          <div className="p-6 space-y-4">
+            <div className="flex items-center justify-between py-3 border-b border-gray-100">
+              <span className="text-gray-500 font-medium">Email</span>
+              <span className="text-gray-900 font-bold">{user?.email}</span>
             </div>
-
-            {/* New Key Display */}
-            {newKey && (
-              <div className="p-4 sm:p-6 bg-terminal/10 border-b border-terminal/30">
-                <div className="flex items-start gap-3">
-                  <div className="text-terminal text-xl">!</div>
-                  <div className="flex-1">
-                    <p className="text-terminal font-bold mb-2">Save your API key now!</p>
-                    <p className="text-sm text-gray-400 mb-3">
-                      This is the only time you&apos;ll see this key. Copy it now and store it securely.
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <code className="flex-1 bg-void px-3 py-2 rounded font-mono text-sm text-gray-200 truncate">
-                        {newKey}
-                      </code>
-                      <button
-                        onClick={copyToClipboard}
-                        className="px-4 py-2 bg-terminal text-void font-bold rounded hover:bg-terminal-bright transition-colors"
-                      >
-                        {copied ? 'Copied!' : 'Copy'}
-                      </button>
-                    </div>
-                    <button
-                      onClick={() => setNewKey(null)}
-                      className="mt-3 text-sm text-gray-400 hover:text-gray-200 transition-colors"
-                    >
-                      I&apos;ve saved my key
-                    </button>
-                  </div>
-                </div>
+            <div className="flex items-center justify-between py-3 border-b border-gray-100">
+              <span className="text-gray-500 font-medium">Plan</span>
+              <span className={`px-3 py-1 rounded-full text-sm font-bold ${
+                profile?.tier === 'pro'
+                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white'
+                  : 'bg-gray-100 text-gray-600'
+              }`}>
+                {profile?.tier === 'pro' ? 'Pro' : 'Free'}
+              </span>
+            </div>
+            {profile?.scan_credits && profile.scan_credits > 0 && (
+              <div className="flex items-center justify-between py-3">
+                <span className="text-gray-500 font-medium">Scan Credits</span>
+                <span className="text-indigo-600 font-bold">{profile.scan_credits}</span>
               </div>
             )}
+          </div>
+        </div>
 
-            {/* Create Key Form */}
-            <div className="p-4 sm:p-6 border-b border-void-100">
-              <div className="flex flex-col sm:flex-row gap-3">
-                <input
-                  type="text"
-                  value={newKeyName}
-                  onChange={(e) => setNewKeyName(e.target.value)}
-                  placeholder="Key name (optional)"
-                  className="flex-1 px-4 py-2 bg-void border border-void-100 rounded text-gray-200 placeholder-gray-500 focus:border-terminal focus:outline-none"
-                />
-                <button
-                  onClick={createApiKey}
-                  disabled={creating || apiKeys.filter(k => k.is_active).length >= 5}
-                  className="px-6 py-2 bg-terminal text-void font-bold rounded hover:bg-terminal-bright transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-                >
-                  {creating ? 'Creating...' : 'Create API Key'}
-                </button>
+        {/* API Keys Section */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+          <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+            <h2 className="text-xl font-black text-gray-900">API Keys</h2>
+            <p className="text-gray-500 text-sm mt-1">Use API keys to authenticate with the Crisp CLI</p>
+          </div>
+
+          {/* New Key Alert */}
+          {newKey && (
+            <div className="p-6 bg-emerald-50 border-b border-emerald-200">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="text-emerald-800 font-bold mb-2">Save your API key now!</p>
+                  <p className="text-emerald-600 text-sm mb-4">This is the only time you&apos;ll see this key.</p>
+                  <div className="flex items-center gap-3">
+                    <code className="flex-1 bg-white px-4 py-3 rounded-xl font-mono text-sm text-gray-800 border border-emerald-200 truncate">
+                      {newKey}
+                    </code>
+                    <button
+                      onClick={copyToClipboard}
+                      className="px-6 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-all"
+                    >
+                      {copied ? 'Copied!' : 'Copy'}
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => setNewKey(null)}
+                    className="mt-4 text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                  >
+                    I&apos;ve saved my key
+                  </button>
+                </div>
               </div>
-              {error && (
-                <p className="text-danger text-sm mt-2">{error}</p>
-              )}
-              {apiKeys.filter(k => k.is_active).length >= 5 && (
-                <p className="text-gray-400 text-sm mt-2">Maximum 5 active API keys allowed.</p>
-              )}
             </div>
+          )}
 
-            {/* API Keys List */}
-            {loadingKeys ? (
-              <div className="p-6 text-center text-gray-500">Loading...</div>
-            ) : apiKeys.filter(k => k.is_active).length === 0 ? (
-              <div className="p-6 text-center text-gray-500">
-                No API keys yet. Create one to use the CLI.
+          {/* Create Key Form */}
+          <div className="p-6 border-b border-gray-100">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="text"
+                value={newKeyName}
+                onChange={(e) => setNewKeyName(e.target.value)}
+                placeholder="Key name (optional)"
+                className="flex-1 px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all"
+              />
+              <button
+                onClick={createApiKey}
+                disabled={creating || apiKeys.filter(k => k.is_active).length >= 5}
+                className="px-6 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 whitespace-nowrap"
+              >
+                {creating ? (
+                  <span className="flex items-center gap-2">
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Creating...
+                  </span>
+                ) : (
+                  'Create API Key'
+                )}
+              </button>
+            </div>
+            {error && <p className="text-red-500 text-sm mt-3 font-medium">{error}</p>}
+            {apiKeys.filter(k => k.is_active).length >= 5 && (
+              <p className="text-gray-500 text-sm mt-3">Maximum 5 active API keys allowed.</p>
+            )}
+          </div>
+
+          {/* Keys List */}
+          {loadingKeys ? (
+            <div className="p-12 text-center">
+              <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-gray-500 font-medium">Loading keys...</p>
+            </div>
+          ) : apiKeys.filter(k => k.is_active).length === 0 ? (
+            <div className="p-12 text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                </svg>
               </div>
-            ) : (
-              <div className="divide-y divide-void-100">
-                {apiKeys.filter(k => k.is_active).map((key) => (
-                  <div key={key.id} className="flex items-center justify-between px-4 sm:px-6 py-4">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-gray-200 font-medium">{key.name}</p>
-                      <div className="flex items-center gap-3 mt-1">
-                        <code className="text-sm text-gray-500 font-mono">{key.key_prefix}</code>
-                        <span className="text-xs text-gray-500">
-                          Created {new Date(key.created_at).toLocaleDateString()}
+              <p className="text-gray-900 font-bold mb-2">No API keys yet</p>
+              <p className="text-gray-500">Create one to use the CLI</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {apiKeys.filter(k => k.is_active).map((key) => (
+                <div key={key.id} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-gray-900 font-bold">{key.name}</p>
+                    <div className="flex flex-wrap items-center gap-3 mt-1">
+                      <code className="text-sm text-gray-500 font-mono bg-gray-100 px-2 py-0.5 rounded-lg">{key.key_prefix}</code>
+                      <span className="text-xs text-gray-400">
+                        Created {new Date(key.created_at).toLocaleDateString()}
+                      </span>
+                      {key.last_used_at && (
+                        <span className="text-xs text-gray-400">
+                          Last used {new Date(key.last_used_at).toLocaleDateString()}
                         </span>
-                        {key.last_used_at && (
-                          <span className="text-xs text-gray-500">
-                            Last used {new Date(key.last_used_at).toLocaleDateString()}
-                          </span>
-                        )}
-                      </div>
+                      )}
                     </div>
-                    <button
-                      onClick={() => revokeApiKey(key.id)}
-                      className="px-3 py-1 text-sm text-danger hover:bg-danger/10 rounded transition-colors"
-                    >
-                      Revoke
-                    </button>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* CLI Installation */}
-          <div className="mt-6 bg-void-50 rounded-lg border border-void-100 p-4 sm:p-6">
-            <h2 className="text-lg font-bold text-gray-100 mb-4">Install the CLI</h2>
-            <p className="text-sm text-gray-400 mb-4">Choose your preferred installation method:</p>
-            <div className="space-y-3">
-              <div>
-                <p className="text-xs text-gray-500 mb-1">npm (Node.js)</p>
-                <code className="block bg-void px-4 py-3 rounded font-mono text-sm text-terminal overflow-x-auto">
-                  npm install -g error-king
-                </code>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 mb-1">npx (no install)</p>
-                <code className="block bg-void px-4 py-3 rounded font-mono text-sm text-terminal overflow-x-auto">
-                  npx error-king scan https://example.com
-                </code>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Homebrew (macOS/Linux)</p>
-                <code className="block bg-void px-4 py-3 rounded font-mono text-sm text-terminal overflow-x-auto">
-                  brew tap AtomicIntuition/tap && brew install error-king
-                </code>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Cargo (Rust)</p>
-                <code className="block bg-void px-4 py-3 rounded font-mono text-sm text-terminal overflow-x-auto">
-                  cargo install error_king
-                </code>
-              </div>
+                  <button
+                    onClick={() => revokeApiKey(key.id)}
+                    className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-xl font-bold transition-colors"
+                  >
+                    Revoke
+                  </button>
+                </div>
+              ))}
             </div>
-          </div>
+          )}
+        </div>
 
-          {/* CLI Usage */}
-          <div className="mt-6 bg-void-50 rounded-lg border border-void-100 p-4 sm:p-6">
-            <h2 className="text-lg font-bold text-gray-100 mb-4">Usage</h2>
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-gray-400 mb-2">Set your API key:</p>
-                <code className="block bg-void px-4 py-3 rounded font-mono text-sm text-terminal overflow-x-auto">
-                  export ERRORKING_API_KEY=sk_...
+        {/* CLI Installation */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+          <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+            <h2 className="text-xl font-black text-gray-900">Install the CLI</h2>
+          </div>
+          <div className="p-6 space-y-4">
+            {[
+              { label: 'npm (Node.js)', cmd: 'npm install -g crisp' },
+              { label: 'npx (no install)', cmd: 'npx crisp scan https://example.com' },
+              { label: 'Homebrew (macOS/Linux)', cmd: 'brew install crisp' },
+            ].map((item, i) => (
+              <div key={i}>
+                <p className="text-xs text-gray-500 mb-2 font-bold uppercase tracking-wide">{item.label}</p>
+                <code className="block bg-gray-900 text-emerald-400 px-4 py-3 rounded-xl font-mono text-sm overflow-x-auto">
+                  {item.cmd}
                 </code>
               </div>
-              <div>
-                <p className="text-sm text-gray-400 mb-2">Verify your key:</p>
-                <code className="block bg-void px-4 py-3 rounded font-mono text-sm text-terminal overflow-x-auto">
-                  3rror auth
+            ))}
+          </div>
+        </div>
+
+        {/* Usage Examples */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+          <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+            <h2 className="text-xl font-black text-gray-900">Usage</h2>
+          </div>
+          <div className="p-6 space-y-4">
+            {[
+              { label: 'Set your API key', cmd: 'export CRISP_API_KEY=sk_...' },
+              { label: 'Verify your key', cmd: 'crisp auth' },
+              { label: 'Scan a website', cmd: 'crisp scan https://example.com' },
+              { label: 'Search previous scans', cmd: 'crisp search stripe.com' },
+            ].map((item, i) => (
+              <div key={i}>
+                <p className="text-sm text-gray-500 mb-2">{item.label}</p>
+                <code className="block bg-gray-900 text-emerald-400 px-4 py-3 rounded-xl font-mono text-sm overflow-x-auto">
+                  {item.cmd}
                 </code>
               </div>
-              <div>
-                <p className="text-sm text-gray-400 mb-2">Scan a website:</p>
-                <code className="block bg-void px-4 py-3 rounded font-mono text-sm text-terminal overflow-x-auto">
-                  3rror scan https://example.com
-                </code>
-              </div>
-              <div>
-                <p className="text-sm text-gray-400 mb-2">Search previous scans:</p>
-                <code className="block bg-void px-4 py-3 rounded font-mono text-sm text-terminal overflow-x-auto">
-                  3rror search stripe.com
-                </code>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

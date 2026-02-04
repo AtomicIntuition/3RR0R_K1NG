@@ -73,10 +73,10 @@ export function PaymentButton({
         onClick={handleClick}
         disabled={isLoading}
         className={clsx(
-          'w-full px-6 py-4 font-bold rounded transition-all duration-200',
-          'bg-gradient-to-r from-terminal to-neon-cyan text-void',
-          'hover:from-terminal-bright hover:to-neon-cyan',
-          'hover:shadow-lg hover:shadow-terminal/25',
+          'w-full px-6 py-4 font-bold rounded-xl transition-all duration-200',
+          'bg-primary text-white',
+          'hover:bg-primary-600',
+          'hover:shadow-lg',
           'active:scale-[0.98]',
           'disabled:opacity-50 disabled:cursor-not-allowed'
         )}
@@ -142,30 +142,30 @@ export function PricingCard({
   return (
     <div
       className={clsx(
-        'relative p-6 rounded-lg border',
+        'relative p-6 rounded-xl border shadow-sm',
         popular
-          ? 'border-terminal bg-terminal/5'
-          : 'border-void-100 bg-void-50',
+          ? 'border-primary bg-primary/5'
+          : 'border-gray-200 bg-white',
         className
       )}
     >
       {popular && (
-        <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-terminal text-void text-xs font-bold rounded-full">
+        <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary text-white text-xs font-bold rounded-full">
           POPULAR
         </span>
       )}
 
-      <h3 className="text-xl font-bold text-gray-100 mb-2">{name}</h3>
+      <h3 className="text-xl font-bold text-gray-900 mb-2">{name}</h3>
 
       <div className="mb-6">
-        <span className="text-4xl font-bold text-terminal">{price}</span>
+        <span className="text-4xl font-bold text-primary">{price}</span>
         {period && <span className="text-gray-500 ml-1">/{period}</span>}
       </div>
 
       <ul className="space-y-3 mb-6">
         {features.map((feature, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm text-gray-400">
-            <span className="text-terminal mt-0.5">✓</span>
+          <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+            <span className="text-success mt-0.5">✓</span>
             <span>{feature}</span>
           </li>
         ))}

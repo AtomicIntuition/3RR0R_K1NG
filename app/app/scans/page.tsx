@@ -11,8 +11,8 @@ export default function ScansPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-terminal">Loading...</div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="text-primary">Loading...</div>
     </div>
   );
 }

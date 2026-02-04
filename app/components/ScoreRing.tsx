@@ -20,6 +20,14 @@ const SIZES = {
   xl: { ring: 200, stroke: 12, text: 'text-5xl', label: 'text-lg' },
 };
 
+// Get glow color based on score
+function getGlowColor(score: number): string {
+  if (score >= 90) return 'rgba(34, 197, 94, 0.2)'; // green
+  if (score >= 70) return 'rgba(245, 158, 11, 0.2)'; // yellow
+  if (score >= 50) return 'rgba(217, 119, 6, 0.2)'; // orange
+  return 'rgba(239, 68, 68, 0.2)'; // red
+}
+
 export function ScoreRing({
   score,
   size = 'md',
@@ -39,13 +47,10 @@ export function ScoreRing({
   const progress = (displayScore / 100) * circumference;
   const offset = circumference - progress;
 
-  // Animate using requestAnimationFrame for smooth 60fps
   const animateScore = useCallback((startTime: number, duration: number, targetScore: number) => {
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-
-      // Ease out cubic for smooth deceleration
       const easeOut = 1 - Math.pow(1 - progress, 3);
       const currentScore = Math.round(easeOut * targetScore);
 
@@ -68,7 +73,6 @@ export function ScoreRing({
           setHasAnimated(true);
           observer.disconnect();
 
-          // Start animation with requestAnimationFrame
           requestAnimationFrame((startTime) => {
             animateScore(startTime, 1200, score);
           });
@@ -89,7 +93,6 @@ export function ScoreRing({
     };
   }, [animate, score, hasAnimated, animateScore]);
 
-  // Update score if prop changes after animation
   useEffect(() => {
     if (hasAnimated && !animate) {
       setDisplayScore(score);
@@ -98,12 +101,22 @@ export function ScoreRing({
 
   const colorClass = getScoreColor(displayScore);
   const grade = getGrade(displayScore);
+  const glowColor = getGlowColor(displayScore);
 
   return (
     <div ref={ref} className={clsx('score-ring inline-flex flex-col items-center', className)}>
       <div className="relative" style={{ width: ring, height: ring }}>
-        <svg width={ring} height={ring} className="transform -rotate-90">
-          {/* Background circle */}
+        {/* Ambient glow behind ring */}
+        <div
+          className="absolute inset-0 rounded-full blur-xl transition-all duration-500"
+          style={{
+            background: `radial-gradient(circle, ${glowColor} 0%, transparent 70%)`,
+            transform: 'scale(1.3)',
+          }}
+        />
+
+        <svg width={ring} height={ring} className="relative transform -rotate-90">
+          {/* Background circle with dashed pattern */}
           <circle
             cx={ring / 2}
             cy={ring / 2}
@@ -111,9 +124,10 @@ export function ScoreRing({
             fill="none"
             stroke="currentColor"
             strokeWidth={stroke}
-            className="text-void-100"
+            strokeDasharray="4 4"
+            className="text-gray-200"
           />
-          {/* Progress circle */}
+          {/* Progress circle with gradient effect */}
           <circle
             cx={ring / 2}
             cy={ring / 2}
@@ -124,31 +138,38 @@ export function ScoreRing({
             strokeDasharray={circumference}
             strokeDashoffset={offset}
             strokeLinecap="round"
-            className={clsx(colorClass, 'transition-[stroke-dashoffset] duration-300 ease-out')}
+            className={clsx(colorClass, 'transition-[stroke-dashoffset] duration-500 ease-premium drop-shadow-sm')}
             style={{
-              filter: `drop-shadow(0 0 6px currentColor)`,
               willChange: 'stroke-dashoffset',
+              filter: `drop-shadow(0 0 6px ${glowColor})`,
             }}
           />
         </svg>
 
-        {/* Center content */}
+        {/* Center content with scale entrance animation */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           {showGrade ? (
-            <span className={clsx(text, 'font-bold', colorClass)}>{grade}</span>
+            <span className={clsx(text, 'font-bold font-display', colorClass)}>{grade}</span>
           ) : (
             <>
-              <span className={clsx(text, 'font-bold tabular-nums leading-none', colorClass)}>
+              <span
+                className={clsx(
+                  text,
+                  'font-bold tabular-nums leading-none font-display',
+                  colorClass,
+                  hasAnimated && 'animate-scale-in'
+                )}
+              >
                 {displayScore}
               </span>
-              <span className={clsx(labelSize, 'text-gray-500 mt-1')}>/100</span>
+              <span className={clsx(labelSize, 'text-gray-400 mt-1')}>/100</span>
             </>
           )}
         </div>
       </div>
 
       {label && (
-        <span className={clsx(labelSize, 'mt-2 text-gray-400 font-medium')}>
+        <span className={clsx(labelSize, 'mt-3 text-gray-600 font-medium')}>
           {label}
         </span>
       )}

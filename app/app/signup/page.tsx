@@ -4,7 +4,6 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
-import { GlitchText } from '@/components/GlitchText';
 import { toast } from 'sonner';
 
 export default function SignUpPage() {
@@ -42,118 +41,180 @@ export default function SignUpPage() {
       toast.error('Sign up failed', { description: error.message });
       setLoading(false);
     } else {
-      // Account created successfully - refresh profile and redirect
       await refreshProfile();
-      toast.success('Account created!', { description: 'Welcome to 3RROR_K1NG.' });
+      toast.success('Account created!', { description: 'Welcome to Crisp.' });
       router.push('/');
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-block mb-6">
-            <span className="text-2xl font-bold text-terminal hover:text-terminal-bright transition-colors">
-              3RROR_K1NG
-            </span>
+    <div className="min-h-screen flex">
+      {/* Left side - Gradient */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 right-10 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
+
+        <div className="relative z-10 flex flex-col justify-center px-12">
+          <Link href="/" className="flex items-center gap-3 mb-12">
+            <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+              <span className="text-white text-xl font-black">C</span>
+            </div>
+            <span className="text-3xl font-black text-white">Crisp</span>
           </Link>
 
-          <h1 className="text-3xl font-bold mb-2">
-            <GlitchText
-              text="Join the Roast"
-              className="text-gray-100"
-              glitchIntensity="low"
-              as="span"
-            />
+          <h1 className="text-4xl font-black text-white mb-4">
+            Start auditing today
           </h1>
-          <p className="text-gray-400">Create an account to unlock more scans</p>
-        </div>
+          <p className="text-xl text-white/80 max-w-md mb-8">
+            Create your free account and get instant access to powerful website auditing tools.
+          </p>
 
-        {/* Sign Up Form */}
-        <div className="bg-void-50 rounded-lg border border-void-100 p-6">
-          {/* Email/Password Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-void-100 border border-void-200 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:border-terminal"
-                placeholder="you@example.com"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-void-100 border border-void-200 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:border-terminal"
-                placeholder="At least 6 characters"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-1">
-                Confirm Password
-              </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-void-100 border border-void-200 rounded-lg text-gray-100 placeholder-gray-500 focus:outline-none focus:border-terminal"
-                placeholder="Confirm your password"
-                required
-              />
-            </div>
-
-            {error && (
-              <div className="px-4 py-2 bg-danger/10 border border-danger/30 rounded text-danger text-sm">
-                {error}
+          {/* Features list */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
               </div>
-            )}
+              <span className="text-white/90 font-medium">3 free scans per day</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <span className="text-white/90 font-medium">AI-powered analysis</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <span className="text-white/90 font-medium">No credit card required</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full px-4 py-3 bg-terminal text-void font-bold rounded-lg hover:bg-terminal-bright transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Creating account...' : 'Create Account'}
-            </button>
-          </form>
+      {/* Right side - Form */}
+      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-gray-50">
+        <div className="w-full max-w-md">
+          {/* Mobile logo */}
+          <div className="lg:hidden text-center mb-8">
+            <Link href="/" className="inline-flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+                <span className="text-white text-lg font-black">C</span>
+              </div>
+              <span className="text-2xl font-black text-gray-900">Crisp</span>
+            </Link>
+          </div>
 
-          <p className="mt-4 text-xs text-gray-500 text-center">
-            By signing up, you agree to our{' '}
-            <Link href="/terms" className="text-gray-400 hover:text-terminal">
-              Terms of Service
-            </Link>{' '}
-            and{' '}
-            <Link href="/privacy" className="text-gray-400 hover:text-terminal">
-              Privacy Policy
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-black text-gray-900 mb-2">
+              Create account
+            </h2>
+            <p className="text-gray-500">
+              Sign up to unlock more features
+            </p>
+          </div>
+
+          {/* Form Card */}
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Email address
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all"
+                  placeholder="you@example.com"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all"
+                  placeholder="At least 6 characters"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Confirm password
+                </label>
+                <input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all"
+                  placeholder="Confirm your password"
+                  required
+                />
+              </div>
+
+              {error && (
+                <div className="px-4 py-3 bg-red-50 border-2 border-red-200 rounded-xl text-red-600 text-sm font-medium">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Creating account...
+                  </span>
+                ) : (
+                  'Create account'
+                )}
+              </button>
+            </form>
+
+            <p className="mt-4 text-xs text-gray-500 text-center">
+              By signing up, you agree to our{' '}
+              <Link href="/terms" className="text-purple-600 hover:text-purple-700 font-medium">
+                Terms of Service
+              </Link>{' '}
+              and{' '}
+              <Link href="/privacy" className="text-purple-600 hover:text-purple-700 font-medium">
+                Privacy Policy
+              </Link>
+            </p>
+          </div>
+
+          <p className="mt-8 text-center text-gray-500">
+            Already have an account?{' '}
+            <Link href="/login" className="text-purple-600 hover:text-purple-700 font-semibold">
+              Sign in
             </Link>
           </p>
         </div>
-
-        {/* Login Link */}
-        <p className="mt-6 text-center text-gray-400">
-          Already have an account?{' '}
-          <Link href="/login" className="text-terminal hover:text-terminal-bright transition-colors">
-            Sign in
-          </Link>
-        </p>
       </div>
     </div>
   );

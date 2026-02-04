@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Modal } from './Modal';
-import { GlitchText } from './GlitchText';
 import { PRICING } from '@/lib/constants';
 import { wasExitIntentShown, setExitIntentShown } from '@/lib/conversion-tracking';
 import { useAuth } from '@/lib/auth-context';
@@ -125,26 +124,22 @@ export function ExitIntentModal({ discountPriceId }: ExitIntentModalProps) {
       closeOnEscape={true}
       className="max-w-md"
     >
-      <div className="relative overflow-hidden">
-        {/* Animated background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-terminal/10 via-transparent to-neon-cyan/10 animate-pulse" />
+      <div className="relative overflow-hidden bg-white">
+        {/* Subtle gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-success/5" />
 
         <div className="relative p-8">
           {/* Header */}
           <div className="text-center mb-6">
-            <div className="inline-block px-3 py-1 bg-danger/20 text-danger text-xs font-bold rounded-full mb-4 animate-pulse">
-              WAIT — EXCLUSIVE OFFER
+            <div className="inline-block px-3 py-1 bg-warning/10 text-warning text-xs font-bold rounded-full mb-4">
+              EXCLUSIVE OFFER
             </div>
 
-            <h2 className="text-3xl font-bold text-gray-100 mb-3">
-              <GlitchText
-                text="Don't leave yet!"
-                glitchIntensity="medium"
-                as="span"
-              />
+            <h2 className="text-3xl font-bold text-gray-800 mb-3">
+              Wait — don&apos;t leave yet!
             </h2>
 
-            <p className="text-gray-400">
+            <p className="text-gray-500">
               Get your first month of Pro for just
             </p>
           </div>
@@ -152,23 +147,23 @@ export function ExitIntentModal({ discountPriceId }: ExitIntentModalProps) {
           {/* Price display */}
           <div className="text-center mb-6">
             <div className="inline-flex items-baseline gap-2">
-              <span className="text-2xl text-gray-500 line-through">
+              <span className="text-2xl text-gray-400 line-through">
                 ${PRICING.PRO_MONTHLY}
               </span>
-              <span className="text-5xl font-bold text-terminal">
+              <span className="text-5xl font-bold text-primary">
                 ${PRICING.EXIT_INTENT_DISCOUNT_PRICE}
               </span>
             </div>
             <div className="mt-2">
-              <span className="inline-block px-3 py-1 bg-terminal/20 text-terminal text-sm font-bold rounded-full">
+              <span className="inline-block px-3 py-1 bg-primary/10 text-primary text-sm font-bold rounded-full">
                 {PRICING.EXIT_INTENT_DISCOUNT_PERCENT}% OFF
               </span>
             </div>
           </div>
 
           {/* What you get */}
-          <div className="bg-void-100 rounded-lg p-4 mb-6">
-            <p className="text-sm text-gray-400 font-medium mb-3">What you get:</p>
+          <div className="bg-gray-50 rounded-xl p-4 mb-6">
+            <p className="text-sm text-gray-500 font-medium mb-3">What you get:</p>
             <ul className="space-y-2">
               {[
                 `${PRICING.PRO_SCANS_PER_MONTH} scans per month`,
@@ -177,8 +172,8 @@ export function ExitIntentModal({ discountPriceId }: ExitIntentModalProps) {
                 'Scan history saved to account',
                 'Cancel anytime',
               ].map((feature, i) => (
-                <li key={i} className="flex items-center gap-2 text-sm text-gray-300">
-                  <svg className="w-4 h-4 text-terminal flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <li key={i} className="flex items-center gap-2 text-sm text-gray-700">
+                  <svg className="w-4 h-4 text-success flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <span>{feature}</span>
@@ -190,7 +185,7 @@ export function ExitIntentModal({ discountPriceId }: ExitIntentModalProps) {
           {/* Timer */}
           <div className="text-center mb-6">
             <p className="text-sm text-gray-500 mb-1">Offer expires in</p>
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-danger/10 border border-danger/30 rounded-lg">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-danger/10 border border-danger/20 rounded-lg">
               <svg className="w-5 h-5 text-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -206,10 +201,10 @@ export function ExitIntentModal({ discountPriceId }: ExitIntentModalProps) {
               onClick={handleClaimOffer}
               disabled={isLoading}
               className={clsx(
-                'w-full px-6 py-4 font-bold rounded-lg transition-all duration-200',
-                'bg-gradient-to-r from-terminal to-neon-cyan text-void',
-                'hover:from-terminal-bright hover:to-neon-cyan',
-                'hover:shadow-lg hover:shadow-terminal/25',
+                'w-full px-6 py-4 font-bold rounded-xl transition-all duration-200',
+                'bg-primary text-white',
+                'hover:bg-primary-600',
+                'hover:shadow-lg hover:shadow-primary/25',
                 'disabled:opacity-50 disabled:cursor-not-allowed',
                 'active:scale-[0.98]'
               )}
@@ -229,7 +224,7 @@ export function ExitIntentModal({ discountPriceId }: ExitIntentModalProps) {
 
             <button
               onClick={handleDecline}
-              className="w-full px-6 py-3 text-gray-500 hover:text-gray-400 transition-colors text-sm"
+              className="w-full px-6 py-3 text-gray-500 hover:text-gray-700 transition-colors text-sm"
             >
               No thanks, I&apos;ll pay full price later
             </button>

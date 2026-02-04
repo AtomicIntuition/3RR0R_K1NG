@@ -3,7 +3,6 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { GlitchText } from '@/components/GlitchText';
 import { useAuth } from '@/lib/auth-context';
 import { toast } from 'sonner';
 
@@ -27,24 +26,28 @@ function PaymentSuccessContent() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-terminal"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   if (status === 'error') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-4">
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-gray-50">
         <div className="text-center max-w-md">
-          <span className="text-6xl mb-6 block">⚠️</span>
-          <h1 className="text-2xl font-bold text-neon-orange mb-4">
+          <div className="w-16 h-16 mx-auto mb-6 bg-warning/10 rounded-full flex items-center justify-center">
+            <svg className="w-8 h-8 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">
             Something went wrong
           </h1>
-          <p className="text-gray-400 mb-6">
+          <p className="text-gray-500 mb-6">
             We couldn't verify your payment. If you were charged, please contact support.
           </p>
-          <Link href="/" className="btn-primary inline-block">
+          <Link href="/" className="inline-block px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-600 transition-colors">
             Go Home
           </Link>
         </div>
@@ -53,13 +56,13 @@ function PaymentSuccessContent() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-gray-50">
       <div className="text-center max-w-lg">
         {/* Success Animation */}
         <div className="relative mb-8">
-          <div className="w-24 h-24 mx-auto rounded-full bg-terminal/20 flex items-center justify-center animate-pulse">
+          <div className="w-24 h-24 mx-auto rounded-full bg-success/10 flex items-center justify-center">
             <svg
-              className="w-12 h-12 text-terminal"
+              className="w-12 h-12 text-success"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -74,39 +77,33 @@ function PaymentSuccessContent() {
           </div>
         </div>
 
-        <h1 className="text-3xl sm:text-4xl font-bold mb-4">
-          <GlitchText
-            text="Payment Successful!"
-            className="text-terminal"
-            glitchIntensity="low"
-            as="span"
-          />
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-4">
+          Payment Successful!
         </h1>
 
-        <p className="text-xl text-gray-300 mb-2">
-          Welcome to the elite, hacker.
+        <p className="text-xl text-gray-600 mb-2">
+          Welcome to Pro.
         </p>
 
         <p className="text-gray-500 mb-8">
-          Your account has been upgraded. You now have access to unlimited roasting power.
-          Time to expose some vulnerabilities.
+          Your account has been upgraded. You now have access to all premium features.
         </p>
 
         {/* Next Steps */}
-        <div className="bg-void-50 rounded-lg border border-void-100 p-6 mb-8 text-left">
-          <h2 className="font-bold text-terminal mb-4">What's next?</h2>
-          <ul className="space-y-3 text-sm text-gray-400">
+        <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-8 text-left shadow-sm">
+          <h2 className="font-semibold text-gray-800 mb-4">What's next?</h2>
+          <ul className="space-y-3 text-sm text-gray-600">
             <li className="flex items-start gap-2">
-              <span className="text-terminal">1.</span>
-              <span>Start scanning unlimited websites with priority queue access</span>
+              <span className="text-primary font-medium">1.</span>
+              <span>200 scans per month with priority queue access</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-terminal">2.</span>
-              <span>Access detailed security deep-dives and historical data</span>
+              <span className="text-primary font-medium">2.</span>
+              <span>Site monitoring with score drop alerts</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-terminal">3.</span>
-              <span>Export your roast reports as shareable PDFs</span>
+              <span className="text-primary font-medium">3.</span>
+              <span>API access for automated auditing</span>
             </li>
           </ul>
         </div>
@@ -115,22 +112,22 @@ function PaymentSuccessContent() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href="/"
-            className="px-8 py-4 font-bold rounded transition-all duration-200 bg-gradient-to-r from-terminal to-neon-cyan text-void hover:shadow-lg hover:shadow-terminal/25"
+            className="px-8 py-4 font-semibold rounded-xl transition-all bg-primary text-white hover:bg-primary-600"
           >
             Start Scanning
           </Link>
           <Link
-            href="/pricing"
-            className="px-8 py-4 font-bold rounded transition-all duration-200 bg-void-100 text-gray-300 hover:bg-void-200"
+            href="/dashboard"
+            className="px-8 py-4 font-semibold rounded-xl transition-all bg-gray-100 text-gray-700 hover:bg-gray-200"
           >
-            View Plans
+            Go to Dashboard
           </Link>
         </div>
 
         {/* Receipt Info */}
-        <p className="mt-8 text-xs text-gray-600">
+        <p className="mt-8 text-xs text-gray-400">
           A receipt has been sent to your email. Questions?{' '}
-          <a href="mailto:support@3rrork1ng.com" className="text-terminal hover:underline">
+          <a href="mailto:support@3rk.dev" className="text-primary hover:underline">
             Contact support
           </a>
         </p>
@@ -141,8 +138,8 @@ function PaymentSuccessContent() {
 
 function LoadingFallback() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-terminal"></div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
 }

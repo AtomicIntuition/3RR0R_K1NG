@@ -108,8 +108,8 @@ const SCAN_PHASES = [
 
 type ScanPhase = typeof SCAN_PHASES[number];
 
-export async function runScan(scanId: string, url: string, persona: RoastPersona = 'hacker', skipRoast: boolean = false): Promise<ScanResult> {
-  console.log(`Starting scan for ${url} (${scanId}) with persona: ${persona}, skipRoast: ${skipRoast}`);
+export async function runScan(scanId: string, url: string, persona: RoastPersona = 'professional', skipRoast: boolean = false): Promise<ScanResult> {
+  console.log(`Starting scan for ${url} (${scanId}) skipRoast: ${skipRoast}`);
 
   const completedPhases: string[] = [];
 

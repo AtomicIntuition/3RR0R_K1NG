@@ -44,7 +44,7 @@ export function Navbar() {
             <div className="flex items-center gap-6">
               <span className="text-sm font-medium text-gray-400">Pricing</span>
               <span className="text-sm font-medium text-gray-400">Sign In</span>
-              <span className="text-sm px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium">Sign Up</span>
+              <span className="text-sm px-4 py-2 bg-emerald-500 text-emerald-950 rounded-lg font-semibold">Sign Up</span>
             </div>
           </div>
         </div>

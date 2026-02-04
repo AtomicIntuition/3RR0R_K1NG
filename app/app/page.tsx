@@ -198,7 +198,7 @@ export default function HomePage() {
             ].map((item, index) => (
               <div key={item.step} className="relative text-center">
                 {/* Step Number */}
-                <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold text-sm mx-auto mb-5">
+                <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-emerald-950 font-bold text-sm mx-auto mb-5">
                   {item.step}
                 </div>
 
@@ -233,7 +233,7 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/pricing"
-                className="px-8 py-3.5 bg-emerald-500 text-white font-semibold rounded-xl hover:bg-emerald-400 transition-all"
+                className="px-8 py-3.5 bg-emerald-500 text-emerald-950 font-semibold rounded-xl hover:bg-emerald-400 transition-all"
               >
                 View Pricing
               </Link>

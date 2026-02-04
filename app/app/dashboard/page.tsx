@@ -141,7 +141,7 @@ export default function DashboardPage() {
             <div className="flex gap-3">
               <Link
                 href="/"
-                className="px-6 py-3 bg-emerald-500 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:bg-emerald-400 transition-all"
+                className="px-6 py-3 bg-emerald-500 text-emerald-950 font-bold rounded-xl shadow-lg hover:shadow-xl hover:bg-emerald-400 transition-all"
               >
                 New Scan
               </Link>
@@ -240,7 +240,7 @@ export default function DashboardPage() {
               {filter === 'all' && (
                 <Link
                   href="/"
-                  className="inline-block px-6 py-3 bg-emerald-500 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:bg-emerald-400 transition-all"
+                  className="inline-block px-6 py-3 bg-emerald-500 text-emerald-950 font-bold rounded-xl shadow-lg hover:shadow-xl hover:bg-emerald-400 transition-all"
                 >
                   Run your first scan
                 </Link>

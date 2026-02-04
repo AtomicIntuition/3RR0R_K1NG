@@ -47,7 +47,7 @@ function PaymentSuccessContent() {
           <p className="text-gray-400 mb-6">
             We couldn't verify your payment. If you were charged, please contact support.
           </p>
-          <Link href="/" className="inline-block px-6 py-3 bg-emerald-500 text-white font-semibold rounded-xl hover:bg-emerald-400 transition-colors">
+          <Link href="/" className="inline-block px-6 py-3 bg-emerald-500 text-emerald-950 font-semibold rounded-xl hover:bg-emerald-400 transition-colors">
             Go Home
           </Link>
         </div>
@@ -112,7 +112,7 @@ function PaymentSuccessContent() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href="/"
-            className="px-8 py-4 font-semibold rounded-xl transition-all bg-emerald-500 text-white hover:bg-emerald-400"
+            className="px-8 py-4 font-semibold rounded-xl transition-all bg-emerald-500 text-emerald-950 hover:bg-emerald-400"
           >
             Start Scanning
           </Link>
@@ -127,7 +127,7 @@ function PaymentSuccessContent() {
         {/* Receipt Info */}
         <p className="mt-8 text-xs text-gray-400">
           A receipt has been sent to your email. Questions?{' '}
-          <a href="mailto:support@crisp.dev" className="text-emerald-500 hover:underline">
+          <a href="mailto:support@3rrork1ng.com" className="text-emerald-500 hover:underline">
             Contact support
           </a>
         </p>

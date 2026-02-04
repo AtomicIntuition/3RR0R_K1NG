@@ -27,7 +27,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: 'Crisp | Website Audit Platform',
-  description: 'Professional website audits for security, performance, SEO, and accessibility. Get actionable insights powered by AI.',
+  description: 'Professional website audits for security, performance, SEO, and accessibility. Get actionable insights powered by AI analysis. Scan any URL for free and fix issues fast.',
   keywords: ['website audit', 'security scanner', 'performance testing', 'SEO checker', 'accessibility audit'],
   authors: [{ name: 'Crisp' }],
   alternates: {
@@ -73,7 +73,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Crisp | Professional Website Audits',
     description: 'AI-powered security, performance, SEO & accessibility audits. Get actionable insights for your website.',
-    creator: '@crisp_dev',
+    creator: '@3rrork1ng',
     images: [`${siteUrl}/images/og-image.png`],
   },
   robots: {
@@ -178,7 +178,7 @@ export default function RootLayout({
 
             {/* Footer */}
             <footer className="relative z-10 py-8 px-4 border-t border-gray-800 bg-gray-950">
-              <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
+              <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-400">
                 <div className="flex items-center gap-3">
                   <div className="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center">
                     <span className="text-white text-xs font-bold">C</span>
@@ -191,12 +191,12 @@ export default function RootLayout({
                   <a href="/privacy" className="hover:text-gray-200 transition-colors font-medium">Privacy</a>
                   <a href="/terms" className="hover:text-gray-200 transition-colors font-medium">Terms</a>
                   <a
-                    href="https://x.com/crisp_dev"
+                    href="https://x.com/3rrork1ng"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-gray-200 transition-colors font-medium"
                   >
-                    @crisp
+                    @3rrork1ng
                   </a>
                 </div>
               </div>

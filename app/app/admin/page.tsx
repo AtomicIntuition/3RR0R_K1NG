@@ -226,7 +226,7 @@ export default function AdminPage() {
             <button
               type="submit"
               disabled={submitting || !newEmail.trim()}
-              className="px-6 py-2 bg-emerald-500 text-white font-bold rounded-lg hover:bg-emerald-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-emerald-500 text-emerald-950 font-bold rounded-lg hover:bg-emerald-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? 'Adding...' : 'Add Email'}
             </button>

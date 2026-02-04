@@ -78,7 +78,7 @@ export function ShareCard({ scanId, url, score, twitterRoast, className }: Share
           className={clsx(
             'px-4 py-2 rounded-lg font-medium transition-all duration-200',
             copied
-              ? 'bg-emerald-500 text-white'
+              ? 'bg-emerald-500 text-emerald-950'
               : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
           )}
         >

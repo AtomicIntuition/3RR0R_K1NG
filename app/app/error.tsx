@@ -62,7 +62,7 @@ export default function Error({
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={() => reset()}
-              className="px-8 py-4 bg-emerald-500 text-white font-bold text-lg rounded-xl shadow-xl hover:bg-emerald-400 transition-all"
+              className="px-8 py-4 bg-emerald-500 text-emerald-950 font-bold text-lg rounded-xl shadow-xl hover:bg-emerald-400 transition-all"
             >
               Try Again
             </button>

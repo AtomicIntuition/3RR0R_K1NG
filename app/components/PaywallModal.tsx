@@ -229,7 +229,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
                 disabled={isLoading !== null}
                 className={clsx(
                   'w-full px-6 py-3 sm:py-4 font-bold rounded-xl transition-all duration-200',
-                  'bg-emerald-500 text-white',
+                  'bg-emerald-500 text-emerald-950',
                   'hover:bg-emerald-400',
                   'hover:shadow-lg',
                   'disabled:opacity-50 disabled:cursor-not-allowed',
@@ -319,7 +319,7 @@ export function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
               <div className="text-left">
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-emerald-500 text-base sm:text-lg">Pro Monthly</span>
-                  <span className="px-2 py-0.5 text-xs font-bold bg-emerald-500 text-white rounded">
+                  <span className="px-2 py-0.5 text-xs font-bold bg-emerald-500 text-emerald-950 rounded">
                     BEST
                   </span>
                 </div>

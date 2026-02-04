@@ -155,7 +155,7 @@ export function Scanner({ className, autoFocus = false }: ScannerProps) {
                 'disabled:opacity-50 disabled:cursor-not-allowed',
                 isLoading
                   ? 'bg-gray-700 text-white'
-                  : 'bg-emerald-500 text-white hover:bg-emerald-400 active:scale-[0.98]'
+                  : 'bg-emerald-500 text-emerald-950 hover:bg-emerald-400 active:scale-[0.98]'
               )}
             >
               {isLoading ? (

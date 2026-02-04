@@ -63,7 +63,7 @@ export default function ScanResultsPage() {
           <p className="text-gray-400 mb-8 leading-relaxed">{error}</p>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-emerald-500 text-white font-semibold rounded-xl hover:bg-emerald-400 transition-all duration-300"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-emerald-500 text-emerald-950 font-semibold rounded-xl hover:bg-emerald-400 transition-all duration-300"
           >
             <span>Try Again</span>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,7 +131,7 @@ export default function ScanResultsPage() {
           )}
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-emerald-500 text-white font-semibold rounded-xl hover:bg-emerald-400 transition-all duration-300"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-emerald-500 text-emerald-950 font-semibold rounded-xl hover:bg-emerald-400 transition-all duration-300"
           >
             <span>Scan Another Site</span>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -414,7 +414,7 @@ export default function ScanResultsPage() {
             <p className="text-gray-400 mb-6 text-lg">Want to analyze another site?</p>
             <Link
               href="/"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-emerald-500 text-white font-semibold rounded-xl hover:bg-emerald-400 transition-all duration-300 group"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-emerald-500 text-emerald-950 font-semibold rounded-xl hover:bg-emerald-400 transition-all duration-300 group"
             >
               <span>Scan Another URL</span>
               <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">

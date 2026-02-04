@@ -162,7 +162,7 @@ export default function ResetPasswordPage() {
 
               <Link
                 href="/forgot-password"
-                className="block w-full px-6 py-4 bg-emerald-500 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-emerald-400 transition-all text-center"
+                className="block w-full px-6 py-4 bg-emerald-500 text-emerald-950 font-bold text-lg rounded-xl shadow-lg hover:bg-emerald-400 transition-all text-center"
               >
                 Request new link
               </Link>
@@ -287,7 +287,7 @@ export default function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-6 py-4 bg-emerald-500 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-emerald-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-6 py-4 bg-emerald-500 text-emerald-950 font-bold text-lg rounded-xl shadow-lg hover:bg-emerald-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">

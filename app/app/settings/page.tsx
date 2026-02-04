@@ -192,7 +192,7 @@ export default function SettingsPage() {
                     </code>
                     <button
                       onClick={copyToClipboard}
-                      className="px-6 py-3 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-400 transition-all"
+                      className="px-6 py-3 bg-emerald-500 text-emerald-950 font-bold rounded-xl hover:bg-emerald-400 transition-all"
                     >
                       {copied ? 'Copied!' : 'Copy'}
                     </button>
@@ -221,7 +221,7 @@ export default function SettingsPage() {
               <button
                 onClick={createApiKey}
                 disabled={creating || apiKeys.filter(k => k.is_active).length >= 5}
-                className="px-6 py-3.5 bg-emerald-500 text-white font-bold rounded-xl shadow-lg hover:bg-emerald-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                className="px-6 py-3.5 bg-emerald-500 text-emerald-950 font-bold rounded-xl shadow-lg hover:bg-emerald-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
               >
                 {creating ? (
                   <span className="flex items-center gap-2">

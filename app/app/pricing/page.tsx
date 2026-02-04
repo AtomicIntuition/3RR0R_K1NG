@@ -86,7 +86,7 @@ export default function PricingPage() {
               }`}
             >
               Yearly
-              <span className="px-2 py-0.5 bg-emerald-500 text-white text-xs rounded-full font-bold">
+              <span className="px-2 py-0.5 bg-emerald-500 text-emerald-950 text-xs rounded-full font-bold">
                 -43%
               </span>
             </button>
@@ -140,7 +140,7 @@ export default function PricingPage() {
           <div className="relative bg-gray-900 rounded-3xl shadow-2xl p-8 md:-mt-4 md:mb-4">
             {/* Popular badge */}
             <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-              <span className="px-6 py-2 bg-emerald-500 text-white text-sm font-black rounded-full shadow-lg">
+              <span className="px-6 py-2 bg-emerald-500 text-emerald-950 text-sm font-black rounded-full shadow-lg">
                 MOST POPULAR
               </span>
             </div>
@@ -185,7 +185,7 @@ export default function PricingPage() {
               priceId={isYearly ? PRICE_IDS.proYearly : PRICE_IDS.proMonthly}
               mode="subscription"
               label="Go Pro"
-              className="[&_button]:bg-emerald-500 [&_button]:text-white [&_button]:hover:bg-emerald-400 [&_button]:shadow-xl"
+              className="[&_button]:bg-emerald-500 [&_button]:text-emerald-950 [&_button]:hover:bg-emerald-400 [&_button]:shadow-xl"
             />
             <p className="text-white/50 text-xs text-center mt-4">Cancel anytime</p>
           </div>
@@ -193,7 +193,7 @@ export default function PricingPage() {
           {/* Scan Pack */}
           <div className="bg-gray-900 rounded-3xl border border-gray-800 p-8 transition-all">
             <div className="mb-6">
-              <h3 className="text-xl font-black text-gray-900 mb-1">Scan Pack</h3>
+              <h3 className="text-xl font-black text-gray-50 mb-1">Scan Pack</h3>
               <p className="text-gray-500 text-sm">For agencies & teams</p>
             </div>
 
@@ -356,8 +356,8 @@ export default function PricingPage() {
           <h2 className="text-2xl font-black text-gray-50 mb-4">Questions?</h2>
           <p className="text-gray-400 mb-6">We&apos;re here to help with any questions about pricing or features.</p>
           <a
-            href="mailto:support@crisp.dev"
-            className="inline-block px-8 py-4 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-400 transition-all"
+            href="mailto:support@3rrork1ng.com"
+            className="inline-block px-8 py-4 bg-emerald-500 text-emerald-950 font-bold rounded-xl hover:bg-emerald-400 transition-all"
           >
             Contact Support
           </a>

@@ -26,7 +26,7 @@ const GuestLinks = () => (
     </Link>
     <Link
       href="/signup"
-      className="text-sm px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-400 transition-all duration-200"
+      className="text-sm px-4 py-2 bg-emerald-500 text-emerald-950 rounded-lg font-semibold hover:bg-emerald-400 transition-all duration-200"
     >
       Sign Up
     </Link>

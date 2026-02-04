@@ -285,7 +285,7 @@ export default function AccountPage() {
                     <button
                       onClick={handleReactivateSubscription}
                       disabled={isProcessing}
-                      className="px-6 py-3 bg-emerald-500 text-white font-bold rounded-xl transition-all hover:bg-emerald-400 disabled:opacity-50"
+                      className="px-6 py-3 bg-emerald-500 text-emerald-950 font-bold rounded-xl transition-all hover:bg-emerald-400 disabled:opacity-50"
                     >
                       {isProcessing ? 'Processing...' : 'Reactivate Subscription'}
                     </button>
@@ -326,7 +326,7 @@ export default function AccountPage() {
                 )}
                 <Link
                   href="/pricing"
-                  className="inline-block px-6 py-3 bg-emerald-500 text-white font-bold rounded-xl transition-all hover:bg-emerald-400"
+                  className="inline-block px-6 py-3 bg-emerald-500 text-emerald-950 font-bold rounded-xl transition-all hover:bg-emerald-400"
                 >
                   Upgrade to Pro
                 </Link>

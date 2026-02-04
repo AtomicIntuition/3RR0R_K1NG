@@ -51,7 +51,7 @@ export function LLMReport({ report }: LLMReportProps) {
           className={`shrink-0 px-5 py-2.5 rounded-xl font-medium transition-all text-sm ${
             copied
               ? 'bg-success/10 text-success border border-success/30'
-              : 'bg-emerald-500 text-white hover:bg-emerald-400 active:scale-95'
+              : 'bg-emerald-500 text-emerald-950 hover:bg-emerald-400 active:scale-95'
           }`}
         >
           {copied ? (

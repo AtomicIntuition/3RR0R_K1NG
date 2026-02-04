@@ -66,6 +66,18 @@ export function middleware(request: NextRequest) {
   // X-XSS-Protection (legacy but still useful)
   headers.set('X-XSS-Protection', '1; mode=block');
 
+  // Suppress server information disclosure
+  headers.set('Server', '');
+  headers.delete('X-Powered-By');
+
+  // Restrictive CORS - only allow own origin, override any platform defaults
+  const allowedOrigins = ['https://3rrork1ng.com', 'https://www.3rrork1ng.com'];
+  const requestOrigin = request.headers.get('origin');
+  if (requestOrigin && allowedOrigins.includes(requestOrigin)) {
+    headers.set('Access-Control-Allow-Origin', requestOrigin);
+  }
+  // If no origin header or not in allowed list, don't set ACAO at all (block cross-origin)
+
   return response;
 }
 

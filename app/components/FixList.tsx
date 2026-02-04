@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import clsx from 'clsx';
 import type { RoastFix } from '@/types/scan';
 import {
@@ -15,6 +16,8 @@ import {
   Clock,
   Wrench,
   CheckCircle,
+  Copy,
+  TrendingUp,
 } from 'lucide-react';
 
 interface FixListProps {
@@ -68,6 +71,8 @@ const CATEGORY_ICONS = {
 };
 
 export function FixList({ fixes, className }: FixListProps) {
+  const [copiedAll, setCopiedAll] = useState(false);
+
   if (!fixes || fixes.length === 0) {
     return (
       <div className={clsx('text-center py-8', className)}>
@@ -78,6 +83,24 @@ export function FixList({ fixes, className }: FixListProps) {
       </div>
     );
   }
+
+  const handleCopyAll = async () => {
+    const markdown = fixes.map((fix, i) => {
+      let line = `${i + 1}. **[${fix.priority.toUpperCase()}]** ${fix.title}\n`;
+      line += `   ${fix.description}\n`;
+      line += `   Effort: ${fix.effort} | Category: ${fix.category.replace('_', ' ')}`;
+      if (fix.impact) line += `\n   Impact: ${fix.impact}`;
+      return line;
+    }).join('\n\n');
+
+    try {
+      await navigator.clipboard.writeText(markdown);
+      setCopiedAll(true);
+      setTimeout(() => setCopiedAll(false), 2000);
+    } catch {
+      // Clipboard write failed
+    }
+  };
 
   return (
     <div className={className}>
@@ -142,6 +165,14 @@ export function FixList({ fixes, className }: FixListProps) {
                 {fix.description}
               </p>
 
+              {/* Impact */}
+              {fix.impact && (
+                <p className="text-sm text-emerald-400/80 mb-3 pl-0 sm:pl-[100px] flex items-center gap-1.5">
+                  <TrendingUp size={14} className="shrink-0" />
+                  <span>{fix.impact}</span>
+                </p>
+              )}
+
               {/* Footer */}
               <div className="flex items-center gap-4 pl-0 sm:pl-[100px] text-xs">
                 {/* Effort estimate */}
@@ -157,17 +188,19 @@ export function FixList({ fixes, className }: FixListProps) {
                   </span>
                 </div>
               </div>
-
-              {/* Hover hint */}
-              <div className="mt-3 pt-3 border-t border-gray-800 opacity-0 group-hover:opacity-100 transition-opacity">
-                <p className="text-xs text-gray-400">
-                  <span className="text-emerald-500 font-medium">Tip:</span> Fixing {fix.priority} priority issues first will have the biggest impact on your score.
-                </p>
-              </div>
             </li>
           );
         })}
       </ul>
+
+      {/* Copy all fixes button */}
+      <button
+        onClick={handleCopyAll}
+        className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-gray-300 hover:bg-gray-700 hover:text-gray-100 transition-all"
+      >
+        <Copy size={14} />
+        <span>{copiedAll ? 'Copied!' : 'Copy all fixes'}</span>
+      </button>
     </div>
   );
 }

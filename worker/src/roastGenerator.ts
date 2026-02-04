@@ -26,6 +26,7 @@ export interface RoastFix {
   title: string;
   description: string;
   effort: 'quick' | 'medium' | 'significant';
+  impact?: string;
 }
 
 export interface RoastResult {
@@ -831,31 +832,37 @@ ANALYSIS DEPTH: ${getAnalysisDepth(input.scores.overall)}
 Generate an analysis report in the following JSON format. The analysis should be professional, technically accurate, and include specific references to the actual issues found. Be direct and actionable.
 
 {
-  "title": "A clear summary headline (max 80 chars, complete the thought)",
-  "body": "2-3 paragraph professional analysis that references specific findings. Start with the overall assessment, highlight key issues, and end with a prioritized recommendation.",
-  "twitterRoast": "A concise 280-char summary suitable for sharing. Include the score and key finding.",
+  "title": "One-line verdict (max 80 chars)",
+  "executiveSummary": {
+    "keyStrength": "Single most impressive aspect, with data reference",
+    "biggestRisk": "Most critical issue, with severity context",
+    "topPriority": "The #1 thing to fix right now and why"
+  },
+  "twitterRoast": "280-char summary",
   "fixes": [
     {
       "priority": "critical|high|medium|low",
       "category": "performance|security|seo|accessibility|code_quality",
-      "title": "Short actionable fix title",
-      "description": "Specific technical explanation of what to do",
-      "effort": "quick|medium|significant"
+      "title": "Actionable fix title",
+      "description": "Specific technical explanation",
+      "effort": "quick|medium|significant",
+      "impact": "Estimated score improvement or business impact, one sentence"
     }
   ]
 }
 
 RULES:
 - Title must be under 80 characters and complete (no cut-off words)
+- Each executiveSummary field: 1-2 sentences max, must reference specific data (scores, headers, metrics)
+- No filler words, no generic praise
+- impact field required on every fix
 - twitterRoast must be under 280 characters (for sharing)
 - Include 3-5 of the most impactful fixes
 - Fixes should be ordered by priority (critical first)
 - Be specific - reference actual URLs, headers, or metrics found
 - If the site scores well (85+), acknowledge strengths while noting areas for improvement
 - Use technical terms correctly
-- The body should be 100-200 words
 - Maintain a professional, consultative tone
-- Do NOT use markdown formatting in the body text
 
 Return ONLY the JSON, no other text.`;
 }
@@ -972,6 +979,12 @@ export async function generateRoast(input: RoastInput): Promise<RoastResult> {
     return generateFallbackRoast(input, 'JSON parse failed');
   }
 
+  // Handle executiveSummary format: serialize to body field for DB compatibility
+  const parsed = result as any;
+  if (parsed.executiveSummary && typeof parsed.executiveSummary === 'object') {
+    result.body = JSON.stringify(parsed.executiveSummary);
+  }
+
   // Validate required fields
   if (!result.title || !result.body || !Array.isArray(result.fixes)) {
     console.error('Invalid roast format - missing required fields');
@@ -1006,6 +1019,7 @@ export async function generateRoast(input: RoastInput): Promise<RoastResult> {
     effort: ['quick', 'medium', 'significant'].includes(fix.effort)
       ? fix.effort
       : 'medium',
+    impact: fix.impact ? String(fix.impact).slice(0, 200) : undefined,
   })) as RoastFix[];
 
   // Generate LLM-ready report
@@ -1107,23 +1121,49 @@ function generateFallbackRoast(input: RoastInput, reason?: string): RoastResult 
   console.log(`Using fallback analysis${reason ? `: ${reason}` : ''}`);
 
   let title: string;
-  let body: string;
+
+  // Determine key strength
+  const categoryScores = [
+    { name: 'Security', score: scores.security },
+    { name: 'Performance', score: scores.performance },
+    { name: 'SEO', score: scores.seo },
+    { name: 'Accessibility', score: scores.accessibility },
+    { name: 'Code Quality', score: scores.codeQuality },
+  ];
+  const best = categoryScores.reduce((a, b) => a.score >= b.score ? a : b);
+  const worst = categoryScores.reduce((a, b) => a.score <= b.score ? a : b);
+
+  const failedSecurity = input.securityFindings.filter(f => !f.passed);
+  const failedSeo = input.seoFindings.filter(f => !f.passed);
+
+  // Build executive summary
+  const executiveSummary = {
+    keyStrength: `${best.name} scored ${best.score}/100, the strongest category in this audit.`,
+    biggestRisk: worst.score < 60
+      ? `${worst.name} at ${worst.score}/100 is critically underperforming and needs immediate attention.`
+      : `${worst.name} at ${worst.score}/100 is the weakest area, though still functional.`,
+    topPriority: failedSecurity.length > 0
+      ? `Address ${failedSecurity.length} security issue${failedSecurity.length > 1 ? 's' : ''} — missing headers leave the site vulnerable to common attacks.`
+      : scores.performance < 70
+        ? `Optimize performance (currently ${scores.performance}/100) to improve user experience and search ranking.`
+        : failedSeo.length > 0
+          ? `Fix ${failedSeo.length} SEO issue${failedSeo.length > 1 ? 's' : ''} to improve search engine visibility.`
+          : `Focus on ${worst.name.toLowerCase()} improvements to push the overall score higher.`,
+  };
+
+  const body = JSON.stringify(executiveSummary);
 
   if (scores.overall >= 80) {
     title = 'Strong Foundation with Room for Optimization';
-    body = `Your site scored ${scores.overall}/100, demonstrating solid fundamentals across most categories. With a security score of ${scores.security}/100, you've implemented good baseline protections. However, there are still opportunities for improvement that could further strengthen your site's security posture and user experience. Review the detailed findings below for specific recommendations.`;
   } else if (scores.overall >= 60) {
     title = 'Several Areas Require Attention';
-    body = `With a score of ${scores.overall}/100, your site has a foundation to build on but requires attention in key areas. Performance at ${scores.performance}/100 is impacting user experience, and there are security considerations that should be addressed. The good news: most of these issues have straightforward solutions. Prioritize the critical and high-priority fixes listed below.`;
   } else {
     title = 'Critical Issues Identified - Immediate Action Recommended';
-    body = `Your site scored ${scores.overall}/100, indicating significant issues across multiple categories. Security headers require immediate attention, performance is severely impacting user experience, and SEO visibility is limited. We recommend addressing the critical issues first, then working through high-priority items systematically. See the detailed breakdown below for specific action items.`;
   }
 
   const fixes: RoastFix[] = [];
 
   // Generate fixes based on actual issues
-  const failedSecurity = input.securityFindings.filter(f => !f.passed);
   if (failedSecurity.length > 0) {
     const critical = failedSecurity.find(f => f.severity === 'critical' || f.severity === 'high');
     if (critical) {
@@ -1133,6 +1173,7 @@ function generateFallbackRoast(input: RoastInput, reason?: string): RoastResult 
         title: critical.title,
         description: critical.recommendation,
         effort: 'quick',
+        impact: `Could improve security score from ${scores.security} toward 90+`,
       });
     }
   }
@@ -1144,10 +1185,10 @@ function generateFallbackRoast(input: RoastInput, reason?: string): RoastResult 
       title: 'Optimize Core Web Vitals',
       description: 'Improve LCP by optimizing images, reduce CLS with proper sizing, and minimize TBT by deferring non-critical JavaScript.',
       effort: 'medium',
+      impact: `Performance at ${scores.performance}/100 — optimization could add 15-25 points`,
     });
   }
 
-  const failedSeo = input.seoFindings.filter(f => !f.passed);
   if (failedSeo.length > 0) {
     fixes.push({
       priority: 'medium',
@@ -1155,17 +1196,19 @@ function generateFallbackRoast(input: RoastInput, reason?: string): RoastResult 
       title: failedSeo[0].title,
       description: failedSeo[0].description,
       effort: 'quick',
+      impact: `Fixing SEO issues could improve search visibility and score from ${scores.seo}/100`,
     });
   }
 
   if (input.accessibilityViolations.length > 0) {
-    const worst = input.accessibilityViolations[0];
+    const worstViolation = input.accessibilityViolations[0];
     fixes.push({
-      priority: worst.impact === 'critical' ? 'critical' : 'medium',
+      priority: worstViolation.impact === 'critical' ? 'critical' : 'medium',
       category: 'accessibility',
       title: 'Fix accessibility violations',
-      description: worst.help,
+      description: worstViolation.help,
       effort: 'medium',
+      impact: `${input.accessibilityViolations.length} violation${input.accessibilityViolations.length > 1 ? 's' : ''} affecting WCAG compliance`,
     });
   }
 

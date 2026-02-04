@@ -60,6 +60,13 @@ export interface RoastFix {
   title: string;
   description: string;
   effort: 'quick' | 'medium' | 'significant';
+  impact?: string;
+}
+
+export interface ExecutiveSummary {
+  keyStrength: string;
+  biggestRisk: string;
+  topPriority: string;
 }
 
 export interface ScanResults {

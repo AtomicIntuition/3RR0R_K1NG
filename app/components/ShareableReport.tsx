@@ -1,14 +1,6 @@
 'use client';
 
-import { getGrade, getGradeColor } from '@/lib/scoring';
-
-interface RoastFix {
-  priority: 'critical' | 'high' | 'medium' | 'low';
-  category: 'performance' | 'security' | 'seo' | 'accessibility' | 'code_quality';
-  title: string;
-  description: string;
-  effort: 'quick' | 'medium' | 'significant';
-}
+import { getGrade } from '@/lib/scoring';
 
 interface ShareableReportProps {
   url: string;
@@ -24,11 +16,18 @@ interface ShareableReportProps {
   roastTitle?: string;
   roastBody?: string;
   roastId?: string;
-  fixes?: RoastFix[];
+  fixes?: {
+    priority: 'critical' | 'high' | 'medium' | 'low';
+    category: string;
+    title: string;
+    description: string;
+    effort: string;
+    impact?: string;
+  }[];
 }
 
-// Fixed-width component designed specifically for screenshots
-// This renders at exactly the same size on ALL devices
+// Fixed-width component designed specifically for screenshots (html2canvas)
+// Must use inline styles only - no CSS grid, no CSS variables
 export function ShareableReport({
   url,
   scoreOverall,
@@ -36,48 +35,56 @@ export function ShareableReport({
   scoringBreakdown,
   roastTitle,
   roastBody,
-  roastId,
-  fixes,
 }: ShareableReportProps) {
   const grade = letterGrade || getGrade(scoreOverall);
 
-  // Apple-style colors
-  const getGradeHexColor = (grade: string) => {
-    if (grade.startsWith('A')) return '#34C759'; // success
-    if (grade.startsWith('B')) return '#34C759';
-    if (grade.startsWith('C')) return '#FF9500'; // warning
-    if (grade.startsWith('D')) return '#FF9500';
-    return '#FF3B30'; // danger
-  };
-
   const getScoreColor = (score: number) => {
     if (score >= 90) return '#34C759';
-    if (score >= 70) return '#FF9500';
-    if (score >= 50) return '#FF9500';
-    return '#FF3B30';
+    if (score >= 70) return '#FBBF24';
+    if (score >= 50) return '#F97316';
+    return '#EF4444';
   };
 
   const getStatusLabel = (score: number) => {
     if (score >= 85) return { label: 'Excellent', color: '#34C759' };
-    if (score >= 65) return { label: 'Good', color: '#FF9500' };
-    if (score >= 40) return { label: 'Needs Improvement', color: '#FF9500' };
-    return { label: 'Critical Issues', color: '#FF3B30' };
+    if (score >= 65) return { label: 'Good', color: '#FBBF24' };
+    if (score >= 40) return { label: 'Needs Work', color: '#F97316' };
+    return { label: 'Critical', color: '#EF4444' };
+  };
+
+  const getGradeHexColor = (g: string) => {
+    if (g.startsWith('A')) return '#34C759';
+    if (g.startsWith('B')) return '#34C759';
+    if (g.startsWith('C')) return '#FBBF24';
+    if (g.startsWith('D')) return '#F97316';
+    return '#EF4444';
+  };
+
+  const getShortLabel = (category: string): string => {
+    const labels: Record<string, string> = {
+      'security': 'SEC',
+      'performance': 'PERF',
+      'user experience': 'UX',
+      'accessibility': 'A11Y',
+      'seo': 'SEO',
+      'code quality': 'CODE',
+    };
+    return labels[category.toLowerCase()] || category.slice(0, 4).toUpperCase();
   };
 
   const status = getStatusLabel(scoreOverall);
   const gradeColor = getGradeHexColor(grade);
+  const scoreColor = getScoreColor(scoreOverall);
+  const domain = url.replace(/^https?:\/\//, '').slice(0, 40);
 
-  const getShortLabel = (category: string): string => {
-    const labels: Record<string, string> = {
-      'security': 'Security',
-      'performance': 'Performance',
-      'user experience': 'UX',
-      'accessibility': 'Accessibility',
-      'seo': 'SEO',
-      'code quality': 'Code',
-    };
-    return labels[category.toLowerCase()] || category;
-  };
+  // Parse topPriority from body if available
+  let topPriority = '';
+  try {
+    const parsed = JSON.parse(roastBody || '');
+    if (parsed.topPriority) topPriority = parsed.topPriority;
+  } catch {
+    // Not JSON, skip
+  }
 
   return (
     <div
@@ -90,55 +97,38 @@ export function ShareableReport({
         boxSizing: 'border-box',
       }}
     >
-      {/* Header */}
+      {/* Compact header */}
       <div
         style={{
-          textAlign: 'center',
-          padding: '24px 28px',
-          background: 'linear-gradient(135deg, #18181B 0%, #09090B 100%)',
-          border: '1px solid #27272A',
-          borderRadius: '16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
           marginBottom: '28px',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '10px',
+            width: '32px',
+            height: '32px',
+            borderRadius: '8px',
             backgroundColor: '#10B981',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
           }}>
-            <span style={{ color: '#ffffff', fontSize: '16px', fontWeight: '700' }}>C</span>
+            <span style={{ color: '#ffffff', fontSize: '14px', fontWeight: '700' }}>C</span>
           </div>
-          <span style={{ fontSize: '24px', fontWeight: '600', color: '#FAFAFA' }}>Crisp</span>
+          <span style={{ fontSize: '18px', fontWeight: '600', color: '#FAFAFA' }}>Crisp</span>
+          <span style={{ fontSize: '13px', color: '#71717A', marginLeft: '4px' }}>Website Audit</span>
         </div>
-        <div style={{ fontSize: '14px', color: '#A1A1AA', letterSpacing: '0.5px' }}>
-          Website Audit Report
-        </div>
-      </div>
-
-      {/* Target URL */}
-      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '10px 20px',
-            backgroundColor: '#18181B',
-            borderRadius: '10px',
-          }}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A1A1AA" strokeWidth="2">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-          </svg>
-          <span style={{ color: '#FAFAFA', fontWeight: '500', fontSize: '14px' }}>
-            {url.replace(/^https?:\/\//, '').slice(0, 35)}{url.replace(/^https?:\/\//, '').length > 35 ? '...' : ''}
-          </span>
+        <div style={{
+          padding: '6px 14px',
+          backgroundColor: '#18181B',
+          borderRadius: '8px',
+          fontSize: '13px',
+          color: '#A1A1AA',
+        }}>
+          {domain}
         </div>
       </div>
 
@@ -148,47 +138,47 @@ export function ShareableReport({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: '48px',
-          marginBottom: '28px',
+          gap: '40px',
+          marginBottom: '24px',
         }}
       >
         {/* Score Ring */}
-        <div style={{ position: 'relative', width: '120px', height: '120px' }}>
-          <svg width="120" height="120" viewBox="0 0 120 120">
-            <circle cx="60" cy="60" r="52" fill="none" stroke="#27272A" strokeWidth="8" />
+        <div style={{ position: 'relative', width: '140px', height: '140px' }}>
+          <svg width="140" height="140" viewBox="0 0 140 140">
+            <circle cx="70" cy="70" r="60" fill="none" stroke="#27272A" strokeWidth="10" />
             <circle
-              cx="60"
-              cy="60"
-              r="52"
+              cx="70"
+              cy="70"
+              r="60"
               fill="none"
-              stroke={getScoreColor(scoreOverall)}
-              strokeWidth="8"
+              stroke={scoreColor}
+              strokeWidth="10"
               strokeLinecap="round"
-              strokeDasharray={`${(scoreOverall / 100) * 327} 327`}
-              transform="rotate(-90 60 60)"
+              strokeDasharray={`${(scoreOverall / 100) * 377} 377`}
+              transform="rotate(-90 70 70)"
             />
-            <text x="60" y="56" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '32px', fontWeight: '600', fill: '#FAFAFA' }}>
+            <text x="70" y="64" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '40px', fontWeight: '700', fill: '#FAFAFA' }}>
               {scoreOverall}
             </text>
-            <text x="60" y="76" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '12px', fill: '#A1A1AA' }}>
+            <text x="70" y="88" textAnchor="middle" dominantBaseline="middle" style={{ fontSize: '13px', fill: '#71717A' }}>
               /100
             </text>
           </svg>
         </div>
 
-        {/* Grade & Status */}
+        {/* Grade + Status */}
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '64px', fontWeight: '700', color: gradeColor, lineHeight: 1 }}>
+          <div style={{ fontSize: '72px', fontWeight: '800', color: gradeColor, lineHeight: 1 }}>
             {grade}
           </div>
           <div
             style={{
               marginTop: '8px',
               padding: '6px 16px',
-              backgroundColor: `${status.color}15`,
+              backgroundColor: `${status.color}18`,
               borderRadius: '20px',
               fontSize: '13px',
-              fontWeight: '500',
+              fontWeight: '600',
               color: status.color,
             }}
           >
@@ -197,164 +187,85 @@ export function ShareableReport({
         </div>
       </div>
 
-      {/* Category Scores */}
+      {/* Category Mini-Bars */}
       {scoringBreakdown?.breakdown && (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(5, 1fr)',
-            gap: '10px',
-            marginBottom: '28px',
-          }}
-        >
-          {scoringBreakdown.breakdown.map((cat) => (
-            <div
-              key={cat.category}
-              style={{
-                backgroundColor: '#18181B',
-                borderRadius: '12px',
-                padding: '14px 10px',
-                textAlign: 'center',
-              }}
-            >
-              <div style={{ fontSize: '11px', color: '#A1A1AA', marginBottom: '6px', fontWeight: '500' }}>
-                {getShortLabel(cat.category)}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
+          {scoringBreakdown.breakdown.map((cat) => {
+            const catColor = getScoreColor(cat.score);
+            return (
+              <div
+                key={cat.category}
+                style={{
+                  flex: 1,
+                  backgroundColor: '#18181B',
+                  borderRadius: '10px',
+                  padding: '12px 8px',
+                  textAlign: 'center',
+                }}
+              >
+                <div style={{ fontSize: '10px', color: '#71717A', marginBottom: '6px', fontWeight: '600', letterSpacing: '0.5px' }}>
+                  {getShortLabel(cat.category)}
+                </div>
+                <div style={{
+                  height: '4px',
+                  backgroundColor: '#27272A',
+                  borderRadius: '2px',
+                  marginBottom: '6px',
+                  overflow: 'hidden',
+                }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${cat.score}%`,
+                    backgroundColor: catColor,
+                    borderRadius: '2px',
+                  }} />
+                </div>
+                <div style={{ fontSize: '16px', fontWeight: '600', color: catColor }}>
+                  {cat.score}
+                </div>
               </div>
-              <div style={{ fontSize: '22px', fontWeight: '600', color: getScoreColor(cat.score) }}>
-                {cat.score}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
-      {/* Analysis Summary */}
-      {roastTitle && roastBody && (
+      {/* Top Priority highlight */}
+      {topPriority && (
         <div
           style={{
             backgroundColor: '#18181B',
-            borderRadius: '16px',
-            padding: '20px 24px',
-            marginBottom: '20px',
+            borderLeft: '3px solid #10B981',
+            borderRadius: '10px',
+            padding: '14px 18px',
+            marginBottom: '24px',
           }}
         >
-          <h3 style={{ fontSize: '17px', fontWeight: '600', color: '#FAFAFA', marginBottom: '12px', lineHeight: 1.4 }}>
-            {roastTitle}
-          </h3>
-          <p style={{ fontSize: '14px', color: '#A1A1AA', lineHeight: 1.6, margin: 0 }}>
-            {roastBody.length > 300 ? roastBody.slice(0, 300) + '...' : roastBody}
+          <div style={{ fontSize: '10px', color: '#10B981', fontWeight: '600', letterSpacing: '1px', marginBottom: '6px' }}>
+            TOP PRIORITY
+          </div>
+          <p style={{ fontSize: '13px', color: '#D4D4D8', lineHeight: 1.5, margin: 0 }}>
+            {topPriority.length > 120 ? topPriority.slice(0, 120) + '...' : topPriority}
           </p>
         </div>
       )}
 
-      {/* Top Fixes */}
-      {fixes && fixes.length > 0 && (
+      {/* If no executive summary, show title */}
+      {!topPriority && roastTitle && (
         <div
           style={{
-            backgroundColor: '#09090B',
-            border: '1px solid #27272A',
-            borderRadius: '16px',
-            padding: '20px 24px',
-            marginBottom: '20px',
+            backgroundColor: '#18181B',
+            borderRadius: '10px',
+            padding: '14px 18px',
+            marginBottom: '24px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2">
-              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-            </svg>
-            <span style={{ fontSize: '15px', fontWeight: '600', color: '#FAFAFA' }}>
-              Priority Fixes
-            </span>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {fixes.slice(0, 3).map((fix, index) => {
-              const priorityColors: Record<string, string> = {
-                critical: '#FF3B30',
-                high: '#FF9500',
-                medium: '#10B981',
-                low: '#A1A1AA',
-              };
-              const priorityColor = priorityColors[fix.priority] || '#A1A1AA';
-
-              return (
-                <div
-                  key={index}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '12px',
-                    padding: '12px 14px',
-                    backgroundColor: '#18181B',
-                    borderRadius: '10px',
-                    borderLeft: `3px solid ${priorityColor}`,
-                  }}
-                >
-                  <span style={{ fontSize: '13px', color: '#A1A1AA', fontWeight: '500', minWidth: '20px' }}>
-                    {index + 1}.
-                  </span>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '13px', fontWeight: '500', color: '#FAFAFA', marginBottom: '4px' }}>
-                      {fix.title}
-                    </div>
-                    <div style={{ fontSize: '12px', color: '#A1A1AA', lineHeight: 1.4 }}>
-                      {fix.description.length > 70 ? fix.description.slice(0, 70) + '...' : fix.description}
-                    </div>
-                  </div>
-                  <span
-                    style={{
-                      fontSize: '10px',
-                      fontWeight: '600',
-                      color: priorityColor,
-                      textTransform: 'uppercase',
-                      padding: '4px 8px',
-                      backgroundColor: `${priorityColor}10`,
-                      borderRadius: '6px',
-                    }}
-                  >
-                    {fix.priority}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+          <p style={{ fontSize: '14px', color: '#D4D4D8', lineHeight: 1.5, margin: 0, fontWeight: '500' }}>
+            {roastTitle}
+          </p>
         </div>
       )}
 
-      {/* CTA */}
-      <div
-        style={{
-          background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-          borderRadius: '16px',
-          padding: '24px',
-          textAlign: 'center',
-          marginBottom: '20px',
-        }}
-      >
-        <div style={{ fontSize: '17px', fontWeight: '600', color: '#ffffff', marginBottom: '8px' }}>
-          Get Your Free Website Audit
-        </div>
-        <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', marginBottom: '16px' }}>
-          Security, Performance, SEO & Accessibility Analysis
-        </div>
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '12px 24px',
-            backgroundColor: 'rgba(255,255,255,0.95)',
-            borderRadius: '10px',
-          }}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2">
-            <circle cx="11" cy="11" r="8"/>
-            <path d="M21 21l-4.35-4.35"/>
-          </svg>
-          <span style={{ fontSize: '14px', color: '#171717', fontWeight: '600' }}>3rrork1ng.com</span>
-        </div>
-      </div>
-
-      {/* Footer */}
+      {/* Footer with CTA */}
       <div
         style={{
           display: 'flex',
@@ -366,30 +277,26 @@ export function ShareableReport({
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div style={{
-            width: '24px',
-            height: '24px',
-            borderRadius: '6px',
-            backgroundColor: '#10B981',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <span style={{ color: '#ffffff', fontSize: '10px', fontWeight: '700' }}>C</span>
-          </div>
-          <span style={{ fontSize: '12px', color: '#A1A1AA' }}>
-            Analyzed by <span style={{ color: '#FAFAFA', fontWeight: '500' }}>Crisp</span>
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            backgroundColor: '#34C759',
+          }} />
+          <span style={{ fontSize: '12px', color: '#71717A' }}>
+            {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
           </span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <div
-            style={{
-              width: '8px',
-              height: '8px',
-              borderRadius: '50%',
-              backgroundColor: '#34C759',
-            }}
-          />
-          <span style={{ fontSize: '11px', color: '#A1A1AA' }}>Analysis Complete</span>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '6px 14px',
+            backgroundColor: '#10B98120',
+            borderRadius: '8px',
+          }}
+        >
+          <span style={{ fontSize: '12px', color: '#10B981', fontWeight: '600' }}>3rrork1ng.com</span>
         </div>
       </div>
     </div>

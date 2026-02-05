@@ -5,6 +5,11 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { UserMenu } from './UserMenu';
 
+const NAV_LINKS = [
+  { href: '/pricing', label: 'Pricing' },
+  { href: '/dashboard', label: 'Dashboard' },
+];
+
 export function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
@@ -31,20 +36,19 @@ export function Navbar() {
   if (!mounted) {
     return (
       <nav className="fixed top-0 left-0 right-0 z-50">
-        <div className="px-6 py-3 transition-all duration-300 bg-gray-950/80 backdrop-blur-md border-b border-gray-800/60">
+        <div className="px-6 py-3 bg-gray-950/80 backdrop-blur-md border-b border-gray-800/50">
           <div className="max-w-7xl mx-auto flex justify-between items-center">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center">
-                <span className="text-white text-sm font-bold">C</span>
+              <div className="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center">
+                <span className="text-white text-xs font-bold">C</span>
               </div>
-              <span className="text-base font-bold text-gray-50">
-                Crisp
-              </span>
+              <span className="text-sm font-semibold text-gray-50">Crisp</span>
             </div>
-            <div className="flex items-center gap-6">
-              <span className="text-sm font-medium text-gray-400">Pricing</span>
-              <span className="text-sm font-medium text-gray-400">Sign In</span>
-              <span className="text-sm px-4 py-2 bg-emerald-500 text-emerald-950 rounded-lg font-semibold">Sign Up</span>
+            <div className="flex items-center gap-5">
+              {NAV_LINKS.map((link) => (
+                <span key={link.href} className="text-sm text-gray-400">{link.label}</span>
+              ))}
+              <span className="text-sm text-gray-400">Sign In</span>
             </div>
           </div>
         </div>
@@ -54,30 +58,33 @@ export function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50">
-      <div className="px-6 py-3 transition-all duration-300 bg-gray-950/80 backdrop-blur-md border-b border-gray-800/60">
+      <div className="px-6 py-3 bg-gray-950/80 backdrop-blur-md border-b border-gray-800/50">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           {/* Logo */}
           <a
             href="/"
             onClick={handleLogoClick}
-            className="group flex items-center gap-2.5 transition-all duration-200"
+            className="group flex items-center gap-2.5"
           >
-            <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center group-hover:bg-emerald-400 transition-colors">
-              <span className="text-white text-sm font-bold">C</span>
+            <div className="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center group-hover:bg-emerald-400 transition-colors">
+              <span className="text-white text-xs font-bold">C</span>
             </div>
-            <span className="text-base font-bold text-gray-50">
+            <span className="text-sm font-semibold text-gray-50">
               Crisp
             </span>
           </a>
 
-          {/* Nav links and user menu */}
-          <div className="flex items-center gap-6">
-            <Link
-              href="/pricing"
-              className="text-sm font-medium text-gray-400 hover:text-gray-100 transition-colors"
-            >
-              Pricing
-            </Link>
+          {/* Right side */}
+          <div className="flex items-center gap-5">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm text-gray-400 hover:text-gray-50 transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
             <UserMenu />
           </div>
         </div>

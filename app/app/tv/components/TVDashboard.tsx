@@ -34,6 +34,17 @@ function formatClock(): string {
   return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
+function parseSummary(body?: string): string {
+  if (!body) return 'Audit complete';
+  try {
+    const parsed = JSON.parse(body);
+    if (parsed.keyStrength) return parsed.keyStrength;
+  } catch {
+    // Not JSON — use as plain text
+  }
+  return body.split('\n')[0]?.slice(0, 120) ?? 'Audit complete';
+}
+
 export function TVDashboard({ scans, onSelectScan }: TVDashboardProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -105,7 +116,7 @@ export function TVDashboard({ scans, onSelectScan }: TVDashboardProps) {
       <div className="flex flex-col items-center justify-center h-screen bg-gray-950 text-gray-50">
         <h2 className="text-4xl font-bold font-display mb-4">No Scans Yet</h2>
         <p className="text-2xl text-gray-400">
-          Run your first scan at <span className="text-primary">crisp.sh</span>
+          Run your first scan at <span className="text-primary">3rrork1ng.com</span>
         </p>
       </div>
     );
@@ -116,9 +127,7 @@ export function TVDashboard({ scans, onSelectScan }: TVDashboardProps) {
 
   const grade = getGrade(scan.scoreOverall ?? 0);
   const gradeColor = getScoreColor(scan.scoreOverall ?? 0);
-  const summary = scan.analysisBody
-    ? scan.analysisBody.split('\n')[0]?.slice(0, 120)
-    : 'Audit complete';
+  const summary = parseSummary(scan.analysisBody);
 
   return (
     <div className="relative h-screen bg-gray-950 text-gray-50 overflow-hidden flex flex-col">

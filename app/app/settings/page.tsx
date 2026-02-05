@@ -292,6 +292,7 @@ export default function SettingsPage() {
           </div>
           <div className="p-6 space-y-4">
             {[
+              { label: 'Cargo (Rust)', cmd: 'cargo install error-king' },
               { label: 'npm (Node.js)', cmd: 'npm install -g error-king' },
               { label: 'npx (no install)', cmd: 'npx error-king scan https://example.com' },
               { label: 'Homebrew (macOS/Linux)', cmd: 'brew install error-king' },

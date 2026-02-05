@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { supabase } from './supabase';
 import { dbScanToScan, type Scan, type DbScan } from '@/types/scan';
 
@@ -104,9 +104,14 @@ export function useScanRealtime(scanId: string) {
   });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const fetchingRef = useRef(false);
+  const doneRef = useRef(false);
 
-  // Fetch initial scan data
+  // Fetch scan data with guard against concurrent fetches
   const fetchScan = useCallback(async () => {
+    if (fetchingRef.current) return null;
+    fetchingRef.current = true;
+
     try {
       const { data, error: fetchError } = await supabase
         .from('scans')
@@ -122,6 +127,7 @@ export function useScanRealtime(scanId: string) {
       setProgress(calculateProgress(dbScan));
 
       if (dbScan.status === 'completed' || dbScan.status === 'failed') {
+        doneRef.current = true;
         setIsLoading(false);
       }
 
@@ -130,10 +136,14 @@ export function useScanRealtime(scanId: string) {
       setError(err instanceof Error ? err.message : 'Failed to fetch scan');
       setIsLoading(false);
       return null;
+    } finally {
+      fetchingRef.current = false;
     }
   }, [scanId]);
 
   useEffect(() => {
+    doneRef.current = false;
+
     // Initial fetch
     fetchScan();
 
@@ -163,17 +173,25 @@ export function useScanRealtime(scanId: string) {
       )
       .subscribe();
 
-    // Fallback polling in case Realtime isn't enabled
+    // Fallback polling in case Realtime isn't enabled or drops
     const pollInterval = setInterval(async () => {
-      const result = await fetchScan();
-      if (result && (result.status === 'completed' || result.status === 'failed')) {
-        clearInterval(pollInterval);
-      }
+      if (doneRef.current) return;
+      await fetchScan();
     }, 3000);
+
+    // Immediate re-fetch when tab becomes visible again
+    // (browsers throttle setInterval in background tabs)
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible' && !doneRef.current) {
+        fetchScan();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
 
     return () => {
       supabase.removeChannel(channel);
       clearInterval(pollInterval);
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [scanId, fetchScan]);
 

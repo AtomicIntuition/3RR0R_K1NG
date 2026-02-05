@@ -20,12 +20,14 @@ const GuestLinks = () => (
   <div className="flex items-center gap-3">
     <Link
       href="/login"
+      prefetch={false}
       className="text-sm font-medium text-gray-400 hover:text-gray-100 transition-colors"
     >
       Sign In
     </Link>
     <Link
       href="/signup"
+      prefetch={false}
       className="text-sm px-4 py-2 bg-emerald-500 text-emerald-950 rounded-lg font-semibold hover:bg-emerald-400 transition-all duration-200"
     >
       Sign Up

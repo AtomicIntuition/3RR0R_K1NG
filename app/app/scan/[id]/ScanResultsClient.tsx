@@ -12,6 +12,7 @@ import { FixList } from '@/components/FixList';
 import { ShareCard } from '@/components/ShareCard';
 import { LLMReport } from '@/components/LLMReport';
 import { ScreenshotButton } from '@/components/ScreenshotButton';
+import { ReportDownloadButton } from '@/components/ReportDownloadButton';
 import { ScrollReveal } from '@/components/ScrollReveal';
 import { useScanRealtime } from '@/lib/useScanRealtime';
 import { getGrade, getGradeColor, type CategoryScores } from '@/lib/scoring';
@@ -149,6 +150,7 @@ export function ScanResultsClient({ initialScan, scanId }: ScanResultsClientProp
             </span>
           </div>
           <div className="flex items-center gap-2 screenshot-ignore">
+            <ReportDownloadButton scan={scan} />
             <ScreenshotButton
               scanData={{
                 url: scan.url,

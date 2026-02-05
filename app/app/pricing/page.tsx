@@ -3,8 +3,10 @@
 import { useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import clsx from 'clsx';
-import { Check } from 'lucide-react';
+import { Check, X, Minus } from 'lucide-react';
 import { PaymentButton } from '@/components/PaymentButton';
+import { FAQ } from '@/components/FAQ';
+import { ScrollReveal } from '@/components/ScrollReveal';
 import { PRICING } from '@/lib/constants';
 
 const PRICE_IDS = {
@@ -12,6 +14,41 @@ const PRICE_IDS = {
   proMonthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID || '',
   proYearly: process.env.NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID || '',
 };
+
+type FeatureValue = boolean | string;
+
+interface ComparisonRow {
+  feature: string;
+  free: FeatureValue;
+  pro: FeatureValue;
+  scanPack: FeatureValue;
+}
+
+const COMPARISON: ComparisonRow[] = [
+  { feature: 'Scan limit', free: `${PRICING.FREE_SCANS_PER_DAY}/day`, pro: `${PRICING.PRO_SCANS_PER_MONTH}/mo`, scanPack: `${PRICING.SCAN_PACK_SCANS} total` },
+  { feature: 'Audit categories', free: 'All 5', pro: 'All 5', scanPack: 'All 5' },
+  { feature: 'AI-powered analysis', free: true, pro: true, scanPack: true },
+  { feature: 'Shareable reports', free: true, pro: true, scanPack: true },
+  { feature: 'Priority queue', free: false, pro: true, scanPack: true },
+  { feature: 'PDF reports', free: true, pro: true, scanPack: true },
+  { feature: 'API access', free: false, pro: true, scanPack: true },
+  { feature: 'CLI access', free: false, pro: true, scanPack: true },
+  { feature: 'Site monitoring', free: false, pro: '5 sites', scanPack: '5 sites' },
+  { feature: 'Score drop alerts', free: false, pro: true, scanPack: true },
+  { feature: 'Full scan history', free: false, pro: true, scanPack: true },
+  { feature: 'Support', free: 'Community', pro: 'Priority', scanPack: 'Priority' },
+];
+
+function FeatureCell({ value }: { value: FeatureValue }) {
+  if (typeof value === 'boolean') {
+    return value ? (
+      <Check className="w-4 h-4 text-emerald-500 mx-auto" />
+    ) : (
+      <Minus className="w-4 h-4 text-gray-700 mx-auto" />
+    );
+  }
+  return <span className="text-sm text-gray-300">{value}</span>;
+}
 
 export default function PricingPage() {
   const [isYearly, setIsYearly] = useState(false);
@@ -30,7 +67,7 @@ export default function PricingPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center px-4 py-20">
+    <div className="min-h-screen bg-gray-950 flex flex-col items-center px-4 py-20">
       <div className="w-full max-w-5xl mx-auto">
 
         {/* Headline */}
@@ -213,6 +250,48 @@ export default function PricingPage() {
         <p className="text-center text-gray-500 text-sm mt-8">
           Cancel anytime. No hidden fees.
         </p>
+
+        {/* Comparison Table */}
+        <ScrollReveal>
+          <div className="mt-20">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white text-center mb-10 tracking-tight">
+              Compare plans
+            </h2>
+
+            <div className="overflow-x-auto -mx-4 px-4">
+              <table className="w-full min-w-[600px]">
+                <thead>
+                  <tr className="border-b border-gray-800">
+                    <th className="text-left py-4 pr-4 text-sm font-medium text-gray-500 w-[40%]">Feature</th>
+                    <th className="py-4 px-4 text-sm font-medium text-gray-400 text-center w-[20%]">Free</th>
+                    <th className="py-4 px-4 text-sm font-medium text-emerald-400 text-center w-[20%]">Pro</th>
+                    <th className="py-4 px-4 text-sm font-medium text-gray-400 text-center w-[20%]">Scan Pack</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {COMPARISON.map((row) => (
+                    <tr key={row.feature} className="border-b border-gray-800/50">
+                      <td className="py-3.5 pr-4 text-sm text-gray-300">{row.feature}</td>
+                      <td className="py-3.5 px-4 text-center"><FeatureCell value={row.free} /></td>
+                      <td className="py-3.5 px-4 text-center bg-emerald-500/[0.03]"><FeatureCell value={row.pro} /></td>
+                      <td className="py-3.5 px-4 text-center"><FeatureCell value={row.scanPack} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </ScrollReveal>
+
+        {/* FAQ */}
+        <ScrollReveal>
+          <div className="mt-20">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white text-center mb-10 tracking-tight">
+              Frequently asked questions
+            </h2>
+            <FAQ />
+          </div>
+        </ScrollReveal>
 
       </div>
     </div>

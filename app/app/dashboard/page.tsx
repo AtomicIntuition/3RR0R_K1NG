@@ -216,7 +216,7 @@ export default function DashboardPage() {
             return (
               <div
                 key={s.label}
-                className="animate-fade-up bg-gray-900 rounded-xl p-5 border border-gray-800"
+                className="animate-fade-up bg-gray-900 rounded-xl p-5 border border-gray-800 hover:border-gray-700 transition-colors"
                 style={{ animationDelay: `${i * 80}ms` }}
               >
                 <div className="flex items-center justify-between mb-3">
@@ -225,8 +225,18 @@ export default function DashboardPage() {
                   </span>
                   <Icon className={clsx('w-4 h-4', s.accent)} />
                 </div>
-                <div className={clsx('text-3xl font-semibold', s.accent)}>
-                  {s.value}
+                <div className="flex items-end justify-between">
+                  <div className={clsx('text-3xl font-semibold', s.accent)}>
+                    {s.value}
+                  </div>
+                  {s.label === 'Current Plan' && profile?.tier !== 'pro' && (
+                    <Link
+                      href="/pricing"
+                      className="text-xs font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
+                    >
+                      Upgrade
+                    </Link>
+                  )}
                 </div>
               </div>
             );

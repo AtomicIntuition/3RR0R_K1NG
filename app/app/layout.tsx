@@ -5,6 +5,7 @@ import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Providers } from '@/components/Providers';
 import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/Footer';
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration';
 import './globals.css';
 
@@ -176,22 +177,7 @@ export default function RootLayout({
             </main>
 
             {/* Footer */}
-            <footer className="relative z-10 py-8 px-4 border-t border-gray-800 bg-gray-950">
-              <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-400">
-                <div className="flex items-center gap-3">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">C</span>
-                  </div>
-                  <span className="text-gray-50 font-bold">Crisp</span>
-                  <span className="text-gray-700">|</span>
-                  <span>Website Audit Platform</span>
-                </div>
-                <div className="flex items-center gap-6">
-                  <a href="/privacy" className="hover:text-gray-200 transition-colors font-medium">Privacy</a>
-                  <a href="/terms" className="hover:text-gray-200 transition-colors font-medium">Terms</a>
-                </div>
-              </div>
-            </footer>
+            <Footer />
           </div>
         </Providers>
         <Analytics />

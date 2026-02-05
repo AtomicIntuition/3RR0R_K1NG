@@ -41,7 +41,7 @@ export async function generateMetadata({
   })();
   const grade = scan.letterGrade || getGrade(scan.scoreOverall);
   const title = `${domain} - ${scan.scoreOverall}/100 (${grade}) | Crisp Audit`;
-  const description = scan.roastTitle || `Website audit results for ${domain}`;
+  const description = scan.analysisTitle || `Website audit results for ${domain}`;
 
   return {
     title,

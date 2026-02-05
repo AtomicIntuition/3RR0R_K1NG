@@ -324,7 +324,26 @@ const SECURITY_HEADERS = [
     title: 'Content Security Policy (CSP)',
     description: 'CSP prevents XSS attacks by controlling which resources can be loaded.',
     recommendation: 'Implement a strict CSP that limits script sources and disables inline scripts.',
-    check: (value: string | null) => !!value && value.length > 10,
+    check: (value: string | null) => {
+      if (!value || value.length <= 10) return false;
+      // Check for weak directives that undermine CSP
+      const hasUnsafeInline = /script-src[^;]*'unsafe-inline'/.test(value);
+      const hasUnsafeEval = /script-src[^;]*'unsafe-eval'/.test(value);
+      const hasWildcard = /script-src[^;]*\s\*[\s;]/.test(value) || /default-src[^;]*\s\*[\s;]/.test(value);
+      // CSP exists but is weak if it has unsafe-eval or wildcard sources
+      // unsafe-inline alone is common (many frameworks need it) so we're lenient there
+      return !(hasUnsafeEval || hasWildcard);
+    },
+    getIssues: (value: string | null): string[] => {
+      if (!value) return ['No CSP header set'];
+      const issues: string[] = [];
+      if (/script-src[^;]*'unsafe-inline'/.test(value)) issues.push("script-src allows 'unsafe-inline'");
+      if (/script-src[^;]*'unsafe-eval'/.test(value)) issues.push("script-src allows 'unsafe-eval' (dangerous)");
+      if (/default-src[^;]*\s\*[\s;]/.test(value)) issues.push("default-src uses wildcard * (defeats purpose of CSP)");
+      if (!/default-src/.test(value)) issues.push("Missing default-src directive (fallback for undefined directives)");
+      if (!/frame-ancestors/.test(value)) issues.push("Missing frame-ancestors (use instead of X-Frame-Options)");
+      return issues;
+    },
   },
   {
     name: 'X-Content-Type-Options',
@@ -442,14 +461,34 @@ export async function runSecurityAudit(
     const value = headers[header.name.toLowerCase()] || null;
     const passed = header.check(value) ?? false;
 
-    findings.push({
+    const finding: SecurityFinding = {
       id: header.id,
       severity: header.severity,
       title: header.title,
       description: header.description,
       recommendation: header.recommendation,
       passed,
-    });
+    };
+
+    // Include current header value and specific issues in details
+    if (value || !passed) {
+      finding.details = {
+        currentValue: value || '(not set)',
+      };
+      // Add CSP-specific issues if available
+      if ('getIssues' in header && typeof header.getIssues === 'function') {
+        const issues = header.getIssues(value);
+        if (issues.length > 0) {
+          finding.details.affectedElements = issues;
+          // Update description with specific CSP weaknesses
+          if (value && !passed) {
+            finding.description = `CSP header present but has weaknesses: ${issues.join('; ')}`;
+          }
+        }
+      }
+    }
+
+    findings.push(finding);
   }
 
   // Check HTTPS

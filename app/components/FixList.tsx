@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import clsx from 'clsx';
-import type { RoastFix } from '@/types/scan';
+import type { AuditFix } from '@/types/scan';
 import {
   AlertCircle,
   AlertTriangle,
@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 
 interface FixListProps {
-  fixes: RoastFix[];
+  fixes: AuditFix[];
   className?: string;
 }
 

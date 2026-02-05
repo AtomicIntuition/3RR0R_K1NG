@@ -9,11 +9,11 @@ interface ShareCardProps {
   scanId: string;
   url: string;
   score: number;
-  twitterRoast?: string;
+  twitterSummary?: string;
   className?: string;
 }
 
-export function ShareCard({ scanId, url, score, twitterRoast, className }: ShareCardProps) {
+export function ShareCard({ scanId, url, score, twitterSummary, className }: ShareCardProps) {
   const [copied, setCopied] = useState(false);
 
   const shareUrl = typeof window !== 'undefined'
@@ -25,8 +25,8 @@ export function ShareCard({ scanId, url, score, twitterRoast, className }: Share
     try { return new URL(url).hostname; } catch { return url; }
   })();
 
-  const shareText = twitterRoast
-    ? `${twitterRoast}\n\nAnalyze your site:`
+  const shareText = twitterSummary
+    ? `${twitterSummary}\n\nAnalyze your site:`
     : `${domain} scored ${score}/100 (Grade: ${grade}). Full report:`;
 
   const handleCopy = async () => {

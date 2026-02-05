@@ -39,6 +39,7 @@ export async function runSeoAudit(page: Page, url: string): Promise<SeoAuditResu
     linksWithoutText: 0,
     hasLang: false,
     lang: null as string | null,
+    headingHierarchy: [] as { level: number; text: string }[],
   };
 
   // Extract meta information from the page - wrapped in try-catch
@@ -83,6 +84,10 @@ export async function runSeoAudit(page: Page, url: string): Promise<SeoAuditResu
         linksWithoutText: document.querySelectorAll('a:not([aria-label])').length,
         hasLang: document.documentElement.hasAttribute('lang'),
         lang: document.documentElement.getAttribute('lang'),
+        headingHierarchy: Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6')).slice(0, 20).map(el => ({
+          level: parseInt(el.tagName[1]),
+          text: (el.textContent || '').trim().slice(0, 80),
+        })),
       };
     }).catch(() => defaultSeoData);
   } catch (e) {
@@ -205,6 +210,80 @@ export async function runSeoAudit(page: Page, url: string): Promise<SeoAuditResu
     passed: seoData.imgWithoutAlt === 0,
     value: `${Math.round(imgAltRatio)}% coverage`,
   });
+
+  // Robots meta tag analysis — catch noindex/nofollow that block search engines
+  if (seoData.robots) {
+    const robotsLower = seoData.robots.toLowerCase();
+    const hasNoindex = robotsLower.includes('noindex');
+    const hasNofollow = robotsLower.includes('nofollow');
+
+    if (hasNoindex || hasNofollow) {
+      findings.push({
+        id: 'robots-meta',
+        title: 'Robots Meta Tag',
+        description: hasNoindex
+          ? 'Page has noindex — search engines will NOT index this page'
+          : 'Page has nofollow — search engines will not follow links on this page',
+        passed: false,
+        value: seoData.robots,
+      });
+    } else {
+      findings.push({
+        id: 'robots-meta',
+        title: 'Robots Meta Tag',
+        description: 'Robots meta tag allows indexing',
+        passed: true,
+        value: seoData.robots,
+      });
+    }
+  }
+
+  // Heading hierarchy — check for skipped levels (e.g. H1 → H3, missing H2)
+  if (seoData.headingHierarchy.length > 0) {
+    const levels = seoData.headingHierarchy.map(h => h.level);
+    const skippedLevels: string[] = [];
+    for (let i = 1; i < levels.length; i++) {
+      if (levels[i] > levels[i - 1] + 1) {
+        skippedLevels.push(`H${levels[i - 1]} → H${levels[i]}`);
+      }
+    }
+
+    findings.push({
+      id: 'heading-hierarchy',
+      title: 'Heading Hierarchy',
+      description: skippedLevels.length === 0
+        ? 'Heading hierarchy is well-structured'
+        : `Heading levels are skipped: ${skippedLevels.slice(0, 3).join(', ')} (bad for SEO and accessibility)`,
+      passed: skippedLevels.length === 0,
+      value: seoData.headingHierarchy.slice(0, 5).map(h => `H${h.level}: ${h.text}`).join(' → '),
+    });
+  }
+
+  // Canonical URL validation — check if self-referencing and absolute
+  if (seoData.canonical) {
+    const isAbsolute = seoData.canonical.startsWith('http');
+    const normalizeUrl = (u: string) => u.replace(/\/$/, '').replace(/^https?:\/\/(www\.)?/, '');
+    const isSelfRef = normalizeUrl(seoData.canonical) === normalizeUrl(url);
+
+    if (!isAbsolute) {
+      findings.push({
+        id: 'canonical-quality',
+        title: 'Canonical URL Quality',
+        description: `Canonical URL is relative ("${seoData.canonical}") — should be absolute`,
+        passed: false,
+        value: seoData.canonical,
+      });
+    } else if (!isSelfRef) {
+      // Not an error — could be intentional consolidation — but worth noting
+      findings.push({
+        id: 'canonical-quality',
+        title: 'Canonical URL Quality',
+        description: `Canonical points to different URL (${seoData.canonical}) — make sure this is intentional`,
+        passed: true,
+        value: seoData.canonical,
+      });
+    }
+  }
 
   // Check robots.txt
   try {

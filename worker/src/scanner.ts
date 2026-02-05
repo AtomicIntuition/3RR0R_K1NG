@@ -19,7 +19,7 @@ import { scanCodePatterns, type CodePatternsAuditResult } from './audits/codePat
 import { runPWAAudit, type PWAAuditResult } from './audits/pwa.js';
 import { runStructuredDataAudit, type StructuredDataAuditResult } from './audits/structuredData.js';
 import { runLinkAudit, type LinkAuditResult } from './audits/links.js';
-import { generateRoast, generateUploadRoast, generateLLMReport, generateQuickAuditFixes, type RoastResult, type RoastPersona, type RoastInput } from './roastGenerator.js';
+import { generateAnalysis, generateUploadAnalysis, generateLLMReport, generateQuickAuditFixes, type AuditResult, type AuditInput } from './roastGenerator.js';
 import { updateScan } from './lib/supabase.js';
 import {
   calculateComprehensiveScore,
@@ -48,7 +48,7 @@ export interface ScanResult {
   pwa?: PWAAuditResult;
   structuredData?: StructuredDataAuditResult;
   links?: LinkAuditResult;
-  roast: RoastResult;
+  analysis: AuditResult;
   overallScore: number;
   letterGrade: string;
   scoringBreakdown?: ScoringResult;
@@ -59,7 +59,7 @@ export interface UploadScanResult {
   dependencies: DependencyAuditResult;
   secrets: SecretsAuditResult;
   codePatterns: CodePatternsAuditResult;
-  roast: RoastResult;
+  analysis: AuditResult;
   overallScore: number;
   letterGrade: string;
 }
@@ -103,12 +103,12 @@ const SCAN_PHASES = [
   'resources',
   'extended_audits',
   'performance',
-  'roast',
+  'analysis',
 ] as const;
 
 type ScanPhase = typeof SCAN_PHASES[number];
 
-export async function runScan(scanId: string, url: string, persona: RoastPersona = 'professional', skipRoast: boolean = false): Promise<ScanResult> {
+export async function runScan(scanId: string, url: string, _persona: string = 'professional', skipRoast: boolean = false): Promise<ScanResult> {
   console.log(`Starting scan for ${url} (${scanId}) skipRoast: ${skipRoast}`);
 
   const completedPhases: string[] = [];
@@ -132,7 +132,6 @@ export async function runScan(scanId: string, url: string, persona: RoastPersona
     started_at: new Date().toISOString(),
     current_phase: 'security',
     completed_phases: [],
-    roast_persona: persona,
   });
 
   const browserInstance = await getBrowser();
@@ -325,15 +324,14 @@ export async function runScan(scanId: string, url: string, persona: RoastPersona
     const letterGrade = scoringResult.letterGrade;
     console.log(`Comprehensive score calculated: ${overallScore}/100 (${letterGrade})`);
 
-    // Generate roast with selected persona (unless skipped)
-    let roast: RoastResult;
+    // Generate AI analysis (unless skipped for quick audit)
+    let analysis: AuditResult;
 
     if (skipRoast) {
-      // Skip AI roast but still generate useful report and fixes
-      console.log(`Quick Audit mode - generating report without AI roast for ${scanId}`);
+      // Skip AI analysis but still generate useful report and fixes
+      console.log(`Quick Audit mode - generating report without AI analysis for ${scanId}`);
 
-      // Build input for report generation (same structure as roast input)
-      const reportInput: RoastInput = {
+      const reportInput: AuditInput = {
         url,
         scores: {
           overall: overallScore,
@@ -366,19 +364,19 @@ export async function runScan(scanId: string, url: string, persona: RoastPersona
       const llmReport = generateLLMReport(reportInput);
       const fixes = generateQuickAuditFixes(reportInput);
 
-      roast = {
+      analysis = {
         title: 'Quick Audit Complete',
         body: `Your site scored ${overallScore}/100 (${letterGrade}). Review the detailed metrics and actionable fixes below.`,
         fixes,
         llmReport,
-        twitterRoast: `${url.replace(/^https?:\/\//, '')} scored ${overallScore}/100 (${letterGrade}). Quick audit complete - see full report for fixes.`.slice(0, 280),
+        twitterSummary: `${url.replace(/^https?:\/\//, '')} scored ${overallScore}/100 (${letterGrade}). Quick audit complete - see full report for fixes.`.slice(0, 280),
         isFallback: true,
         fallbackReason: 'quick_audit',
       };
-      completePhase('roast');
+      completePhase('analysis');
     } else {
-      await updatePhase('roast');
-      roast = await generateRoast({
+      await updatePhase('analysis');
+      analysis = await generateAnalysis({
         url,
         scores: {
           overall: overallScore,
@@ -407,10 +405,8 @@ export async function runScan(scanId: string, url: string, persona: RoastPersona
         pwa: pwaResult,
         structuredData: structuredDataResult,
         links: linksResult,
-        // Persona for roast style
-        persona,
       });
-      completePhase('roast');
+      completePhase('analysis');
     }
 
     // Update final results
@@ -419,13 +415,13 @@ export async function runScan(scanId: string, url: string, persona: RoastPersona
       score_overall: overallScore,
       letter_grade: letterGrade,
       scoring_breakdown: scoringResult,
-      roast_title: roast.title,
-      roast_body: roast.body,
-      roast_fixes: roast.fixes,
-      llm_report: roast.llmReport,
-      twitter_roast: roast.twitterRoast,
-      roast_is_fallback: roast.isFallback || false,
-      roast_fallback_reason: roast.fallbackReason || null,
+      roast_title: analysis.title,
+      roast_body: analysis.body,
+      roast_fixes: analysis.fixes,
+      llm_report: analysis.llmReport,
+      twitter_roast: analysis.twitterSummary,
+      roast_is_fallback: analysis.isFallback || false,
+      roast_fallback_reason: analysis.fallbackReason || null,
       current_phase: 'complete',
       completed_phases: completedPhases,
       completed_at: new Date().toISOString(),
@@ -449,7 +445,7 @@ export async function runScan(scanId: string, url: string, persona: RoastPersona
       pwa: pwaResult,
       structuredData: structuredDataResult,
       links: linksResult,
-      roast,
+      analysis,
       overallScore,
       letterGrade,
       scoringBreakdown: scoringResult,
@@ -525,8 +521,8 @@ export async function runUploadScan(
     );
     const letterGrade = getLetterGrade(overallScore);
 
-    // Generate roast for upload scan
-    const roast = await generateUploadRoast({
+    // Generate analysis for upload scan
+    const analysis = await generateUploadAnalysis({
       filesCount: files.length,
       dependencies: dependenciesResult,
       secrets: secretsResult,
@@ -541,12 +537,12 @@ export async function runUploadScan(
       letter_grade: letterGrade,
       score_security: secretsResult.score,
       score_code_quality: codePatternsResult.score,
-      roast_title: roast.title,
-      roast_body: roast.body,
-      roast_fixes: roast.fixes,
-      llm_report: roast.llmReport,
-      roast_is_fallback: roast.isFallback || false,
-      roast_fallback_reason: roast.fallbackReason || null,
+      roast_title: analysis.title,
+      roast_body: analysis.body,
+      roast_fixes: analysis.fixes,
+      llm_report: analysis.llmReport,
+      roast_is_fallback: analysis.isFallback || false,
+      roast_fallback_reason: analysis.fallbackReason || null,
       completed_at: new Date().toISOString(),
     });
 
@@ -556,7 +552,7 @@ export async function runUploadScan(
       dependencies: dependenciesResult,
       secrets: secretsResult,
       codePatterns: codePatternsResult,
-      roast,
+      analysis,
       overallScore,
       letterGrade,
     };

@@ -13,9 +13,9 @@ interface ShareableReportProps {
       weight: number;
     }>;
   };
-  roastTitle?: string;
-  roastBody?: string;
-  roastId?: string;
+  analysisTitle?: string;
+  analysisBody?: string;
+  scanId?: string;
   fixes?: {
     priority: 'critical' | 'high' | 'medium' | 'low';
     category: string;
@@ -33,8 +33,8 @@ export function ShareableReport({
   scoreOverall,
   letterGrade,
   scoringBreakdown,
-  roastTitle,
-  roastBody,
+  analysisTitle,
+  analysisBody,
 }: ShareableReportProps) {
   const grade = letterGrade || getGrade(scoreOverall);
 
@@ -80,7 +80,7 @@ export function ShareableReport({
   // Parse topPriority from body if available
   let topPriority = '';
   try {
-    const parsed = JSON.parse(roastBody || '');
+    const parsed = JSON.parse(analysisBody || '');
     if (parsed.topPriority) topPriority = parsed.topPriority;
   } catch {
     // Not JSON, skip
@@ -250,7 +250,7 @@ export function ShareableReport({
       )}
 
       {/* If no executive summary, show title */}
-      {!topPriority && roastTitle && (
+      {!topPriority && analysisTitle && (
         <div
           style={{
             backgroundColor: '#18181B',
@@ -260,7 +260,7 @@ export function ShareableReport({
           }}
         >
           <p style={{ fontSize: '14px', color: '#D4D4D8', lineHeight: 1.5, margin: 0, fontWeight: '500' }}>
-            {roastTitle}
+            {analysisTitle}
           </p>
         </div>
       )}

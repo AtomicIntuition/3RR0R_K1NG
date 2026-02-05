@@ -31,10 +31,8 @@ export interface ScanJobData {
   scanId: string;
   url?: string;
   userTier?: 'anonymous' | 'free' | 'pro';
-  // Analysis style (kept for backwards compatibility)
-  persona?: 'professional';
-  // Skip analysis generation for faster results
-  skipRoast?: boolean;
+  persona?: string; // kept for backwards compat
+  skipAI?: boolean; // skip AI analysis for faster results
   // Phase 2: File upload support
   scanType?: 'url' | 'upload';
   files?: Array<{ path: string; content: string }>;

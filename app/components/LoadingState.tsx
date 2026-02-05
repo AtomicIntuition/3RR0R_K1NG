@@ -24,7 +24,7 @@ const PHASE_CONFIG: Record<string, { displayName: string; icon: string }> = {
   resources: { displayName: 'Resources', icon: 'chart' },
   extended_audits: { displayName: 'Deep Scan', icon: 'flask' },
   performance: { displayName: 'Performance', icon: 'bolt' },
-  roast: { displayName: 'AI Analysis', icon: 'sparkle' },
+  analysis: { displayName: 'AI Analysis', icon: 'sparkle' },
 };
 
 const PHASE_ORDER = [
@@ -36,7 +36,7 @@ const PHASE_ORDER = [
   'resources',
   'extended_audits',
   'performance',
-  'roast',
+  'analysis',
 ];
 
 const DISPLAY_TO_PHASE: Record<string, string> = {
@@ -48,7 +48,7 @@ const DISPLAY_TO_PHASE: Record<string, string> = {
   'Resources': 'resources',
   'Deep Scan': 'extended_audits',
   'Performance': 'performance',
-  'AI Analysis': 'roast',
+  'AI Analysis': 'analysis',
 };
 
 // Pre-written terminal log lines per phase
@@ -105,7 +105,7 @@ const PHASE_LOGS: Record<string, string[]> = {
     'Measuring Cumulative Layout Shift...',
     'Computing Speed Index...',
   ],
-  roast: [
+  analysis: [
     'Compiling audit results...',
     'Generating AI-powered analysis...',
     'Writing actionable recommendations...',

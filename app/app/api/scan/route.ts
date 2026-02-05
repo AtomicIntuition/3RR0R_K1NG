@@ -255,7 +255,6 @@ export async function POST(request: NextRequest) {
         ip_address: ip,
         fingerprint: sanitizedFingerprint,
         user_id: userId || null,
-        roast_persona: selectedPersona,
       })
       .select('id')
       .single();

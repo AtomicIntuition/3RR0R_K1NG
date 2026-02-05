@@ -21,7 +21,7 @@ const PHASE_CONFIG: Record<string, { displayName: string; description: string; w
   resources: { displayName: 'Resources', description: 'Analyzing resource waterfall...', weight: 8 },
   extended_audits: { displayName: 'Deep Scan', description: 'Running extended audits...', weight: 15 },
   performance: { displayName: 'Performance', description: 'Running Lighthouse audit...', weight: 20 },
-  roast: { displayName: 'AI Analysis', description: 'Generating report...', weight: 10 },
+  analysis: { displayName: 'AI Analysis', description: 'Generating report...', weight: 10 },
 };
 
 // Ordered list of phases for display
@@ -34,7 +34,7 @@ const PHASE_ORDER = [
   'resources',
   'extended_audits',
   'performance',
-  'roast',
+  'analysis',
 ];
 
 // Display names for the UI grid

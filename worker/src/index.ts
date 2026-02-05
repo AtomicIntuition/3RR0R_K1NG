@@ -14,8 +14,8 @@ async function processScanJob(job: Job<ScanJobData>): Promise<void> {
     url,
     scanType,
     files,
-    persona: rawPersona = 'professional',
-    skipRoast = false,
+    persona: _rawPersona = 'professional',
+    skipAI = false,
     // Monitoring fields
     isMonitoredScan,
     monitoredSiteId,
@@ -25,10 +25,7 @@ async function processScanJob(job: Job<ScanJobData>): Promise<void> {
     userEmail,
   } = job.data;
 
-  // Always use 'professional' persona regardless of what was sent
-  const persona = 'professional' as const;
-
-  console.log(`Processing job ${job.id}: ${scanType === 'upload' ? 'File Upload' : url} (skipRoast: ${skipRoast}, monitored: ${isMonitoredScan || false})`);
+  console.log(`Processing job ${job.id}: ${scanType === 'upload' ? 'File Upload' : url} (skipAI: ${skipAI}, monitored: ${isMonitoredScan || false})`);
 
   try {
     let scanResult;
@@ -37,8 +34,8 @@ async function processScanJob(job: Job<ScanJobData>): Promise<void> {
       // Process file upload scan
       scanResult = await runUploadScan(scanId, files);
     } else if (url) {
-      // Process URL scan with persona and skipRoast option
-      scanResult = await runScan(scanId, url, persona, skipRoast);
+      // Process URL scan
+      scanResult = await runScan(scanId, url, 'professional', skipAI);
     } else {
       throw new Error('Invalid job data: missing url or files');
     }

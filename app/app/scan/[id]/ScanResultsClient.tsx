@@ -155,10 +155,10 @@ export function ScanResultsClient({ initialScan, scanId }: ScanResultsClientProp
                 scoreOverall: scan.scoreOverall || 0,
                 letterGrade: scan.letterGrade,
                 scoringBreakdown: scan.scoringBreakdown,
-                roastTitle: scan.roastTitle,
-                roastBody: scan.roastBody,
+                analysisTitle: scan.analysisTitle,
+                analysisBody: scan.analysisBody,
                 id: scan.id,
-                fixes: scan.roastFixes,
+                fixes: scan.analysisFixes,
               }}
               filename={`crisp-audit-${scan.url.replace(/https?:\/\//, '').replace(/[^a-z0-9]/gi, '-').slice(0, 30)}`}
             />
@@ -221,26 +221,26 @@ export function ScanResultsClient({ initialScan, scanId }: ScanResultsClientProp
         </motion.section>
 
         {/* C. EXECUTIVE SUMMARY */}
-        {scan.roastTitle && scan.roastBody && (
+        {scan.analysisTitle && scan.analysisBody && (
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             className="mb-6"
           >
-            <h2 className="text-lg font-semibold text-gray-50 mb-3">{scan.roastTitle}</h2>
+            <h2 className="text-lg font-semibold text-gray-50 mb-3">{scan.analysisTitle}</h2>
             <ExecutiveSummary
-              body={scan.roastBody}
+              body={scan.analysisBody}
               score={scan.scoreOverall || 0}
             />
           </motion.section>
         )}
 
         {/* D. PRIORITY FIXES */}
-        {scan.roastFixes && scan.roastFixes.length > 0 && (
+        {scan.analysisFixes && scan.analysisFixes.length > 0 && (
           <ScrollReveal delay={0}>
             <section className="mb-8">
-              <FixList fixes={scan.roastFixes} />
+              <FixList fixes={scan.analysisFixes} />
             </section>
           </ScrollReveal>
         )}
@@ -365,7 +365,7 @@ export function ScanResultsClient({ initialScan, scanId }: ScanResultsClientProp
               scanId={scan.id}
               url={scan.url}
               score={scan.scoreOverall || 0}
-              twitterRoast={scan.twitterRoast}
+              twitterSummary={scan.twitterSummary}
             />
           </section>
         </ScrollReveal>

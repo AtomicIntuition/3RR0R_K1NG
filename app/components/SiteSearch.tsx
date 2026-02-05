@@ -10,7 +10,7 @@ interface SearchResult {
   domain: string;
   score: number;
   grade: string;
-  roastTitle: string;
+  analysisTitle: string;
   scannedAt: string;
 }
 
@@ -150,9 +150,9 @@ export function SiteSearch({ className = '' }: SiteSearchProps) {
                         {result.grade}
                       </span>
                     </div>
-                    {result.roastTitle && (
+                    {result.analysisTitle && (
                       <p className="text-xs text-gray-500 truncate mt-0.5">
-                        {result.roastTitle}
+                        {result.analysisTitle}
                       </p>
                     )}
                   </div>

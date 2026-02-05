@@ -20,7 +20,7 @@ import type { DependencyAuditResult } from './audits/dependencies.js';
 import type { SecretsAuditResult } from './audits/secrets.js';
 import type { CodePatternsAuditResult } from './audits/codePatterns.js';
 
-export interface RoastFix {
+export interface AuditFix {
   priority: 'critical' | 'high' | 'medium' | 'low';
   category: 'performance' | 'security' | 'seo' | 'accessibility' | 'code_quality';
   title: string;
@@ -29,42 +29,20 @@ export interface RoastFix {
   impact?: string;
 }
 
-export interface RoastResult {
+export interface AuditResult {
   title: string;
   body: string;
-  fixes: RoastFix[];
-  twitterRoast?: string; // Short 280-char roast for Twitter sharing
+  fixes: AuditFix[];
+  twitterSummary?: string; // Short 280-char summary for sharing
   llmReport?: string; // LLM-ready detailed report
   isFallback?: boolean; // Track if AI generation failed
   fallbackReason?: string; // Why AI failed (for debugging)
-  persona?: RoastPersona; // Which persona generated this roast
 }
 
-// ============================================
-// Analysis Configuration - Professional Voice
-// ============================================
+// Analysis prompt for Claude
+const ANALYSIS_PROMPT = `You are a senior web development consultant providing professional website audits. Your analysis is thorough, objective, and focused on actionable improvements. You communicate clearly without jargon, explain the business impact of issues, and prioritize recommendations by severity. Your tone is professional but approachable - direct without being harsh.`;
 
-export type RoastPersona = 'professional';
-
-export interface PersonaConfig {
-  id: RoastPersona;
-  name: string;
-  description: string;
-  icon: string; // Icon identifier for UI
-  prompt: string;
-}
-
-export const ROAST_PERSONAS: Record<RoastPersona, PersonaConfig> = {
-  professional: {
-    id: 'professional',
-    name: 'Crisp Analysis',
-    description: 'Professional website audit with actionable insights',
-    icon: 'chart',
-    prompt: `You are a senior web development consultant providing professional website audits. Your analysis is thorough, objective, and focused on actionable improvements. You communicate clearly without jargon, explain the business impact of issues, and prioritize recommendations by severity. Your tone is professional but approachable - direct without being harsh.`,
-  },
-};
-
-export interface RoastInput {
+export interface AuditInput {
   url: string;
   scores: {
     overall: number;
@@ -98,15 +76,13 @@ export interface RoastInput {
   pwa?: PWAAuditResult;
   structuredData?: StructuredDataAuditResult;
   links?: LinkAuditResult;
-  // Analysis style (kept for backwards compatibility)
-  persona?: RoastPersona;
 }
 
 /**
  * Generate an LLM-ready report that can be pasted directly into Claude/GPT for fixing
  * Exported for use in Quick Audit mode (no AI needed)
  */
-export function generateLLMReport(input: RoastInput): string {
+export function generateLLMReport(input: AuditInput): string {
   const failedSecurity = input.securityFindings.filter(f => !f.passed);
   const failedSeo = input.seoFindings.filter(f => !f.passed);
 
@@ -520,232 +496,242 @@ Start with the highest priority items and work through the list.`;
 }
 
 /**
- * Generate copy-paste ready code fixes for common issues
+ * Generate specific, data-driven code fixes based on actual audit findings.
+ * Every fix references real values found during the scan — no generic templates.
  */
-function generateCodeFixes(input: RoastInput): string {
+function generateCodeFixes(input: AuditInput): string {
   let fixes = '';
   const failedSecurity = input.securityFindings.filter(f => !f.passed);
   const failedSeo = input.seoFindings.filter(f => !f.passed);
 
   // Detect framework from tech stack
   const isNextJs = input.techStack.some(t => t.name.toLowerCase().includes('next'));
-  const isReact = input.techStack.some(t => t.name.toLowerCase().includes('react'));
-  const isVite = input.techStack.some(t => t.name.toLowerCase().includes('vite'));
+  const isTailwind = input.techStack.some(t => t.name.toLowerCase().includes('tailwind'));
 
-  // Security header fixes
-  const hstsIssue = failedSecurity.find(f => f.id === 'hsts');
-  const cspIssue = failedSecurity.find(f => f.id === 'csp');
-  const xFrameIssue = failedSecurity.find(f => f.id === 'x-frame-options');
+  // Security header fixes — only list the specific missing headers
+  const missingHeaders = failedSecurity.filter(f =>
+    ['hsts', 'csp', 'x-frame-options', 'x-content-type-options', 'referrer-policy', 'permissions-policy'].includes(f.id)
+  );
 
-  if (hstsIssue || cspIssue || xFrameIssue) {
+  if (missingHeaders.length > 0) {
+    const headerMap: Record<string, { header: string; value: string }> = {
+      'hsts': { header: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
+      'csp': { header: 'Content-Security-Policy', value: `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' ${input.url.replace(/^(https?:\/\/[^/]+).*/, '$1')}` },
+      'x-frame-options': { header: 'X-Frame-Options', value: 'DENY' },
+      'x-content-type-options': { header: 'X-Content-Type-Options', value: 'nosniff' },
+      'referrer-policy': { header: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+      'permissions-policy': { header: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+    };
+
     if (isNextJs) {
-      fixes += `### Next.js Security Headers (next.config.js)\n\n`;
+      fixes += `### Security: Add Missing Headers (Next.js)\n\n`;
+      fixes += `Your site at \`${input.url}\` is missing ${missingHeaders.length} security header${missingHeaders.length > 1 ? 's' : ''}.\n\n`;
       fixes += '```javascript\n';
-      fixes += `// next.config.js
-const securityHeaders = [
-  {
-    key: 'Strict-Transport-Security',
-    value: 'max-age=31536000; includeSubDomains; preload'
-  },
-  {
-    key: 'X-Frame-Options',
-    value: 'DENY'
-  },
-  {
-    key: 'X-Content-Type-Options',
-    value: 'nosniff'
-  },
-  {
-    key: 'Referrer-Policy',
-    value: 'strict-origin-when-cross-origin'
-  },
-  {
-    key: 'Content-Security-Policy',
-    value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';"
-  }
-];
-
-module.exports = {
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: securityHeaders,
-      },
-    ];
-  },
-};
-`;
+      fixes += `// next.config.js — add only the missing headers\nconst securityHeaders = [\n`;
+      for (const issue of missingHeaders) {
+        const mapped = headerMap[issue.id];
+        if (mapped) {
+          const currentVal = issue.details?.currentValue;
+          if (currentVal) {
+            fixes += `  // Current: ${currentVal} — ${issue.description}\n`;
+          }
+          fixes += `  { key: '${mapped.header}', value: '${mapped.value}' },\n`;
+        }
+      }
+      fixes += `];\n\nmodule.exports = {\n  async headers() {\n    return [{ source: '/(.*)', headers: securityHeaders }];\n  },\n};\n`;
       fixes += '```\n\n';
     } else {
-      fixes += `### Apache Security Headers (.htaccess)\n\n`;
-      fixes += '```apache\n';
-      fixes += `# .htaccess
-Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
-Header always set X-Frame-Options "DENY"
-Header always set X-Content-Type-Options "nosniff"
-Header always set Referrer-Policy "strict-origin-when-cross-origin"
-Header always set Content-Security-Policy "default-src 'self';"
-`;
-      fixes += '```\n\n';
-
-      fixes += `### Nginx Security Headers (nginx.conf)\n\n`;
-      fixes += '```nginx\n';
-      fixes += `# Add to server block
-add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
-add_header X-Frame-Options "DENY" always;
-add_header X-Content-Type-Options "nosniff" always;
-add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-`;
-      fixes += '```\n\n';
+      fixes += `### Security: Add Missing Headers\n\n`;
+      fixes += `Your site at \`${input.url}\` is missing ${missingHeaders.length} security header${missingHeaders.length > 1 ? 's' : ''}:\n\n`;
+      for (const issue of missingHeaders) {
+        const mapped = headerMap[issue.id];
+        if (mapped) {
+          fixes += `- **${mapped.header}**: \`${mapped.value}\`\n`;
+          if (issue.details?.currentValue) {
+            fixes += `  - Currently set to: \`${issue.details.currentValue}\`\n`;
+          }
+        }
+      }
+      fixes += `\nHow to add these depends on your server:\n`;
+      fixes += `- **Nginx:** \`add_header Header-Name "value" always;\` in your server block\n`;
+      fixes += `- **Apache:** \`Header always set Header-Name "value"\` in .htaccess\n`;
+      fixes += `- **Vercel/Netlify:** Add to vercel.json or netlify.toml headers config\n\n`;
     }
   }
 
-  // Meta tag fixes for SEO
-  const titleIssue = failedSeo.find(f => f.id === 'title');
-  const descIssue = failedSeo.find(f => f.id === 'meta-description');
-  const ogIssue = failedSeo.find(f => f.id === 'open-graph');
+  // CORS fix — use actual detected value
+  const corsIssue = failedSecurity.find(f => f.id === 'cors-permissive');
+  if (corsIssue) {
+    const currentOrigin = corsIssue.details?.currentValue || '*';
+    const siteOrigin = input.url.replace(/^(https?:\/\/[^/]+).*/, '$1');
+    fixes += `### Security: Restrict CORS Policy\n\n`;
+    fixes += `Your \`Access-Control-Allow-Origin\` is currently set to \`${currentOrigin}\`.\n`;
+    fixes += `Replace with your specific origin:\n\n`;
+    fixes += '```\n';
+    fixes += `Access-Control-Allow-Origin: ${siteOrigin}\n`;
+    fixes += '```\n\n';
+  }
 
-  if (titleIssue || descIssue || ogIssue) {
-    if (isNextJs) {
-      fixes += `### Next.js SEO Metadata (app/layout.tsx)\n\n`;
-      fixes += '```typescript\n';
-      fixes += `// app/layout.tsx
-import type { Metadata } from 'next';
+  // SEO meta tag fixes — use actual found/missing values
+  if (failedSeo.length > 0) {
+    const titleIssue = failedSeo.find(f => f.id === 'title');
+    const descIssue = failedSeo.find(f => f.id === 'meta-description');
+    const ogIssue = failedSeo.find(f => f.id === 'open-graph');
 
-export const metadata: Metadata = {
-  title: {
-    default: 'Your Site Name',
-    template: '%s | Your Site Name',
-  },
-  description: 'Your compelling meta description (150-160 characters)',
-  openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    url: 'https://yoursite.com',
-    siteName: 'Your Site Name',
-    title: 'Your Site Name',
-    description: 'Description for social sharing',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'Your Site Name',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Your Site Name',
-    description: 'Description for Twitter',
-    images: ['/og-image.png'],
-  },
-};
-`;
-      fixes += '```\n\n';
-    } else {
-      fixes += `### HTML Meta Tags (head section)\n\n`;
-      fixes += '```html\n';
-      fixes += `<head>
-  <title>Your Page Title | Site Name</title>
-  <meta name="description" content="Your compelling meta description (150-160 characters)">
+    if (titleIssue || descIssue || ogIssue) {
+      const siteUrl = input.url.replace(/\/$/, '');
+      fixes += `### SEO: Fix Meta Tags for ${siteUrl}\n\n`;
 
-  <!-- Open Graph -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Your Page Title">
-  <meta property="og:description" content="Description for social sharing">
-  <meta property="og:image" content="https://yoursite.com/og-image.png">
-  <meta property="og:url" content="https://yoursite.com">
+      if (titleIssue) {
+        const current = titleIssue.value;
+        fixes += `**Title tag** — ${titleIssue.description}\n`;
+        if (current) {
+          fixes += `- Current: \`${current}\`\n`;
+          fixes += `- Issue: ${current.length < 30 ? 'Too short — aim for 50-60 characters' : current.length > 60 ? 'Too long — trim to 50-60 characters' : titleIssue.description}\n`;
+        } else {
+          fixes += `- Missing entirely — add a \`<title>\` tag\n`;
+        }
+        fixes += `\n`;
+      }
 
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Your Page Title">
-  <meta name="twitter:description" content="Description for Twitter">
-  <meta name="twitter:image" content="https://yoursite.com/og-image.png">
-</head>
-`;
-      fixes += '```\n\n';
+      if (descIssue) {
+        const current = descIssue.value;
+        fixes += `**Meta description** — ${descIssue.description}\n`;
+        if (current) {
+          fixes += `- Current: \`${current}\`\n`;
+          fixes += `- Issue: ${current.length < 120 ? 'Too short — aim for 150-160 characters' : current.length > 160 ? 'Too long — trim to 150-160 characters' : descIssue.description}\n`;
+        } else {
+          fixes += `- Missing entirely — add \`<meta name="description" content="...">\`\n`;
+        }
+        fixes += `\n`;
+      }
+
+      if (ogIssue) {
+        fixes += `**Open Graph tags** — ${ogIssue.description}\n`;
+        if (isNextJs) {
+          fixes += `\n`;
+          fixes += '```typescript\n';
+          fixes += `// app/layout.tsx — add openGraph to your existing metadata export\nopenGraph: {\n  type: 'website',\n  url: '${siteUrl}',\n  title: '<your page title>',\n  description: '<your meta description>',\n  images: [{ url: '${siteUrl}/og-image.png', width: 1200, height: 630 }],\n}\n`;
+          fixes += '```\n';
+        } else {
+          fixes += `\n`;
+          fixes += '```html\n';
+          fixes += `<meta property="og:type" content="website">\n<meta property="og:url" content="${siteUrl}">\n<meta property="og:title" content="<your page title>">\n<meta property="og:description" content="<your meta description>">\n<meta property="og:image" content="${siteUrl}/og-image.png">\n`;
+          fixes += '```\n';
+        }
+        fixes += `\n`;
+      }
     }
   }
 
-  // Accessibility color contrast fixes
+  // Accessibility color contrast fixes — use actual element data
   const contrastViolations = input.accessibilityViolations.filter(v => v.id === 'color-contrast');
   if (contrastViolations.length > 0) {
-    fixes += `### Accessibility: Color Contrast Fixes (CSS)\n\n`;
-    fixes += '```css\n';
-    fixes += `/* Common Tailwind contrast fixes */
-/* Replace text-gray-500 with text-gray-400 for better contrast on dark backgrounds */
-/* Replace text-gray-600 with text-gray-400 for light backgrounds */
+    fixes += `### Accessibility: Color Contrast Fixes\n\n`;
 
-/* Custom CSS color fixes */
-.low-contrast-text {
-  /* Before: color: #6b7280 (gray-500) - 4.5:1 ratio needed */
-  color: #9ca3af; /* gray-400 - meets contrast requirements */
-}
+    for (const violation of contrastViolations) {
+      const v = violation as any;
+      if (v.affectedElements?.length > 0) {
+        for (const elem of v.affectedElements.slice(0, 8)) {
+          if (elem.colorData) {
+            const text = elem.textContent || elem.html?.replace(/<[^>]+>/g, '').trim().slice(0, 50) || 'element';
+            fixes += `**\`${text}\`**\n`;
+            fixes += `- Current: \`${elem.colorData.fgColor}\` on \`${elem.colorData.bgColor}\` (ratio: ${elem.colorData.contrastRatio.toFixed(2)}, needs ${elem.colorData.expectedRatio})\n`;
+            fixes += `- **Fix: Change color to \`${elem.colorData.suggestedFgColor || '#ffffff'}\`**\n`;
 
-.muted-text {
-  /* Before: color: #9ca3af (gray-400) */
-  color: #d1d5db; /* gray-300 - for dark backgrounds */
-}
-`;
-    fixes += '```\n\n';
+            // Tailwind-specific mapping if detected
+            if (isTailwind) {
+              const tailwindMap: Record<string, string> = {
+                '#71717a': 'text-zinc-500', '#6b7280': 'text-gray-500', '#737373': 'text-neutral-500',
+                '#78716c': 'text-stone-500', '#a1a1aa': 'text-zinc-400', '#9ca3af': 'text-gray-400',
+                '#a3a3a3': 'text-neutral-400', '#a8a29e': 'text-stone-400',
+              };
+              const suggestedMap: Record<string, string> = {
+                '#ffffff': 'text-white', '#f3f4f6': 'text-gray-100', '#e5e7eb': 'text-gray-200',
+                '#d1d5db': 'text-gray-300', '#9ca3af': 'text-gray-400', '#a1a1aa': 'text-zinc-400',
+                '#d4d4d8': 'text-zinc-300', '#e4e4e7': 'text-zinc-200',
+              };
+              const currentClass = tailwindMap[elem.colorData.fgColor];
+              const suggestedClass = suggestedMap[elem.colorData.suggestedFgColor || ''];
+              if (currentClass && suggestedClass) {
+                fixes += `- Tailwind: Change \`${currentClass}\` to \`${suggestedClass}\`\n`;
+              }
+            }
+
+            if (elem.selector) {
+              fixes += `- Selector: \`${elem.selector}\`\n`;
+            }
+            fixes += `\n`;
+          }
+        }
+      } else {
+        fixes += `${(violation as any).nodeCount || 'Multiple'} elements fail contrast ratio — inspect with browser DevTools accessibility panel.\n\n`;
+      }
+    }
   }
 
-  // Performance fixes for render-blocking
-  if (input.resourceAnalysis?.renderBlocking.scripts.length) {
+  // Performance fixes for render-blocking — use actual resource names
+  const blockingScripts = input.resourceAnalysis?.renderBlocking.scripts || [];
+  const blockingStyles = input.resourceAnalysis?.renderBlocking.stylesheets || [];
+
+  if (blockingScripts.length > 0) {
     fixes += `### Performance: Defer Render-Blocking Scripts\n\n`;
-    fixes += '```html\n';
-    fixes += `<!-- Add defer or async to non-critical scripts -->
-<script src="your-script.js" defer></script>
-
-<!-- For analytics, use async -->
-<script src="analytics.js" async></script>
-
-<!-- Critical inline scripts can stay, but move non-critical to end of body -->
-`;
-    fixes += '```\n\n';
+    fixes += `These scripts block page rendering:\n\n`;
+    for (const script of blockingScripts.slice(0, 5)) {
+      const filename = script.url.split('/').pop() || script.url;
+      fixes += `- \`${filename}\` (${script.duration.toFixed(0)}ms) — add \`defer\` or \`async\` attribute\n`;
+    }
+    fixes += `\n`;
   }
 
-  // Third-party preconnect hints
+  // Third-party preconnect hints — already uses real domains
   if (input.resourceAnalysis?.thirdParty.domains.length) {
     const domains = input.resourceAnalysis.thirdParty.domains.slice(0, 5);
     fixes += `### Performance: Preconnect to Third-Party Origins\n\n`;
-    fixes += '```html\n';
-    fixes += `<!-- Add to <head> for faster third-party loading -->\n`;
-    for (const domain of domains) {
-      fixes += `<link rel="preconnect" href="https://${domain.domain}" crossorigin>\n`;
-      fixes += `<link rel="dns-prefetch" href="https://${domain.domain}">\n`;
+    if (isNextJs) {
+      fixes += '```typescript\n';
+      fixes += `// app/layout.tsx — add to <head>\n`;
+      for (const domain of domains) {
+        fixes += `<link rel="preconnect" href="https://${domain.domain}" crossOrigin="anonymous" />\n`;
+      }
+      fixes += '```\n\n';
+    } else {
+      fixes += '```html\n';
+      fixes += `<!-- Add to <head> -->\n`;
+      for (const domain of domains) {
+        fixes += `<link rel="preconnect" href="https://${domain.domain}" crossorigin>\n`;
+        fixes += `<link rel="dns-prefetch" href="https://${domain.domain}">\n`;
+      }
+      fixes += '```\n\n';
     }
-    fixes += '```\n\n';
   }
 
-  // SRI fixes for external resources
+  // SRI fixes — use actual external resource URLs
   const sriIssue = failedSecurity.find(f => f.id === 'sri-missing');
-  if (sriIssue && sriIssue.details?.affectedElements) {
+  if (sriIssue && sriIssue.details?.affectedElements?.length) {
     fixes += `### Security: Add Subresource Integrity (SRI)\n\n`;
-    fixes += '```html\n';
-    fixes += `<!-- Generate SRI hash: https://www.srihash.org/ -->
-<!-- Or use: shasum -b -a 384 file.js | awk '{ print $1 }' | xxd -r -p | base64 -->
+    fixes += `These external resources need integrity hashes:\n\n`;
+    for (const el of sriIssue.details.affectedElements.slice(0, 5)) {
+      fixes += `- \`${el}\`\n`;
+    }
+    fixes += `\nGenerate hashes at https://www.srihash.org/ then add \`integrity="sha384-..."  crossorigin="anonymous"\` to each tag.\n\n`;
+  }
 
-<script
-  src="https://cdn.example.com/library.js"
-  integrity="sha384-HASH_HERE"
-  crossorigin="anonymous"
-></script>
-
-<link
-  rel="stylesheet"
-  href="https://cdn.example.com/styles.css"
-  integrity="sha384-HASH_HERE"
-  crossorigin="anonymous"
->
-`;
-    fixes += '```\n\n';
+  // Vulnerable libraries — use actual library names and versions
+  if (input.vulnerabilities?.vulnerableLibraries.length) {
+    fixes += `### Security: Update Vulnerable Libraries\n\n`;
+    for (const lib of input.vulnerabilities.vulnerableLibraries.slice(0, 5)) {
+      fixes += `**${lib.name}** v${lib.detectedVersion}\n`;
+      for (const vuln of lib.vulnerabilities) {
+        fixes += `- [${vuln.severity.toUpperCase()}] ${vuln.description}\n`;
+        fixes += `  - Fix: Update to v${vuln.fixedIn}+\n`;
+      }
+      fixes += `\n`;
+    }
   }
 
   if (fixes === '') {
-    fixes = '*No critical copy-paste fixes needed - your site is in good shape!*\n\n';
+    fixes = '*No critical code fixes needed — your site is in good shape!*\n\n';
   }
 
   return fixes;
@@ -759,14 +745,11 @@ function getAnalysisDepth(score: number): string {
   return 'thorough assessment with critical action items';
 }
 
-function buildPrompt(input: RoastInput): string {
+function buildPrompt(input: AuditInput): string {
   const failedSecurity = input.securityFindings.filter(f => !f.passed);
   const failedSeo = input.seoFindings.filter(f => !f.passed);
 
-  // Use professional analysis voice
-  const personaConfig = ROAST_PERSONAS['professional'];
-
-  return `${personaConfig.prompt}
+  return `${ANALYSIS_PROMPT}
 
 Your analysis should be clear, actionable, and focused on business impact.
 
@@ -784,19 +767,38 @@ TECH STACK DETECTED:
 ${input.techStack.map(t => `- ${t.name} (${t.category})`).join('\n') || 'Unable to detect tech stack'}
 
 SECURITY ISSUES (${failedSecurity.length} failed):
-${failedSecurity.map(f => `- [${f.severity.toUpperCase()}] ${f.title}: ${f.description}`).join('\n') || 'None found'}
+${failedSecurity.map(f => {
+    let detail = `- [${f.severity.toUpperCase()}] ${f.title}: ${f.description}`;
+    if (f.details?.currentValue) detail += `\n  Current value: "${f.details.currentValue}"`;
+    if (f.details?.expectedValue) detail += `\n  Expected: "${f.details.expectedValue}"`;
+    if (f.details?.affectedElements?.length) detail += `\n  Affected: ${f.details.affectedElements.slice(0, 3).join(', ')}`;
+    return detail;
+  }).join('\n') || 'None found'}
 
 PERFORMANCE METRICS:
-${input.performanceMetrics.map(m => `- ${m.name}: ${m.displayValue} (score: ${m.score})`).join('\n')}
+${input.performanceMetrics.map(m => `- ${m.name}: ${m.displayValue} (score: ${m.score}/100)${m.score < 50 ? ' ← CRITICAL' : m.score < 75 ? ' ← NEEDS WORK' : ''}`).join('\n')}
 
 SEO ISSUES (${failedSeo.length} failed):
-${failedSeo.map(f => `- ${f.title}: ${f.description}`).join('\n') || 'None found'}
+${failedSeo.map(f => `- ${f.title}: ${f.description}${f.value ? `\n  Current value: "${f.value}"` : ''}`).join('\n') || 'None found'}
 
 ACCESSIBILITY VIOLATIONS (${input.accessibilityViolations.length}):
-${input.accessibilityViolations.slice(0, 5).map(v => `- [${v.impact.toUpperCase()}] ${v.description} (${v.nodeCount} elements)`).join('\n') || 'None found'}
+${input.accessibilityViolations.slice(0, 8).map(v => {
+    const typed = v as any;
+    let detail = `- [${v.impact.toUpperCase()}] ${v.description} (${typed.nodeCount || 0} elements)`;
+    if (typed.affectedElements?.length) {
+      for (const el of typed.affectedElements.slice(0, 3)) {
+        if (el.colorData) {
+          detail += `\n  Element "${el.textContent}": color ${el.colorData.fgColor} on ${el.colorData.bgColor} (ratio: ${el.colorData.contrastRatio.toFixed(2)}, needs ${el.colorData.expectedRatio}) → fix: ${el.colorData.suggestedFgColor || '#ffffff'}`;
+        } else if (el.textContent) {
+          detail += `\n  Element "${el.textContent}": ${el.html?.slice(0, 100) || ''}`;
+        }
+      }
+    }
+    return detail;
+  }).join('\n') || 'None found'}
 
 CODE QUALITY ISSUES (${input.codeQualityIssues.length}):
-${input.codeQualityIssues.map(i => `- [${i.type}] ${i.message}`).join('\n') || 'None found'}
+${input.codeQualityIssues.map(i => `- [${i.type.toUpperCase()}] ${i.message}${i.source ? ` (${i.source})` : ''} (count: ${i.count})`).join('\n') || 'None found'}
 
 VULNERABLE LIBRARIES (${input.vulnerabilities?.vulnerableLibraries.length || 0}):
 ${input.vulnerabilities?.vulnerableLibraries.map(lib => `- ${lib.name} v${lib.detectedVersion}: ${lib.vulnerabilities.map(v => `[${v.severity.toUpperCase()}] ${v.cve || v.description}`).join(', ')}`).join('\n') || 'None detected'}
@@ -807,7 +809,7 @@ PROTOCOL:
 - HTTP/3: ${input.protocol?.http3Supported ? 'Yes' : 'No'}
 
 IMAGE ISSUES (${input.images?.issues.length || 0}):
-${input.images?.issues.slice(0, 3).map(i => `- ${i.issues.join(', ')}`).join('\n') || 'None found'}
+${input.images?.issues.slice(0, 5).map(i => `- ${i.src.split('/').pop()}: ${i.issues.join(', ')}${i.recommendations?.length ? ` → ${i.recommendations[0]}` : ''}`).join('\n') || 'None found'}
 
 REDIRECT CHAIN: ${input.redirects?.totalRedirects || 0} redirects (${input.redirects?.totalTime || 0}ms)
 
@@ -829,7 +831,7 @@ LINKS:
 
 ANALYSIS DEPTH: ${getAnalysisDepth(input.scores.overall)}
 
-Generate an analysis report in the following JSON format. The analysis should be professional, technically accurate, and include specific references to the actual issues found. Be direct and actionable.
+Generate an analysis report in the following JSON format. The analysis should be professional, technically accurate, and reference the SPECIFIC issues found on THIS website. Never use generic placeholder text.
 
 {
   "title": "One-line verdict (max 80 chars)",
@@ -838,13 +840,13 @@ Generate an analysis report in the following JSON format. The analysis should be
     "biggestRisk": "Most critical issue, with severity context",
     "topPriority": "The #1 thing to fix right now and why"
   },
-  "twitterRoast": "280-char summary",
+  "twitterSummary": "280-char summary",
   "fixes": [
     {
       "priority": "critical|high|medium|low",
       "category": "performance|security|seo|accessibility|code_quality",
       "title": "Actionable fix title",
-      "description": "Specific technical explanation",
+      "description": "Specific technical fix. Reference the exact header name, color value, metric, URL, or element from the audit data. For example: 'Add Strict-Transport-Security header with max-age=31536000' not 'Add security headers'. Say 'Change #71717a to #a1a1aa on the .nav-link elements' not 'Fix contrast issues'.",
       "effort": "quick|medium|significant",
       "impact": "Estimated score improvement or business impact, one sentence"
     }
@@ -854,12 +856,12 @@ Generate an analysis report in the following JSON format. The analysis should be
 RULES:
 - Title must be under 80 characters and complete (no cut-off words)
 - Each executiveSummary field: 1-2 sentences max, must reference specific data (scores, headers, metrics)
+- NEVER use generic advice — every fix must reference actual values from the audit (header names, color codes, URLs, file names, metric values)
 - No filler words, no generic praise
 - impact field required on every fix
-- twitterRoast must be under 280 characters (for sharing)
+- twitterSummary must be under 280 characters (for sharing)
 - Include 3-5 of the most impactful fixes
 - Fixes should be ordered by priority (critical first)
-- Be specific - reference actual URLs, headers, or metrics found
 - If the site scores well (85+), acknowledge strengths while noting areas for improvement
 - Use technical terms correctly
 - Maintain a professional, consultative tone
@@ -951,7 +953,7 @@ async function callClaudeWithRetry(
   }
 }
 
-export async function generateRoast(input: RoastInput): Promise<RoastResult> {
+export async function generateAnalysis(input: AuditInput): Promise<AuditResult> {
   const client = getAnthropicClient();
   const prompt = buildPrompt(input);
 
@@ -959,24 +961,24 @@ export async function generateRoast(input: RoastInput): Promise<RoastResult> {
   const { text, error } = await callClaudeWithRetry(client, prompt);
 
   if (error) {
-    console.error(`Roast generation failed after ${MAX_RETRIES} attempts:`, error);
-    return generateFallbackRoast(input, `API error: ${error}`);
+    console.error(`Analysis generation failed after ${MAX_RETRIES} attempts:`, error);
+    return generateFallbackAnalysis(input, `API error: ${error}`);
   }
 
   // Extract JSON (handles markdown code fences)
   const jsonString = extractJSON(text);
   if (!jsonString) {
     console.error('Could not extract JSON from response:', text.slice(0, 200));
-    return generateFallbackRoast(input, 'JSON extraction failed');
+    return generateFallbackAnalysis(input, 'JSON extraction failed');
   }
 
   // Parse JSON
-  let result: RoastResult;
+  let result: AuditResult;
   try {
-    result = JSON.parse(jsonString) as RoastResult;
+    result = JSON.parse(jsonString) as AuditResult;
   } catch (parseError) {
     console.error('JSON parse error:', parseError, 'Raw:', jsonString.slice(0, 200));
-    return generateFallbackRoast(input, 'JSON parse failed');
+    return generateFallbackAnalysis(input, 'JSON parse failed');
   }
 
   // Handle executiveSummary format: serialize to body field for DB compatibility
@@ -987,8 +989,8 @@ export async function generateRoast(input: RoastInput): Promise<RoastResult> {
 
   // Validate required fields
   if (!result.title || !result.body || !Array.isArray(result.fixes)) {
-    console.error('Invalid roast format - missing required fields');
-    return generateFallbackRoast(input, 'Invalid response format');
+    console.error('Invalid analysis format - missing required fields');
+    return generateFallbackAnalysis(input, 'Invalid response format');
   }
 
   // Ensure title is not too long (smart truncate at word boundary)
@@ -998,12 +1000,12 @@ export async function generateRoast(input: RoastInput): Promise<RoastResult> {
     result.title = lastSpace > 40 ? truncated.slice(0, lastSpace) : truncated;
   }
 
-  // Ensure twitterRoast is not too long (280 chars for Twitter)
-  if (result.twitterRoast) {
-    result.twitterRoast = result.twitterRoast.slice(0, 280);
+  // Ensure twitterSummary is not too long (280 chars for Twitter)
+  if (result.twitterSummary) {
+    result.twitterSummary = result.twitterSummary.slice(0, 280);
   } else {
-    // Generate a default twitter roast from the title and score
-    result.twitterRoast = `${input.url.replace(/^https?:\/\//, '')} scored ${input.scores.overall}/100 (${input.scores.letterGrade}). ${result.title}`.slice(0, 280);
+    // Generate a default twitter summary from the title and score
+    result.twitterSummary = `${input.url.replace(/^https?:\/\//, '')} scored ${input.scores.overall}/100 (${input.scores.letterGrade}). ${result.title}`.slice(0, 280);
   }
 
   // Validate fixes
@@ -1020,13 +1022,11 @@ export async function generateRoast(input: RoastInput): Promise<RoastResult> {
       ? fix.effort
       : 'medium',
     impact: fix.impact ? String(fix.impact).slice(0, 200) : undefined,
-  })) as RoastFix[];
+  })) as AuditFix[];
 
   // Generate LLM-ready report
   result.llmReport = generateLLMReport(input);
   result.isFallback = false;
-  result.persona = 'professional';
-
   console.log('AI analysis generated successfully');
   return result;
 }
@@ -1035,8 +1035,8 @@ export async function generateRoast(input: RoastInput): Promise<RoastResult> {
  * Generate deterministic fixes from audit data (no AI needed)
  * Used for Quick Audit mode
  */
-export function generateQuickAuditFixes(input: RoastInput): RoastFix[] {
-  const fixes: RoastFix[] = [];
+export function generateQuickAuditFixes(input: AuditInput): AuditFix[] {
+  const fixes: AuditFix[] = [];
 
   // Security fixes
   const failedSecurity = input.securityFindings.filter(f => !f.passed);
@@ -1115,7 +1115,7 @@ export function generateQuickAuditFixes(input: RoastInput): RoastFix[] {
   return fixes.slice(0, 5);
 }
 
-function generateFallbackRoast(input: RoastInput, reason?: string): RoastResult {
+function generateFallbackAnalysis(input: AuditInput, reason?: string): AuditResult {
   const { scores } = input;
 
   console.log(`Using fallback analysis${reason ? `: ${reason}` : ''}`);
@@ -1153,15 +1153,17 @@ function generateFallbackRoast(input: RoastInput, reason?: string): RoastResult 
 
   const body = JSON.stringify(executiveSummary);
 
+  const domain = input.url.replace(/^https?:\/\//, '').replace(/\/.*/, '');
   if (scores.overall >= 80) {
-    title = 'Strong Foundation with Room for Optimization';
+    title = `${domain}: ${scores.overall}/100 — ${worst.name} (${worst.score}) needs work`;
   } else if (scores.overall >= 60) {
-    title = 'Several Areas Require Attention';
+    title = `${domain}: ${scores.overall}/100 — ${worst.name} at ${worst.score} is dragging score down`;
   } else {
-    title = 'Critical Issues Identified - Immediate Action Recommended';
+    title = `${domain}: ${scores.overall}/100 — ${worst.name} (${worst.score}) needs immediate fixes`;
   }
+  title = title.slice(0, 80);
 
-  const fixes: RoastFix[] = [];
+  const fixes: AuditFix[] = [];
 
   // Generate fixes based on actual issues
   if (failedSecurity.length > 0) {
@@ -1179,13 +1181,14 @@ function generateFallbackRoast(input: RoastInput, reason?: string): RoastResult 
   }
 
   if (scores.performance < 70) {
+    const worstMetric = input.performanceMetrics.reduce((a, b) => a.score <= b.score ? a : b);
     fixes.push({
       priority: 'high',
       category: 'performance',
-      title: 'Optimize Core Web Vitals',
-      description: 'Improve LCP by optimizing images, reduce CLS with proper sizing, and minimize TBT by deferring non-critical JavaScript.',
+      title: `Improve ${worstMetric.name} (${worstMetric.displayValue})`,
+      description: `${worstMetric.name} scored ${worstMetric.score}/100 with a value of ${worstMetric.displayValue}. This is the lowest-performing metric and should be prioritized.`,
       effort: 'medium',
-      impact: `Performance at ${scores.performance}/100 — optimization could add 15-25 points`,
+      impact: `Performance at ${scores.performance}/100 — fixing ${worstMetric.name} could add 15-25 points`,
     });
   }
 
@@ -1216,25 +1219,24 @@ function generateFallbackRoast(input: RoastInput, reason?: string): RoastResult 
   const llmReport = generateLLMReport(input);
 
   // Generate twitter summary for fallback
-  const twitterRoast = `${input.url.replace(/^https?:\/\//, '')} scored ${scores.overall}/100. ${title}`.slice(0, 280);
+  const twitterSummary = `${input.url.replace(/^https?:\/\//, '')} scored ${scores.overall}/100. ${title}`.slice(0, 280);
 
   return {
     title,
     body,
     fixes,
-    twitterRoast,
+    twitterSummary,
     llmReport,
     isFallback: true,
     fallbackReason: reason,
-    persona: 'professional',
   };
 }
 
 // ============================================
-// Phase 2: File Upload Roast Generation
+// Phase 2: File Upload Analysis Generation
 // ============================================
 
-interface UploadRoastInput {
+interface UploadAuditInput {
   filesCount: number;
   dependencies: DependencyAuditResult;
   secrets: SecretsAuditResult;
@@ -1245,7 +1247,7 @@ interface UploadRoastInput {
 /**
  * Generate an LLM-ready report for file upload scans
  */
-function generateUploadLLMReport(input: UploadRoastInput): string {
+function generateUploadLLMReport(input: UploadAuditInput): string {
   let report = `# Code Audit Report - LLM Fix Instructions
 ## Files Analyzed: ${input.filesCount}
 ## Overall Score: ${input.overallScore}/100
@@ -1366,7 +1368,7 @@ Start with the highest priority items and provide actionable code fixes.`;
 /**
  * Build prompt for upload scan analysis
  */
-function buildUploadPrompt(input: UploadRoastInput): string {
+function buildUploadPrompt(input: UploadAuditInput): string {
   return `You are a senior security consultant providing professional code audits. Your analysis is thorough, objective, and focused on actionable improvements. You communicate clearly, explain business impact, and prioritize recommendations by severity.
 
 CODE SCAN RESULTS:
@@ -1424,9 +1426,9 @@ Return ONLY the JSON, no other text.`;
 }
 
 /**
- * Generate roast for file upload scans
+ * Generate analysis for file upload scans
  */
-export async function generateUploadRoast(input: UploadRoastInput): Promise<RoastResult> {
+export async function generateUploadAnalysis(input: UploadAuditInput): Promise<AuditResult> {
   const client = getAnthropicClient();
   const prompt = buildUploadPrompt(input);
 
@@ -1434,30 +1436,30 @@ export async function generateUploadRoast(input: UploadRoastInput): Promise<Roas
   const { text, error } = await callClaudeWithRetry(client, prompt);
 
   if (error) {
-    console.error(`Upload roast generation failed after ${MAX_RETRIES} attempts:`, error);
-    return generateUploadFallbackRoast(input, `API error: ${error}`);
+    console.error(`Upload analysis generation failed after ${MAX_RETRIES} attempts:`, error);
+    return generateUploadFallbackAnalysis(input, `API error: ${error}`);
   }
 
   // Extract JSON (handles markdown code fences)
   const jsonString = extractJSON(text);
   if (!jsonString) {
     console.error('Could not extract JSON from response:', text.slice(0, 200));
-    return generateUploadFallbackRoast(input, 'JSON extraction failed');
+    return generateUploadFallbackAnalysis(input, 'JSON extraction failed');
   }
 
   // Parse JSON
-  let result: RoastResult;
+  let result: AuditResult;
   try {
-    result = JSON.parse(jsonString) as RoastResult;
+    result = JSON.parse(jsonString) as AuditResult;
   } catch (parseError) {
     console.error('JSON parse error:', parseError, 'Raw:', jsonString.slice(0, 200));
-    return generateUploadFallbackRoast(input, 'JSON parse failed');
+    return generateUploadFallbackAnalysis(input, 'JSON parse failed');
   }
 
   // Validate required fields
   if (!result.title || !result.body || !Array.isArray(result.fixes)) {
-    console.error('Invalid roast format - missing required fields');
-    return generateUploadFallbackRoast(input, 'Invalid response format');
+    console.error('Invalid analysis format - missing required fields');
+    return generateUploadFallbackAnalysis(input, 'Invalid response format');
   }
 
   // Ensure title is not too long (smart truncate at word boundary)
@@ -1480,7 +1482,7 @@ export async function generateUploadRoast(input: UploadRoastInput): Promise<Roas
     effort: ['quick', 'medium', 'significant'].includes(fix.effort)
       ? fix.effort
       : 'medium',
-  })) as RoastFix[];
+  })) as AuditFix[];
 
   // Generate LLM-ready report
   result.llmReport = generateUploadLLMReport(input);
@@ -1493,7 +1495,7 @@ export async function generateUploadRoast(input: UploadRoastInput): Promise<Roas
 /**
  * Generate fallback analysis for upload scans when AI fails
  */
-function generateUploadFallbackRoast(input: UploadRoastInput, reason?: string): RoastResult {
+function generateUploadFallbackAnalysis(input: UploadAuditInput, reason?: string): AuditResult {
   console.log(`Using fallback upload analysis${reason ? `: ${reason}` : ''}`);
 
   let title: string;
@@ -1524,7 +1526,7 @@ function generateUploadFallbackRoast(input: UploadRoastInput, reason?: string): 
     body = `Your code scored ${score}/100, indicating significant areas requiring attention. With ${input.codePatterns.issues.length} code pattern issues and ${input.dependencies.details.length} dependency vulnerabilities identified, we recommend a systematic review starting with critical and high-priority items. See the detailed breakdown below for specific recommendations.`;
   }
 
-  const fixes: RoastFix[] = [];
+  const fixes: AuditFix[] = [];
 
   // Add secret fixes first
   if (input.secrets.findings.length > 0) {

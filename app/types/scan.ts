@@ -54,7 +54,7 @@ export interface TechStackItem {
   icon?: string;
 }
 
-export interface RoastFix {
+export interface AuditFix {
   priority: 'critical' | 'high' | 'medium' | 'low';
   category: 'performance' | 'security' | 'seo' | 'accessibility' | 'code_quality';
   title: string;
@@ -286,13 +286,12 @@ export interface Scan {
     insecureLinks: InsecureLink[];
   };
 
-  // Roast content
-  roastTitle?: string;
-  roastBody?: string;
-  roastFixes?: RoastFix[];
-  twitterRoast?: string; // Short 280-char roast for Twitter
-  roastPersona?: string; // Which persona generated the roast
-  llmReport?: string; // LLM-ready detailed report for AI assistants
+  // Analysis content (DB columns kept as roast_* for backwards compat)
+  analysisTitle?: string;
+  analysisBody?: string;
+  analysisFixes?: AuditFix[];
+  twitterSummary?: string;
+  llmReport?: string;
 
   // Metadata
   screenshotUrl?: string;
@@ -354,9 +353,8 @@ export interface DbScan {
   results_links: { score: number; totalLinks: number; internalLinks: number; externalLinks: number; checkedLinks: number; brokenLinks: BrokenLink[]; insecureLinks: InsecureLink[] } | null;
   roast_title: string | null;
   roast_body: string | null;
-  roast_fixes: RoastFix[] | null;
+  roast_fixes: AuditFix[] | null;
   twitter_roast: string | null;
-  roast_persona: string | null;
   llm_report: string | null;
   screenshot_url: string | null;
   error_message: string | null;
@@ -399,11 +397,10 @@ export function dbScanToScan(row: DbScan): Scan {
     resultsPwa: row.results_pwa ?? undefined,
     resultsStructuredData: row.results_structured_data ?? undefined,
     resultsLinks: row.results_links ?? undefined,
-    roastTitle: row.roast_title ?? undefined,
-    roastBody: row.roast_body ?? undefined,
-    roastFixes: row.roast_fixes ?? undefined,
-    twitterRoast: row.twitter_roast ?? undefined,
-    roastPersona: row.roast_persona ?? undefined,
+    analysisTitle: row.roast_title ?? undefined,
+    analysisBody: row.roast_body ?? undefined,
+    analysisFixes: row.roast_fixes ?? undefined,
+    twitterSummary: row.twitter_roast ?? undefined,
     llmReport: row.llm_report ?? undefined,
     screenshotUrl: row.screenshot_url ?? undefined,
     errorMessage: row.error_message ?? undefined,

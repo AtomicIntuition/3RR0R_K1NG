@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       domain: new URL(scan.url).hostname,
       score: scan.score_overall,
       grade: scan.letter_grade,
-      roastTitle: scan.roast_title,
+      analysisTitle: scan.roast_title,
       scannedAt: scan.created_at,
     }));
 

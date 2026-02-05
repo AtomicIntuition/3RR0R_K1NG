@@ -104,14 +104,6 @@ export function getSeverity(score: number): 'excellent' | 'good' | 'needs-attent
   return 'critical';
 }
 
-// Legacy alias - kept for backwards compatibility with existing scan data
-export function getRoastSeverity(score: number): 'mild' | 'medium' | 'brutal' | 'nuclear' {
-  if (score >= 85) return 'mild';
-  if (score >= 65) return 'medium';
-  if (score >= 40) return 'brutal';
-  return 'nuclear';
-}
-
 /**
  * Format score for display
  */

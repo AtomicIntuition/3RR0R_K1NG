@@ -1,18 +1,14 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
-import { motion, useInView, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { Scanner } from '@/components/Scanner';
 import {
   Shield, Zap, Search, Eye, Code2, Sparkles,
-  Check, Globe, ArrowRight,
+  Check, ArrowRight,
 } from 'lucide-react';
 
-const ExampleRoasts = dynamic(() =>
-  import('@/components/ExampleRoasts').then(m => ({ default: m.ExampleRoasts }))
-);
 const FAQ = dynamic(
   () => import('@/components/FAQ').then(m => ({ default: m.FAQ })),
   { ssr: false }
@@ -39,34 +35,6 @@ const fadeUp = {
 };
 
 /* ═══════════════════════════════════════════
-   Animated counter
-   ═══════════════════════════════════════════ */
-
-function Counter({ to, suffix = '' }: { to: number; suffix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: '-50px' });
-  const [n, setN] = useState(0);
-
-  useEffect(() => {
-    if (!inView) return;
-    const dur = 1800;
-    const t0 = performance.now();
-    const tick = (now: number) => {
-      const p = Math.min((now - t0) / dur, 1);
-      setN(Math.round((1 - (1 - p) ** 3) * to));
-      if (p < 1) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  }, [inView, to]);
-
-  return (
-    <span ref={ref} className="tabular-nums">
-      {n.toLocaleString()}{suffix}
-    </span>
-  );
-}
-
-/* ═══════════════════════════════════════════
    Features data
    ═══════════════════════════════════════════ */
 
@@ -74,21 +42,18 @@ const FEATURES = [
   {
     icon: Shield,
     title: 'Security',
-    desc: 'HTTPS validation, security headers, CSP policies, XSS protection, and vulnerability scanning.',
+    desc: 'HTTPS, security headers, CSP, XSS protection, and vulnerability scanning.',
     iconColor: 'text-emerald-400',
     iconBg: 'bg-emerald-500/10',
     hoverBorder: 'group-hover:border-emerald-500/30',
-    hoverGlow: 'group-hover:shadow-[0_0_40px_rgba(16,185,129,0.06)]',
-    span: 'md:col-span-2',
   },
   {
     icon: Zap,
     title: 'Performance',
-    desc: 'Core Web Vitals, load times, bundle size, and optimization opportunities.',
+    desc: 'Core Web Vitals, load times, bundle analysis, and optimization opportunities.',
     iconColor: 'text-amber-400',
     iconBg: 'bg-amber-500/10',
     hoverBorder: 'group-hover:border-amber-500/30',
-    hoverGlow: 'group-hover:shadow-[0_0_40px_rgba(245,158,11,0.06)]',
   },
   {
     icon: Search,
@@ -97,16 +62,14 @@ const FEATURES = [
     iconColor: 'text-blue-400',
     iconBg: 'bg-blue-500/10',
     hoverBorder: 'group-hover:border-blue-500/30',
-    hoverGlow: 'group-hover:shadow-[0_0_40px_rgba(59,130,246,0.06)]',
   },
   {
     icon: Eye,
     title: 'Accessibility',
-    desc: 'WCAG 2.1 compliance, color contrast, screen reader support, and keyboard navigation.',
+    desc: 'WCAG 2.1 compliance, color contrast, screen reader support, and keyboard nav.',
     iconColor: 'text-violet-400',
     iconBg: 'bg-violet-500/10',
     hoverBorder: 'group-hover:border-violet-500/30',
-    hoverGlow: 'group-hover:shadow-[0_0_40px_rgba(139,92,246,0.06)]',
   },
   {
     icon: Code2,
@@ -115,17 +78,14 @@ const FEATURES = [
     iconColor: 'text-orange-400',
     iconBg: 'bg-orange-500/10',
     hoverBorder: 'group-hover:border-orange-500/30',
-    hoverGlow: 'group-hover:shadow-[0_0_40px_rgba(249,115,22,0.06)]',
   },
   {
     icon: Sparkles,
-    title: 'AI-Powered Insights',
-    desc: 'Intelligent recommendations with specific code fixes tailored to your stack. Not generic advice — actionable fixes you can copy, paste, and ship.',
+    title: 'AI-Powered Fixes',
+    desc: 'Actionable code fixes tailored to your stack. Copy, paste, and ship.',
     iconColor: 'text-teal-400',
     iconBg: 'bg-teal-400/10',
     hoverBorder: 'group-hover:border-teal-400/30',
-    hoverGlow: 'group-hover:shadow-[0_0_40px_rgba(45,212,191,0.06)]',
-    span: 'md:col-span-2 lg:col-span-3',
   },
 ];
 
@@ -171,7 +131,6 @@ function Divider() {
 export default function HomePage() {
   const { scrollY } = useScroll();
   const orbY1 = useTransform(scrollY, [0, 600], [0, -150]);
-  const orbY2 = useTransform(scrollY, [0, 600], [0, -100]);
   const heroFade = useTransform(scrollY, [0, 500], [1, 0]);
 
   return (
@@ -181,20 +140,13 @@ export default function HomePage() {
           HERO
           ══════════════════════════════════════ */}
       <section className="relative overflow-hidden bg-gray-950 min-h-[85vh] flex items-center">
-        {/* Ambient gradient orbs */}
+        {/* Ambient gradient orb */}
         <motion.div
           style={{ y: orbY1, opacity: heroFade }}
           className="absolute -top-40 -right-40 w-[300px] h-[300px] md:w-[700px] md:h-[700px] pointer-events-none hidden sm:block"
           aria-hidden
         >
           <div className="w-full h-full rounded-full bg-emerald-500/[0.07] blur-[120px]" />
-        </motion.div>
-        <motion.div
-          style={{ y: orbY2, opacity: heroFade }}
-          className="absolute -bottom-40 -left-40 w-[250px] h-[250px] md:w-[500px] md:h-[500px] pointer-events-none hidden sm:block"
-          aria-hidden
-        >
-          <div className="w-full h-full rounded-full bg-blue-500/[0.04] blur-[100px]" />
         </motion.div>
 
         {/* Grid pattern */}
@@ -212,33 +164,17 @@ export default function HomePage() {
         <div className="relative z-10 w-full px-4 pt-20 pb-16 sm:pt-28 sm:pb-24">
           <div className="max-w-4xl mx-auto text-center">
 
-            {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 16, filter: 'blur(8px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              transition={{ duration: 0.6, ease }}
-              className="inline-flex items-center gap-2.5 px-4 py-2 mb-8 bg-gray-900/80 border border-gray-700/50 rounded-full backdrop-blur-sm"
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-              </span>
-              <span className="text-gray-300 font-medium text-sm">
-                Free website audits &mdash; No signup required
-              </span>
-            </motion.div>
-
             {/* Headline */}
             <motion.h1
               initial={{ opacity: 0, y: 24, filter: 'blur(10px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              transition={{ duration: 0.8, ease, delay: 0.1 }}
+              transition={{ duration: 0.8, ease, delay: 0.05 }}
               className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight mb-7 leading-[0.95]"
             >
-              <span className="text-gray-50">Know what&apos;s broken.</span>
+              <span className="text-gray-50">Audit any website.</span>
               <br />
               <span className="bg-gradient-to-r from-emerald-400 via-emerald-300 to-teal-400 bg-clip-text text-transparent">
-                Ship the fix.
+                Ship it better.
               </span>
             </motion.h1>
 
@@ -246,19 +182,18 @@ export default function HomePage() {
             <motion.p
               initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              transition={{ duration: 0.7, ease, delay: 0.2 }}
+              transition={{ duration: 0.7, ease, delay: 0.15 }}
               className="text-lg sm:text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed"
             >
-              Find out in 30 seconds. 50+ automated checks across security,
-              performance, SEO, and accessibility &mdash; with AI&#8209;powered
-              fixes you can ship today.
+              50+ automated checks across security, performance, SEO, and
+              accessibility &mdash; with AI&#8209;powered fixes you can deploy today.
             </motion.p>
 
             {/* Scanner */}
             <motion.div
               initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              transition={{ duration: 0.7, ease, delay: 0.35 }}
+              transition={{ duration: 0.7, ease, delay: 0.3 }}
               className="max-w-2xl mx-auto mb-10"
             >
               <Scanner className="w-full" autoFocus />
@@ -268,10 +203,10 @@ export default function HomePage() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.55 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
               className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-gray-500 text-sm"
             >
-              {['100% Free', 'No Signup', 'Results in 30s'].map((text) => (
+              {['Free to use', 'No signup required', 'Results in 30s'].map((text) => (
                 <div key={text} className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-500/70" />
                   <span>{text}</span>
@@ -283,44 +218,11 @@ export default function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════
-          STATS
+          WHAT WE CHECK
           ══════════════════════════════════════ */}
       <Divider />
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.6, ease }}
-        className="py-16 sm:py-20 px-4 bg-gray-950"
-      >
+      <section className="py-24 sm:py-28 px-4 bg-gray-950">
         <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-            {[
-              { val: 10000, suf: '+', label: 'Sites Audited' },
-              { val: 50, suf: '+', label: 'Checks Per Scan' },
-              { val: 30, suf: 's', label: 'Avg. Scan Time' },
-              { val: 6, suf: '', label: 'Audit Categories' },
-            ].map((s) => (
-              <div key={s.label} className="text-center">
-                <div className="text-3xl sm:text-4xl font-black text-gray-50 mb-1">
-                  <Counter to={s.val} suffix={s.suf} />
-                </div>
-                <div className="text-sm text-gray-500 font-medium">
-                  {s.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </motion.section>
-
-      {/* ══════════════════════════════════════
-          FEATURES — BENTO GRID
-          ══════════════════════════════════════ */}
-      <Divider />
-      <section className="py-24 sm:py-32 px-4 bg-gray-950">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -328,21 +230,20 @@ export default function HomePage() {
             transition={{ duration: 0.6, ease }}
             className="text-center mb-14"
           >
-            <h2 className="text-3xl sm:text-4xl md:text-display-md font-bold text-gray-50 mb-4 tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-50 mb-4 tracking-tight">
               Everything we check
             </h2>
-            <p className="text-lg text-gray-400 max-w-xl mx-auto">
-              Comprehensive analysis across six critical areas
+            <p className="text-gray-400 max-w-lg mx-auto">
+              Six categories. 50+ checks. One report.
             </p>
           </motion.div>
 
-          {/* Grid */}
           <motion.div
             variants={stagger}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-60px' }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
           >
             {FEATURES.map((f) => {
               const Icon = f.icon;
@@ -350,14 +251,14 @@ export default function HomePage() {
                 <motion.div
                   key={f.title}
                   variants={fadeUp}
-                  className={`group relative bg-gray-900 border border-gray-800 rounded-2xl p-7 overflow-hidden transition-all duration-300 hover:bg-gray-900/80 ${f.hoverBorder} ${f.hoverGlow} ${f.span || ''}`}
+                  className={`group bg-gray-900 border border-gray-800 rounded-2xl p-6 transition-all duration-300 hover:bg-gray-900/80 ${f.hoverBorder}`}
                 >
                   <div
-                    className={`w-11 h-11 rounded-xl ${f.iconBg} flex items-center justify-center mb-5`}
+                    className={`w-10 h-10 rounded-xl ${f.iconBg} flex items-center justify-center mb-4`}
                   >
                     <Icon className={`w-5 h-5 ${f.iconColor}`} />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-50 mb-2">
+                  <h3 className="text-base font-semibold text-gray-50 mb-1.5">
                     {f.title}
                   </h3>
                   <p className="text-sm text-gray-400 leading-relaxed">
@@ -374,8 +275,8 @@ export default function HomePage() {
           HOW IT WORKS
           ══════════════════════════════════════ */}
       <Divider />
-      <section className="py-24 sm:py-32 px-4 bg-gradient-to-b from-gray-950 via-gray-900/40 to-gray-950">
-        <div className="max-w-6xl mx-auto">
+      <section className="py-24 sm:py-28 px-4 bg-gradient-to-b from-gray-950 via-gray-900/40 to-gray-950">
+        <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -383,18 +284,15 @@ export default function HomePage() {
             transition={{ duration: 0.6, ease }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl sm:text-4xl md:text-display-md font-bold text-gray-50 mb-4 tracking-tight">
-              Three steps. Zero&nbsp;guesswork.
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-50 mb-4 tracking-tight">
+              How it works
             </h2>
-            <p className="text-lg text-gray-400">
-              From URL to actionable fixes in under a minute
-            </p>
           </motion.div>
 
-          <div className="relative max-w-4xl mx-auto">
+          <div className="relative max-w-3xl mx-auto">
             {/* Connecting line — desktop */}
             <div
-              className="hidden md:block absolute top-[3.25rem] left-[16.67%] right-[16.67%] h-px bg-gradient-to-r from-emerald-500/20 via-emerald-500/40 to-emerald-500/20"
+              className="hidden md:block absolute top-6 left-[16.67%] right-[16.67%] h-px bg-gradient-to-r from-emerald-500/20 via-emerald-500/40 to-emerald-500/20"
               aria-hidden
             />
 
@@ -405,78 +303,17 @@ export default function HomePage() {
               viewport={{ once: true, margin: '-60px' }}
               className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-6"
             >
-              {STEPS.map((step, i) => (
+              {STEPS.map((step) => (
                 <motion.div
                   key={step.n}
                   variants={fadeUp}
                   className="relative text-center"
                 >
-                  {/* Step circle */}
-                  <div className="relative z-10 w-12 h-12 mx-auto mb-6">
-                    <div
-                      className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping"
-                      style={{ animationDuration: '3s' }}
-                      aria-hidden
-                    />
+                  <div className="relative z-10 w-12 h-12 mx-auto mb-5">
                     <div className="relative w-12 h-12 rounded-full bg-emerald-500 flex items-center justify-center text-emerald-950 font-bold text-sm shadow-glow-primary">
                       {step.n}
                     </div>
                   </div>
-
-                  {/* Step 1 mockup — URL bar */}
-                  {i === 0 && (
-                    <div className="bg-gray-900 border border-gray-800 rounded-xl p-3.5 mb-5 mx-auto max-w-[260px]">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Globe className="w-4 h-4 text-gray-600 flex-shrink-0" />
-                        <span className="text-gray-500">https://</span>
-                        <span className="text-gray-300 truncate">
-                          example.com
-                        </span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Step 2 mockup — scanning categories */}
-                  {i === 1 && (
-                    <div className="bg-gray-900 border border-gray-800 rounded-xl p-3.5 mb-5 mx-auto max-w-[260px] space-y-1.5">
-                      {['Security', 'Performance', 'SEO', 'A11y'].map(
-                        (cat, j) => (
-                          <div key={cat} className="flex items-center gap-2">
-                            <Check className="w-3 h-3 text-emerald-500 flex-shrink-0" />
-                            <span className="text-xs text-gray-500">
-                              {cat}
-                            </span>
-                            <div className="flex-1 h-1 bg-gray-800 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-emerald-500/40 rounded-full"
-                                style={{ width: `${65 + j * 10}%` }}
-                              />
-                            </div>
-                          </div>
-                        )
-                      )}
-                    </div>
-                  )}
-
-                  {/* Step 3 mockup — results card */}
-                  {i === 2 && (
-                    <div className="bg-gray-900 border border-gray-800 rounded-xl p-3.5 mb-5 mx-auto max-w-[260px]">
-                      <div className="flex items-center gap-3">
-                        <div className="w-11 h-11 rounded-full border-2 border-emerald-500 flex items-center justify-center text-emerald-500 font-bold text-sm flex-shrink-0">
-                          87
-                        </div>
-                        <div className="text-left">
-                          <div className="text-sm font-semibold text-emerald-400">
-                            B+
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            12 fixes available
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
                   <h3 className="text-lg font-semibold text-gray-50 mb-2">
                     {step.title}
                   </h3>
@@ -491,20 +328,6 @@ export default function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════
-          EXAMPLE REPORTS
-          ══════════════════════════════════════ */}
-      <Divider />
-      <motion.section
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.6, ease }}
-        className="py-24 sm:py-32 px-4 bg-gray-950"
-      >
-        <ExampleRoasts />
-      </motion.section>
-
-      {/* ══════════════════════════════════════
           PRICING CTA
           ══════════════════════════════════════ */}
       <Divider />
@@ -513,22 +336,19 @@ export default function HomePage() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-60px' }}
         transition={{ duration: 0.6, ease }}
-        className="py-24 sm:py-32 px-4 bg-gray-950"
+        className="py-24 sm:py-28 px-4 bg-gray-950"
       >
         <div className="max-w-3xl mx-auto">
-          {/* Gradient border wrapper */}
           <div className="relative p-px rounded-3xl bg-gradient-to-r from-emerald-500/20 via-gray-800 to-emerald-500/20 overflow-hidden">
-            {/* Ambient glow behind card */}
             <div
               className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-32 bg-emerald-500/10 blur-3xl pointer-events-none"
               aria-hidden
             />
-
-            <div className="relative bg-gray-900 rounded-3xl p-10 sm:p-16 text-center">
+            <div className="relative bg-gray-900 rounded-3xl p-10 sm:p-14 text-center">
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 tracking-tight">
                 Ready to ship better websites?
               </h2>
-              <p className="text-lg text-gray-400 mb-10 max-w-xl mx-auto">
+              <p className="text-gray-400 mb-8 max-w-xl mx-auto">
                 Free users get 3 scans/day. Go Pro for 200 scans/month,
                 priority processing, and API access.
               </p>
@@ -563,43 +383,10 @@ export default function HomePage() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-60px' }}
         transition={{ duration: 0.6, ease }}
-        className="py-24 sm:py-32 px-4 bg-gradient-to-b from-gray-950 via-gray-900/40 to-gray-950"
+        className="py-24 sm:py-28 px-4 bg-gray-950"
       >
         <FAQ />
       </motion.section>
-
-      {/* ══════════════════════════════════════
-          FINAL CTA
-          ══════════════════════════════════════ */}
-      <Divider />
-      <section className="relative py-28 sm:py-36 px-4 bg-gray-950 overflow-hidden">
-        {/* Background orb */}
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] pointer-events-none"
-          aria-hidden
-        >
-          <div className="w-full h-full rounded-full bg-emerald-500/[0.04] blur-[100px]" />
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.6, ease }}
-          className="relative z-10 max-w-2xl mx-auto text-center"
-        >
-          <h2 className="text-3xl sm:text-4xl md:text-display-md font-bold text-gray-50 mb-4 tracking-tight">
-            Don&apos;t just guess.{' '}
-            <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-              Know.
-            </span>
-          </h2>
-          <p className="text-lg text-gray-400 mb-10">
-            It&apos;s free. Takes 30 seconds. You might learn something.
-          </p>
-          <Scanner className="w-full" />
-        </motion.div>
-      </section>
     </div>
   );
 }

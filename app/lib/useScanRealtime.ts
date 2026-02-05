@@ -148,13 +148,16 @@ export function useScanRealtime(scanId: string) {
           table: 'scans',
           filter: `id=eq.${scanId}`,
         },
-        (payload) => {
+        async (payload) => {
           const dbScan = payload.new as DbScan;
-          setScan(dbScanToScan(dbScan));
           setProgress(calculateProgress(dbScan));
 
           if (dbScan.status === 'completed' || dbScan.status === 'failed') {
-            setIsLoading(false);
+            // Realtime payloads may omit large JSONB columns.
+            // Do a full fetch to ensure we have all result data.
+            await fetchScan();
+          } else {
+            setScan(dbScanToScan(dbScan));
           }
         }
       )

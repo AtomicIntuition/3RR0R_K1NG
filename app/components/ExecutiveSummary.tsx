@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import type { ExecutiveSummary as ExecutiveSummaryType } from '@/types/scan';
-import { Shield, AlertTriangle, Target } from 'lucide-react';
+import { TrendingUp, AlertCircle, ArrowUpRight } from 'lucide-react';
 
 interface ExecutiveSummaryProps {
   body: string;
@@ -35,7 +35,7 @@ const cardVariants = {
 export function ExecutiveSummary({ body, score, className }: ExecutiveSummaryProps) {
   const summary = useMemo(() => parseExecutiveSummary(body), [body]);
 
-  // Fallback: render plain text in a single card for existing scans
+  // Fallback: render plain text for existing scans without JSON structure
   if (!summary) {
     return (
       <motion.div
@@ -43,65 +43,63 @@ export function ExecutiveSummary({ body, score, className }: ExecutiveSummaryPro
         animate={{ opacity: 1, y: 0 }}
         className={`bg-gray-900 border border-gray-800 rounded-xl p-5 ${className || ''}`}
       >
-        <div className="flex items-center gap-2 mb-3">
-          <Target size={16} className="text-emerald-500" />
-          <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Analysis Summary</span>
-        </div>
         <p className="text-gray-200 leading-relaxed whitespace-pre-wrap">{body}</p>
       </motion.div>
     );
   }
 
-  const cards = [
+  const items = [
     {
-      key: 'keyStrength',
-      label: 'KEY STRENGTH',
+      key: 'strength',
+      label: 'What\'s working',
       content: summary.keyStrength,
-      icon: Shield,
-      borderColor: 'border-l-emerald-500',
-      iconColor: 'text-emerald-500',
-      bgColor: 'bg-emerald-500/5',
+      icon: TrendingUp,
+      accent: 'text-emerald-400',
+      dot: 'bg-emerald-400',
     },
     {
-      key: 'biggestRisk',
-      label: 'BIGGEST RISK',
+      key: 'risk',
+      label: 'Needs attention',
       content: summary.biggestRisk,
-      icon: AlertTriangle,
-      borderColor: 'border-l-red-500',
-      iconColor: 'text-red-500',
-      bgColor: 'bg-red-500/5',
+      icon: AlertCircle,
+      accent: 'text-red-400',
+      dot: 'bg-red-400',
     },
     {
-      key: 'topPriority',
-      label: 'TOP PRIORITY',
+      key: 'priority',
+      label: 'Fix first',
       content: summary.topPriority,
-      icon: Target,
-      borderColor: 'border-l-amber-500',
-      iconColor: 'text-amber-500',
-      bgColor: 'bg-amber-500/5',
+      icon: ArrowUpRight,
+      accent: 'text-amber-400',
+      dot: 'bg-amber-400',
     },
   ];
 
   return (
-    <div className={`grid grid-cols-1 md:grid-cols-3 gap-3 ${className || ''}`}>
-      {cards.map((card, i) => (
-        <motion.div
-          key={card.key}
-          custom={i}
-          initial="hidden"
-          animate="visible"
-          variants={cardVariants}
-          className={`border-l-4 ${card.borderColor} ${card.bgColor} bg-gray-900 border border-gray-800 rounded-xl p-4`}
-        >
-          <div className="flex items-center gap-2 mb-3">
-            <card.icon size={16} className={card.iconColor} />
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">
-              {card.label}
-            </span>
-          </div>
-          <p className="text-sm text-gray-200 leading-relaxed">{card.content}</p>
-        </motion.div>
-      ))}
+    <div className={`bg-gray-900 border border-gray-800 rounded-xl overflow-hidden ${className || ''}`}>
+      <div className="divide-y divide-gray-800">
+        {items.map((item, i) => {
+          const Icon = item.icon;
+          return (
+            <motion.div
+              key={item.key}
+              custom={i}
+              initial="hidden"
+              animate="visible"
+              variants={cardVariants}
+              className="px-5 py-4 flex items-start gap-4"
+            >
+              <div className={`mt-0.5 w-2 h-2 rounded-full ${item.dot} shrink-0`} />
+              <div className="flex-1 min-w-0">
+                <div className={`text-xs font-medium uppercase tracking-wider ${item.accent} mb-1`}>
+                  {item.label}
+                </div>
+                <p className="text-sm text-gray-300 leading-relaxed">{item.content}</p>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
     </div>
   );
 }

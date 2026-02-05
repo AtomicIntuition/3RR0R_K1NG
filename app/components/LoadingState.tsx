@@ -249,6 +249,7 @@ export function LoadingState({
   // --- Terminal log drip effect ---
   const [visibleLogs, setVisibleLogs] = useState<{ time: string; message: string }[]>([]);
   const shownPhasesRef = useRef<Set<string>>(new Set());
+  const logContainerRef = useRef<HTMLDivElement>(null);
   const logEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -269,9 +270,11 @@ export function LoadingState({
     }
   }, [currentPhase]);
 
-  // Auto-scroll terminal
+  // Auto-scroll terminal (only within the terminal container, not the page)
   useEffect(() => {
-    logEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (logContainerRef.current) {
+      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+    }
   }, [visibleLogs]);
 
   // --- Fun facts carousel ---
@@ -487,7 +490,7 @@ export function LoadingState({
           </div>
 
           {/* Log content */}
-          <div className="p-4 font-mono text-sm min-h-[200px] max-h-[400px] overflow-y-auto flex flex-col gap-1">
+          <div ref={logContainerRef} className="p-4 font-mono text-sm min-h-[200px] max-h-[400px] overflow-y-auto flex flex-col gap-1">
             {visibleLogs.length === 0 && (
               <div className="text-zinc-600 text-xs">Waiting for audit to begin...</div>
             )}

@@ -145,7 +145,7 @@ export function ScanResultsClient({ initialScan, scanId }: ScanResultsClientProp
           <div className="inline-flex items-center gap-2 px-3 py-2 bg-gray-900 border border-gray-800 rounded-xl min-w-0">
             <span className="text-emerald-500 font-semibold text-sm shrink-0">URL:</span>
             <span className="text-gray-300 text-sm truncate max-w-[250px] sm:max-w-[400px]">
-              {scan.url.replace(/^https?:\/\//, '')}
+              {scan.url.replace(/^https?:\/\//, '').replace(/\/+$/, '')}
             </span>
           </div>
           <div className="flex items-center gap-2 screenshot-ignore">

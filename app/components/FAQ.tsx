@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -60,32 +59,29 @@ export function FAQ() {
               className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-gray-800/50 transition-colors"
             >
               <span className="font-medium text-gray-50 pr-4">{faq.question}</span>
-              <motion.div
-                animate={{ rotate: openIndex === index ? 180 : 0 }}
-                transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              <div
                 className={clsx(
-                  'flex-shrink-0 transition-colors',
-                  openIndex === index ? 'text-emerald-500' : 'text-gray-400'
+                  'flex-shrink-0 transition-transform duration-200',
+                  openIndex === index ? 'rotate-180 text-emerald-500' : 'text-gray-400'
                 )}
               >
                 <ChevronDown size={20} />
-              </motion.div>
+              </div>
             </button>
 
-            <AnimatePresence>
-              {openIndex === index && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  <div className="px-5 pb-4 text-gray-400 text-sm leading-relaxed border-t border-gray-800 pt-4">
-                    {faq.answer}
-                  </div>
-                </motion.div>
+            {/* CSS grid-rows accordion for smooth height animation */}
+            <div
+              className={clsx(
+                'grid transition-[grid-template-rows] duration-300 ease-out',
+                openIndex === index ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
               )}
-            </AnimatePresence>
+            >
+              <div className="overflow-hidden">
+                <div className="px-5 pb-4 text-gray-400 text-sm leading-relaxed border-t border-gray-800 pt-4">
+                  {faq.answer}
+                </div>
+              </div>
+            </div>
           </div>
         ))}
       </div>

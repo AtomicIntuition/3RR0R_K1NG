@@ -1,8 +1,7 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useMemo, useCallback } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { ScoreRing } from '@/components/ScoreRing';
 import { CategorySection } from '@/components/CategorySection';
 import { CategoryProgressBar } from '@/components/CategoryProgressBar';
@@ -41,20 +40,23 @@ export function ScanResultsClient({ initialScan, scanId }: ScanResultsClientProp
   // Use realtime scan if available (has latest data), otherwise initial
   const scan = realtimeScan || initialScan;
 
-  const scrollToCategory = (category: keyof CategoryScores) => {
+  const scrollToCategory = useCallback((category: keyof CategoryScores) => {
     const el = document.getElementById(`category-${category}`);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
+  }, []);
+
+  // Memoize scan-derived data for CategorySection memo() to work
+  const securityFindings = useMemo(() => scan?.resultsSecurity?.findings, [scan?.resultsSecurity]);
+  const performanceMetrics = useMemo(() => scan?.resultsPerformance?.metrics, [scan?.resultsPerformance]);
+  const a11yViolations = useMemo(() => scan?.resultsAccessibility?.violations, [scan?.resultsAccessibility]);
+  const seoFindings = useMemo(() => scan?.resultsSeo?.findings, [scan?.resultsSeo]);
+  const codeQualityIssues = useMemo(() => scan?.resultsCodeQuality?.issues, [scan?.resultsCodeQuality]);
 
   // Error state
   if (error) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 pt-20 bg-gray-950">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center max-w-md"
-        >
+        <div className="animate-scale-in text-center max-w-md">
           <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-danger/10 flex items-center justify-center">
             <svg className="w-8 h-8 text-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -68,7 +70,7 @@ export function ScanResultsClient({ initialScan, scanId }: ScanResultsClientProp
           >
             <span>Try Again</span>
           </Link>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -93,11 +95,7 @@ export function ScanResultsClient({ initialScan, scanId }: ScanResultsClientProp
   if (scan.status === 'failed') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 pt-20 bg-gray-950">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center max-w-md"
-        >
+        <div className="animate-scale-in text-center max-w-md">
           <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-warning/10 flex items-center justify-center">
             <svg className="w-8 h-8 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -108,14 +106,12 @@ export function ScanResultsClient({ initialScan, scanId }: ScanResultsClientProp
             We couldn&apos;t complete the scan for this URL.
           </p>
           {scan.errorMessage && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-sm text-danger bg-danger/10 border border-danger/20 rounded-xl p-4 mb-8"
+            <div
+              className="animate-fade-up text-sm text-danger bg-danger/10 border border-danger/20 rounded-xl p-4 mb-8"
+              style={{ animationDelay: '300ms' }}
             >
               {scan.errorMessage}
-            </motion.div>
+            </div>
           )}
           <Link
             href="/"
@@ -123,7 +119,7 @@ export function ScanResultsClient({ initialScan, scanId }: ScanResultsClientProp
           >
             <span>Scan Another Site</span>
           </Link>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -137,11 +133,7 @@ export function ScanResultsClient({ initialScan, scanId }: ScanResultsClientProp
       <div className="max-w-4xl mx-auto">
 
         {/* A. HEADER BAR */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-wrap items-center justify-between gap-3 mb-6"
-        >
+        <div className="animate-fade-up flex flex-wrap items-center justify-between gap-3 mb-6">
           <div className="inline-flex items-center gap-2 px-3 py-2 bg-gray-900 border border-gray-800 rounded-xl min-w-0">
             <span className="text-emerald-500 font-semibold text-sm shrink-0">URL:</span>
             <span className="text-gray-300 text-sm truncate max-w-[250px] sm:max-w-[400px]">
@@ -151,40 +143,34 @@ export function ScanResultsClient({ initialScan, scanId }: ScanResultsClientProp
           <div className="flex items-center gap-2 screenshot-ignore">
             <ReportDownloadButton scan={scan} />
           </div>
-        </motion.div>
+        </div>
 
         {/* B. HERO SCORE */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-gray-900 border border-gray-800 rounded-2xl p-4 sm:p-6 mb-6"
+        <section
+          className="animate-fade-up bg-gray-900 border border-gray-800 rounded-2xl p-4 sm:p-6 mb-6"
+          style={{ animationDelay: '100ms' }}
         >
           <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
             {/* Score Ring + Grade */}
             <div className="flex items-center gap-4 sm:gap-6 shrink-0">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                className="transform scale-75 sm:scale-100 origin-center"
+              <div
+                className="animate-scale-up transform scale-75 sm:scale-100 origin-center"
+                style={{ animationDelay: '200ms' }}
               >
                 <ScoreRing
                   score={scan.scoreOverall || 0}
                   size="xl"
                   label="OVERALL"
                 />
-              </motion.div>
-              <motion.div
-                initial={{ x: 20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="flex flex-col items-center"
+              </div>
+              <div
+                className="animate-fade-left flex flex-col items-center"
+                style={{ animationDelay: '300ms' }}
               >
                 <div className={`text-5xl sm:text-7xl font-black tracking-tight ${getGradeColor(grade)}`}>
                   {grade}
                 </div>
-              </motion.div>
+              </div>
             </div>
 
             {/* Category Progress Bars */}
@@ -206,22 +192,20 @@ export function ScanResultsClient({ initialScan, scanId }: ScanResultsClientProp
               )}
             </div>
           </div>
-        </motion.section>
+        </section>
 
         {/* C. EXECUTIVE SUMMARY */}
         {scan.analysisTitle && scan.analysisBody && (
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mb-6"
+          <section
+            className="animate-fade-up mb-6"
+            style={{ animationDelay: '300ms' }}
           >
             <h2 className="text-lg font-semibold text-gray-50 mb-3">{scan.analysisTitle}</h2>
             <ExecutiveSummary
               body={scan.analysisBody}
               score={scan.scoreOverall || 0}
             />
-          </motion.section>
+          </section>
         )}
 
         {/* D. PRIORITY FIXES */}
@@ -247,7 +231,7 @@ export function ScanResultsClient({ initialScan, scanId }: ScanResultsClientProp
                 <CategorySection
                   category="security"
                   score={scan.scoreSecurity}
-                  findings={scan.resultsSecurity?.findings}
+                  findings={securityFindings}
                   protocol={scan.resultsProtocol}
                   vulnerabilities={scan.resultsVulnerabilities}
                 />
@@ -258,7 +242,7 @@ export function ScanResultsClient({ initialScan, scanId }: ScanResultsClientProp
                 <CategorySection
                   category="performance"
                   score={scan.scorePerformance}
-                  metrics={scan.resultsPerformance?.metrics}
+                  metrics={performanceMetrics}
                   images={scan.resultsImages}
                   caching={scan.resultsCaching}
                   redirects={scan.resultsRedirects}
@@ -270,7 +254,7 @@ export function ScanResultsClient({ initialScan, scanId }: ScanResultsClientProp
                 <CategorySection
                   category="accessibility"
                   score={scan.scoreAccessibility}
-                  violations={scan.resultsAccessibility?.violations}
+                  violations={a11yViolations}
                 />
               )}
 
@@ -279,7 +263,7 @@ export function ScanResultsClient({ initialScan, scanId }: ScanResultsClientProp
                 <CategorySection
                   category="seo"
                   score={scan.scoreSeo}
-                  seoFindings={scan.resultsSeo?.findings}
+                  seoFindings={seoFindings}
                   structuredData={scan.resultsStructuredData}
                   links={scan.resultsLinks}
                 />
@@ -290,7 +274,7 @@ export function ScanResultsClient({ initialScan, scanId }: ScanResultsClientProp
                 <CategorySection
                   category="codeQuality"
                   score={scan.scoreCodeQuality}
-                  issues={scan.resultsCodeQuality?.issues}
+                  issues={codeQualityIssues}
                   pwa={scan.resultsPwa}
                 />
               )}

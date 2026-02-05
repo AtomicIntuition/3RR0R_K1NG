@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useRef, useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 
 interface Testimonial {
@@ -46,8 +46,27 @@ const testimonials: Testimonial[] = [
 ];
 
 export function Testimonials() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="w-full max-w-5xl mx-auto">
+    <div className="w-full max-w-5xl mx-auto" ref={ref}>
       <h2 className="text-display-sm sm:text-display-md text-center mb-4 text-gray-50 text-shadow-heading">
         What Developers Are Saying
       </h2>
@@ -57,13 +76,10 @@ export function Testimonials() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {testimonials.map((testimonial, index) => (
-          <motion.div
+          <div
             key={index}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: index * 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-gray-900 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition-all duration-200 group"
+            className={`${visible ? 'animate-fade-up' : 'opacity-0'} bg-gray-900 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition-all duration-200 group`}
+            style={{ animationDelay: `${index * 100}ms` }}
           >
             {/* Score improvement badge */}
             {testimonial.score && (
@@ -107,7 +123,7 @@ export function Testimonials() {
                 <p className="text-xs text-gray-500">{testimonial.role}</p>
               </div>
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
     </div>

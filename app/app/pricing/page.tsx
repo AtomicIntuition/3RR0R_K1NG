@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
 import clsx from 'clsx';
 import { Check } from 'lucide-react';
@@ -125,18 +124,14 @@ export default function PricingPage() {
                 <p className="text-sm text-gray-400 mb-6">For serious developers</p>
 
                 <div className="min-h-[72px] flex flex-col justify-end">
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={isYearly ? 'y' : 'm'}
-                      initial={{ opacity: 0, y: -6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 6 }}
-                      transition={{ duration: 0.15 }}
-                    >
-                      <span className="text-5xl font-bold text-white">${proPrice}</span>
-                      <span className="text-gray-500 text-sm ml-1">/{isYearly ? 'yr' : 'mo'}</span>
-                    </motion.div>
-                  </AnimatePresence>
+                  <div
+                    key={isYearly ? 'y' : 'm'}
+                    className="animate-fade-up"
+                    style={{ animationDuration: '0.15s' }}
+                  >
+                    <span className="text-5xl font-bold text-white">${proPrice}</span>
+                    <span className="text-gray-500 text-sm ml-1">/{isYearly ? 'yr' : 'mo'}</span>
+                  </div>
                   <p className={clsx(
                     'text-xs font-medium mt-1 h-4',
                     isYearly ? 'text-emerald-400' : 'text-transparent'

@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import clsx from 'clsx';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface LoadingStateProps {
   phase?: string;
@@ -169,27 +168,23 @@ function PhaseIcon({ type, className }: { type: string; className?: string }) {
   }
 }
 
-// Animated checkmark SVG
+// CSS animated checkmark SVG
 function AnimatedCheck({ className }: { className?: string }) {
   return (
-    <motion.svg
+    <svg
       className={clsx('w-4 h-4', className)}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
     >
-      <motion.path
+      <path
         d="M5 13l4 4L19 7"
         strokeWidth={2.5}
         strokeLinecap="round"
         strokeLinejoin="round"
-        initial={{ pathLength: 0 }}
-        animate={{ pathLength: 1 }}
-        transition={{ duration: 0.4, ease: 'easeOut' }}
+        className="animate-draw-check"
       />
-    </motion.svg>
+    </svg>
   );
 }
 
@@ -320,11 +315,7 @@ export function LoadingState({
   return (
     <div className={clsx('flex flex-col w-full max-w-5xl mx-auto gap-4', className)}>
       {/* === Target Card === */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full"
-      >
+      <div className="animate-fade-down w-full">
         <div className="flex items-center gap-3 px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl">
           {/* Favicon */}
           <div className="relative flex-shrink-0">
@@ -372,16 +363,12 @@ export function LoadingState({
             <span className="text-sm font-mono font-semibold text-zinc-300">{formatTime(elapsed)}</span>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* === Two-Panel Layout (Desktop) / Stacked (Mobile) === */}
       <div className="grid grid-cols-1 md:grid-cols-[256px_1fr] gap-4">
         {/* --- Phase Timeline (left on desktop, horizontal scroll on mobile) --- */}
-        <motion.div
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.1 }}
-        >
+        <div className="animate-fade-right" style={{ animationDelay: '100ms' }}>
           {/* Desktop: vertical list */}
           <div className="hidden md:block bg-zinc-900 border border-zinc-800 rounded-xl p-3">
             <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold px-2 mb-3">Audit Phases</div>
@@ -463,14 +450,12 @@ export function LoadingState({
               })}
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* --- Terminal Log Feed (right panel) --- */}
-        <motion.div
-          initial={{ opacity: 0, x: 10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.15 }}
-          className="bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden flex flex-col"
+        <div
+          className="animate-fade-left bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden flex flex-col"
+          style={{ animationDelay: '150ms' }}
         >
           {/* Terminal header */}
           <div className="flex items-center gap-2 px-4 py-2.5 border-b border-zinc-800 bg-zinc-900/50">
@@ -494,32 +479,26 @@ export function LoadingState({
             {visibleLogs.length === 0 && (
               <div className="text-zinc-600 text-xs">Waiting for audit to begin...</div>
             )}
-            <AnimatePresence mode="popLayout">
-              {visibleLogs.map((log, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.25 }}
-                  className="flex gap-2"
-                >
-                  <span className="text-zinc-600 flex-shrink-0">[{log.time}]</span>
-                  <span className="text-emerald-500 flex-shrink-0">&gt;</span>
-                  <span className="text-zinc-400">{log.message}</span>
-                </motion.div>
-              ))}
-            </AnimatePresence>
+            {visibleLogs.map((log, i) => (
+              <div
+                key={i}
+                className="animate-fade-up flex gap-2"
+                style={{ animationDuration: '0.25s' }}
+              >
+                <span className="text-zinc-600 flex-shrink-0">[{log.time}]</span>
+                <span className="text-emerald-500 flex-shrink-0">&gt;</span>
+                <span className="text-zinc-400">{log.message}</span>
+              </div>
+            ))}
             <div ref={logEndRef} />
           </div>
-        </motion.div>
+        </div>
       </div>
 
       {/* === Progress Bar === */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3"
+      <div
+        className="animate-fade-up w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3"
+        style={{ animationDelay: '200ms' }}
       >
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
@@ -535,41 +514,33 @@ export function LoadingState({
         </div>
         {/* Bar track */}
         <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
-          <motion.div
-            className="h-full bg-emerald-500 rounded-full"
+          <div
+            className="h-full bg-emerald-500 rounded-full transition-[width] duration-100"
             style={{ width: `${displayPercentage}%` }}
-            transition={{ duration: 0.1 }}
           />
         </div>
         {/* Completed count */}
         <div className="flex items-center justify-between mt-2">
           <span className="text-xs text-zinc-500">{completedAudits.length} / {PHASE_ORDER.length} audits complete</span>
         </div>
-      </motion.div>
+      </div>
 
       {/* === Fun Facts Carousel === */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="flex items-start gap-2 px-4 py-2"
+      <div
+        className="animate-fade-in flex items-start gap-2 px-4 py-2"
+        style={{ animationDelay: '300ms' }}
       >
         <svg className="w-4 h-4 text-zinc-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
         </svg>
-        <AnimatePresence mode="wait">
-          <motion.p
-            key={factIndex}
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.3 }}
-            className="text-xs text-zinc-500 leading-relaxed"
-          >
-            {facts[factIndex % facts.length]}
-          </motion.p>
-        </AnimatePresence>
-      </motion.div>
+        <p
+          key={factIndex}
+          className="animate-fade-up text-xs text-zinc-500 leading-relaxed"
+          style={{ animationDuration: '0.3s' }}
+        >
+          {facts[factIndex % facts.length]}
+        </p>
+      </div>
     </div>
   );
 }

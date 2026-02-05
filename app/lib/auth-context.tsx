@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useMemo, ReactNode } from 'react';
 import { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 
@@ -19,32 +19,38 @@ interface Profile {
   created_at: string;
 }
 
-interface AuthContextType {
+// --- Session context (changes rarely: sign in/out) ---
+interface AuthSessionContextType {
   user: User | null;
   session: Session | null;
-  profile: Profile | null;
   loading: boolean;
-  profileLoading: boolean;
-  authEvent: AuthChangeEvent | null;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string) => Promise<{ error: Error | null }>;
   signInWithGoogle: () => Promise<{ error: Error | null }>;
   signInWithGithub: () => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+}
+
+// --- Profile context (changes on profile fetch) ---
+interface ProfileContextType {
+  profile: Profile | null;
+  profileLoading: boolean;
+  authEvent: AuthChangeEvent | null;
   refreshProfile: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// --- Combined type for backward-compat useAuth() ---
+interface AuthContextType extends AuthSessionContextType, ProfileContextType {}
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+const AuthSessionContext = createContext<AuthSessionContextType | undefined>(undefined);
+const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
+
+// Inner provider for profile — needs access to user from session context
+function ProfileProvider({ children, user }: { children: ReactNode; user: User | null }) {
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
   const [profileLoading, setProfileLoading] = useState(false);
   const [authEvent, setAuthEvent] = useState<AuthChangeEvent | null>(null);
 
-  // Fetch user profile from database with retry logic
   const fetchProfile = useCallback(async (userId: string, retries = 3): Promise<Profile | null> => {
     for (let i = 0; i < retries; i++) {
       const { data, error } = await supabase
@@ -57,17 +63,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return data as Profile;
       }
 
-      if (error) {
-        // Wait a bit before retrying (profile might not exist yet after signup)
-        if (i < retries - 1) {
-          await new Promise(resolve => setTimeout(resolve, 500));
-        }
+      if (error && i < retries - 1) {
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
     }
     return null;
   }, []);
 
-  // Refresh profile data
   const refreshProfile = useCallback(async () => {
     if (user) {
       setProfileLoading(true);
@@ -77,61 +79,82 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [user, fetchProfile]);
 
+  // Listen for auth events to trigger profile fetches
   useEffect(() => {
     let mounted = true;
 
-    // Get initial session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!mounted) return;
-
-      setSession(session);
-      setUser(session?.user ?? null);
-
-      if (session?.user) {
-        setProfileLoading(true);
-        const profileData = await fetchProfile(session.user.id);
+    if (user) {
+      // Initial profile fetch
+      setProfileLoading(true);
+      fetchProfile(user.id).then(profileData => {
         if (!mounted) return;
         setProfile(profileData);
         setProfileLoading(false);
-      }
+      });
+    }
 
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event) => {
+        if (!mounted) return;
+        setAuthEvent(event);
+
+        if (event === 'SIGNED_OUT') {
+          setProfile(null);
+          return;
+        }
+
+        // Only refetch on meaningful events
+        const shouldRefetch = event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'PASSWORD_RECOVERY' || event === 'INITIAL_SESSION';
+        if (shouldRefetch && user) {
+          setProfileLoading(true);
+          const profileData = await fetchProfile(user.id);
+          if (!mounted) return;
+          setProfile(profileData);
+          setProfileLoading(false);
+        }
+      }
+    );
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [user, fetchProfile]);
+
+  const value = useMemo(
+    () => ({ profile, profileLoading, authEvent, refreshProfile }),
+    [profile, profileLoading, authEvent, refreshProfile]
+  );
+
+  return (
+    <ProfileContext.Provider value={value}>
+      {children}
+    </ProfileContext.Provider>
+  );
+}
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      setSession(session);
+      setUser(session?.user ?? null);
       setLoading(false);
     }).catch(() => {
-      // Ignore abort errors during cleanup
       if (mounted) setLoading(false);
     });
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         if (!mounted) return;
-
-        setAuthEvent(event);
         setSession(session);
         setUser(session?.user ?? null);
-
-        if (session?.user) {
-          // Only refetch and show loading on meaningful auth events
-          // Skip TOKEN_REFRESHED to prevent badge flickering when tabbing back
-          const shouldRefetch = event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'PASSWORD_RECOVERY' || event === 'INITIAL_SESSION';
-
-          if (shouldRefetch) {
-            setProfileLoading(true);
-            const profileData = await fetchProfile(session.user.id);
-            if (!mounted) return;
-            setProfile(profileData);
-            setProfileLoading(false);
-          }
-          // For other events (TOKEN_REFRESHED), keep existing profile - don't touch it
-        } else {
-          // Only clear profile on explicit sign out, not on transient session states
-          if (event === 'SIGNED_OUT') {
-            setProfile(null);
-          }
-          // For other events where session is null, keep profile if we have one
-          // This prevents flickering on tab visibility changes
-        }
-
         setLoading(false);
       }
     );
@@ -140,80 +163,86 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [fetchProfile]);
+  }, []);
 
-  const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+  // Auth methods — stable references via useCallback with [] deps
+  // supabase client is a module-level singleton so no dependency needed
+  const signIn = useCallback(async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     return { error: error as Error | null };
-  };
+  }, []);
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = useCallback(async (email: string, password: string) => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
     });
     return { error: error as Error | null };
-  };
+  }, []);
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = useCallback(async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
     return { error: error as Error | null };
-  };
+  }, []);
 
-  const signInWithGithub = async () => {
+  const signInWithGithub = useCallback(async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'github',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
     return { error: error as Error | null };
-  };
+  }, []);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
-    setProfile(null);
-  };
+  }, []);
+
+  const sessionValue = useMemo(
+    () => ({ user, session, loading, signIn, signUp, signInWithGoogle, signInWithGithub, signOut }),
+    [user, session, loading, signIn, signUp, signInWithGoogle, signInWithGithub, signOut]
+  );
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        session,
-        profile,
-        loading,
-        profileLoading,
-        authEvent,
-        signIn,
-        signUp,
-        signInWithGoogle,
-        signInWithGithub,
-        signOut,
-        refreshProfile,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+    <AuthSessionContext.Provider value={sessionValue}>
+      <ProfileProvider user={user}>
+        {children}
+      </ProfileProvider>
+    </AuthSessionContext.Provider>
   );
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext);
+// --- Hooks ---
+
+/** Session-only hook — won't re-render when profile changes */
+export function useSession() {
+  const context = useContext(AuthSessionContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error('useSession must be used within an AuthProvider');
   }
   return context;
+}
+
+/** Profile-only hook — won't re-render when session changes */
+export function useProfile() {
+  const context = useContext(ProfileContext);
+  if (context === undefined) {
+    throw new Error('useProfile must be used within an AuthProvider');
+  }
+  return context;
+}
+
+/** Combined hook — backward compatible, returns everything */
+export function useAuth(): AuthContextType {
+  const sessionCtx = useContext(AuthSessionContext);
+  const profileCtx = useContext(ProfileContext);
+  if (sessionCtx === undefined || profileCtx === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return { ...sessionCtx, ...profileCtx };
 }

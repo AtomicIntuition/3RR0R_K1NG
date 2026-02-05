@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
 import { getCategoryDisplayName, SCORE_WEIGHTS, type CategoryScores } from '@/lib/scoring';
 
 interface CategoryProgressBarProps {
@@ -34,6 +34,12 @@ export function CategoryProgressBar({ category, score, onClick }: CategoryProgre
   const displayName = getCategoryDisplayName(category);
   const weight = SCORE_WEIGHTS[category];
   const weightPercent = Math.round(weight * 100);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
 
   return (
     <button
@@ -44,11 +50,9 @@ export function CategoryProgressBar({ category, score, onClick }: CategoryProgre
         {displayName}
       </span>
       <div className="flex-1 h-2.5 bg-gray-800 rounded-full overflow-hidden">
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${score}%` }}
-          transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
-          className={`h-full rounded-full ${getBarColor(score)} shadow-sm ${getBarGlow(score)}`}
+        <div
+          className={`h-full rounded-full transition-[width] duration-700 ease-out ${getBarColor(score)} shadow-sm ${getBarGlow(score)}`}
+          style={{ width: mounted ? `${score}%` : '0%' }}
         />
       </div>
       <span className={`text-sm font-semibold w-[40px] text-right tabular-nums ${getTextColor(score)}`}>

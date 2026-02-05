@@ -1,7 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { ReactNode, memo } from 'react';
+import { ReactNode, memo, useRef, useEffect, useState } from 'react';
 
 interface ScrollRevealProps {
   children: ReactNode;
@@ -11,41 +10,49 @@ interface ScrollRevealProps {
   duration?: number;
 }
 
-// Memoized to prevent unnecessary re-renders
+const DIRECTION_CLASS: Record<string, string> = {
+  up: 'animate-fade-up',
+  down: 'animate-fade-down',
+  left: 'animate-fade-left',
+  right: 'animate-fade-right',
+  none: 'animate-fade-in',
+};
+
 export const ScrollReveal = memo(function ScrollReveal({
   children,
   className = '',
   delay = 0,
   direction = 'up',
-  duration = 0.4,
 }: ScrollRevealProps) {
-  const directions = {
-    up: { y: 20, x: 0 },
-    down: { y: -20, x: 0 },
-    left: { y: 0, x: 20 },
-    right: { y: 0, x: -20 },
-    none: { y: 0, x: 0 },
-  };
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
 
-  const initial = {
-    opacity: 0,
-    ...directions[direction],
-  };
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <motion.div
-      className={className}
-      initial={initial}
-      whileInView={{ opacity: 1, y: 0, x: 0 }}
-      viewport={{ once: true, amount: 0.1 }}
-      transition={{
-        duration,
-        delay,
-        ease: 'easeOut',
-      }}
+    <div
+      ref={ref}
+      className={`${visible ? DIRECTION_CLASS[direction] : 'opacity-0'} ${className}`}
+      style={delay > 0 ? { animationDelay: `${delay * 1000}ms` } : undefined}
     >
       {children}
-    </motion.div>
+    </div>
   );
 });
 
@@ -58,50 +65,50 @@ interface StaggerChildrenProps {
 export const StaggerChildren = memo(function StaggerChildren({
   children,
   className = '',
-  staggerDelay = 0.05,
 }: StaggerChildrenProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <motion.div
-      className={className}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.1 }}
-      variants={{
-        visible: {
-          transition: {
-            staggerChildren: staggerDelay,
-          },
-        },
-      }}
-    >
+    <div ref={ref} className={className} data-visible={visible}>
       {children}
-    </motion.div>
+    </div>
   );
 });
 
 export const StaggerItem = memo(function StaggerItem({
   children,
   className = '',
+  index = 0,
 }: {
   children: ReactNode;
   className?: string;
+  index?: number;
 }) {
   return (
-    <motion.div
-      className={className}
-      variants={{
-        hidden: { opacity: 0, y: 15 },
-        visible: {
-          opacity: 1,
-          y: 0,
-          transition: {
-            duration: 0.3,
-            ease: 'easeOut',
-          },
-        },
-      }}
+    <div
+      className={`animate-fade-up ${className}`}
+      style={{ animationDelay: `${index * 80}ms` }}
     >
       {children}
-    </motion.div>
+    </div>
   );
 });

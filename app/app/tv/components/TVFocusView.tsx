@@ -1,13 +1,13 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { ScoreRing } from '@/components/ScoreRing';
 import { getGrade, getScoreColor, getCategoryDisplayName } from '@/lib/scoring';
-import { useDpadNavigation } from '../hooks/useDpadNavigation';
 import type { Scan, AuditFix } from '@/types/scan';
 
 interface TVFocusViewProps {
-  scan: Scan;
+  scans: Scan[];
+  currentIndex: number;
   onBack: () => void;
 }
 
@@ -36,28 +36,16 @@ function getPriorityColor(priority: AuditFix['priority']): string {
   }
 }
 
-export function TVFocusView({ scan, onBack }: TVFocusViewProps) {
-  const handleSelect = useCallback(() => {
-    // Could expand category detail in future; no-op for now
-  }, []);
-
-  const { focusedIndex } = useDpadNavigation({
-    items: CATEGORIES.length,
-    columns: 5,
-    onSelect: handleSelect,
-    onBack,
-    enabled: true,
-  });
-
+function FocusSlide({ scan }: { scan: Scan }) {
   const topFixes = (scan.analysisFixes ?? []).slice(0, 3);
   const grade = getGrade(scan.scoreOverall ?? 0);
 
   return (
-    <div className="h-screen bg-gray-950 text-gray-50 overflow-hidden flex flex-col px-12 py-8">
+    <div className="flex-1 flex flex-col px-12 py-8 h-full">
       {/* Header row */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-600 uppercase tracking-wider">Press ESC to go back</span>
+          <span className="text-sm text-gray-600 uppercase tracking-wider">ESC to go back</span>
         </div>
         <h1 className="text-3xl font-bold font-display truncate max-w-[60vw]">
           {stripUrl(scan.url)}
@@ -78,19 +66,14 @@ export function TVFocusView({ scan, onBack }: TVFocusViewProps) {
         <div className="flex-1 flex flex-col min-h-0">
           {/* Category cards */}
           <div className="flex gap-4 mb-8">
-            {CATEGORIES.map((cat, i) => {
+            {CATEGORIES.map((cat) => {
               const score = getCategoryScore(scan, cat) ?? 0;
               const color = getScoreColor(score);
-              const isFocused = focusedIndex === i;
 
               return (
                 <div
                   key={cat}
-                  className={`flex-1 bg-gray-900 rounded-2xl p-5 border transition-all duration-200 ${
-                    isFocused
-                      ? 'ring-4 ring-emerald-500 shadow-glow-primary-lg scale-[1.02] border-emerald-500/50'
-                      : 'border-gray-800'
-                  }`}
+                  className="flex-1 bg-gray-900 rounded-2xl p-5 border border-gray-800"
                 >
                   <div className="text-sm text-gray-500 uppercase tracking-wider mb-3">
                     {getCategoryDisplayName(cat)}
@@ -141,6 +124,81 @@ export function TVFocusView({ scan, onBack }: TVFocusViewProps) {
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+export function TVFocusView({ scans, currentIndex, onBack }: TVFocusViewProps) {
+  const [displayIndex, setDisplayIndex] = useState(currentIndex);
+  const [phase, setPhase] = useState<'visible' | 'fading-out' | 'fading-in'>('visible');
+  const prevIndex = useRef(currentIndex);
+
+  // Crossfade when currentIndex changes (auto-rotation from parent)
+  useEffect(() => {
+    if (currentIndex === prevIndex.current) return;
+    prevIndex.current = currentIndex;
+
+    setPhase('fading-out');
+
+    const fadeOutTimer = setTimeout(() => {
+      setDisplayIndex(currentIndex);
+      setPhase('fading-in');
+
+      const fadeInTimer = setTimeout(() => {
+        setPhase('visible');
+      }, 600);
+
+      return () => clearTimeout(fadeInTimer);
+    }, 500);
+
+    return () => clearTimeout(fadeOutTimer);
+  }, [currentIndex]);
+
+  // Escape to go back
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' || e.key === 'Backspace') {
+        e.preventDefault();
+        onBack();
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [onBack]);
+
+  const scan = scans[displayIndex];
+  if (!scan) return null;
+
+  const opacity = phase === 'fading-out' ? 'opacity-0 scale-[0.97]'
+    : phase === 'fading-in' ? 'opacity-0 scale-[1.03]'
+    : 'opacity-100 scale-100';
+
+  return (
+    <div className="h-screen bg-gray-950 text-gray-50 overflow-hidden flex flex-col">
+      <div
+        className={`flex-1 flex flex-col transition-all duration-500 ease-premium ${opacity}`}
+        style={{ willChange: 'opacity, transform' }}
+      >
+        <FocusSlide scan={scan} />
+      </div>
+
+      {/* Bottom bar with slide dots */}
+      {scans.length > 1 && (
+        <div className="flex items-center justify-center px-8 py-3 border-t border-gray-800/50">
+          <div className="flex gap-2">
+            {scans.map((_, i) => (
+              <div
+                key={i}
+                className={`h-2 rounded-full transition-all duration-500 ${
+                  i === currentIndex
+                    ? 'bg-primary w-6'
+                    : 'bg-gray-700 w-2'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

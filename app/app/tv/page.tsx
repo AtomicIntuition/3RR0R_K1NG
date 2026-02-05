@@ -11,6 +11,8 @@ type TVState = 'init' | 'pairing' | 'dashboard' | 'focus';
 const STORAGE_KEY = 'crisp_tv_session';
 const POLL_PAIRING_MS = 2_000;
 const REFRESH_SCANS_MS = 60_000;
+const CYCLE_INTERVAL = 15_000;
+const PAUSE_DURATION = 30_000;
 
 export default function TVPage() {
   const [state, setState] = useState<TVState>('init');
@@ -18,11 +20,14 @@ export default function TVPage() {
   const [code, setCode] = useState('');
   const [expiresAt, setExpiresAt] = useState('');
   const [scans, setScans] = useState<Scan[]>([]);
-  const [focusedScan, setFocusedScan] = useState<Scan | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const refreshRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const cycleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pauseUntil = useRef(0);
 
-  // Generate a new pairing code
+  // --- Pairing flow ---
+
   const generateCode = useCallback(async () => {
     try {
       const res = await fetch('/api/tv/pair', { method: 'POST' });
@@ -35,12 +40,10 @@ export default function TVPage() {
       }
     } catch (err) {
       console.error('Failed to generate pairing code:', err);
-      // Retry after 3s
       setTimeout(generateCode, 3000);
     }
   }, []);
 
-  // Poll session status
   const pollSession = useCallback(async (sid: string) => {
     try {
       const res = await fetch(`/api/tv/session?sessionId=${sid}`);
@@ -59,13 +62,12 @@ export default function TVPage() {
         return true;
       }
 
-      return false; // still pending
+      return false;
     } catch {
       return false;
     }
   }, [generateCode]);
 
-  // Refresh scans for active session
   const refreshScans = useCallback(async () => {
     if (!sessionId) return;
     try {
@@ -82,14 +84,13 @@ export default function TVPage() {
     }
   }, [sessionId]);
 
-  // Initialize: check localStorage for existing session
+  // Initialize
   useEffect(() => {
     const savedSession = localStorage.getItem(STORAGE_KEY);
     if (savedSession) {
       setSessionId(savedSession);
       pollSession(savedSession).then((activated) => {
         if (!activated) {
-          // Session was pending or invalid, start fresh
           localStorage.removeItem(STORAGE_KEY);
           generateCode();
         }
@@ -99,54 +100,93 @@ export default function TVPage() {
     }
   }, [generateCode, pollSession]);
 
-  // Poll during pairing state
+  // Poll during pairing
   useEffect(() => {
     if (state !== 'pairing' || !sessionId) return;
-
     pollRef.current = setInterval(async () => {
       const activated = await pollSession(sessionId);
       if (activated && pollRef.current) {
         clearInterval(pollRef.current);
       }
     }, POLL_PAIRING_MS);
-
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
     };
   }, [state, sessionId, pollSession]);
 
-  // Refresh scans periodically in dashboard state
+  // Refresh scans periodically when active (dashboard or focus)
   useEffect(() => {
-    if (state !== 'dashboard') return;
-
+    if (state !== 'dashboard' && state !== 'focus') return;
     refreshRef.current = setInterval(refreshScans, REFRESH_SCANS_MS);
     return () => {
       if (refreshRef.current) clearInterval(refreshRef.current);
     };
   }, [state, refreshScans]);
 
+  // --- Auto-cycle (runs in both dashboard and focus) ---
+
+  const scheduleNext = useCallback(() => {
+    if (cycleRef.current) clearTimeout(cycleRef.current);
+    if (scans.length <= 1) return;
+
+    cycleRef.current = setTimeout(() => {
+      if (Date.now() < pauseUntil.current) {
+        scheduleNext();
+        return;
+      }
+      setCurrentIndex((prev) => (prev + 1) % scans.length);
+      scheduleNext();
+    }, CYCLE_INTERVAL);
+  }, [scans.length]);
+
+  useEffect(() => {
+    if (state === 'dashboard' || state === 'focus') {
+      scheduleNext();
+    }
+    return () => {
+      if (cycleRef.current) clearTimeout(cycleRef.current);
+    };
+  }, [state, scheduleNext]);
+
+  // Arrow key nav (left/right to manually cycle, pauses auto-cycle)
+  useEffect(() => {
+    if (state !== 'dashboard' && state !== 'focus') return;
+    if (scans.length <= 1) return;
+
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        pauseUntil.current = Date.now() + PAUSE_DURATION;
+        setCurrentIndex((prev) => (prev + 1) % scans.length);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        pauseUntil.current = Date.now() + PAUSE_DURATION;
+        setCurrentIndex((prev) => (prev - 1 + scans.length) % scans.length);
+      }
+    };
+
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [state, scans.length]);
+
   // Auto-focus if only 1 scan
   useEffect(() => {
     if (state === 'dashboard' && scans.length === 1) {
-      setFocusedScan(scans[0]);
       setState('focus');
     }
   }, [state, scans]);
 
-  // Handle code expiry — regenerate
+  // --- Handlers ---
+
   const handleExpired = useCallback(() => {
     generateCode();
   }, [generateCode]);
 
-  // Focus a scan
-  const handleSelectScan = useCallback((scan: Scan) => {
-    setFocusedScan(scan);
+  const handleSelectScan = useCallback(() => {
     setState('focus');
   }, []);
 
-  // Back from focus to dashboard
   const handleBackToDashboard = useCallback(() => {
-    setFocusedScan(null);
     setState('dashboard');
   }, []);
 
@@ -169,6 +209,8 @@ export default function TVPage() {
     };
   }, []);
 
+  // --- Render ---
+
   if (state === 'init') {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-950">
@@ -187,10 +229,11 @@ export default function TVPage() {
     );
   }
 
-  if (state === 'focus' && focusedScan) {
+  if (state === 'focus') {
     return (
       <TVFocusView
-        scan={focusedScan}
+        scans={scans}
+        currentIndex={currentIndex}
         onBack={handleBackToDashboard}
       />
     );
@@ -199,6 +242,7 @@ export default function TVPage() {
   return (
     <TVDashboard
       scans={scans}
+      currentIndex={currentIndex}
       onSelectScan={handleSelectScan}
     />
   );

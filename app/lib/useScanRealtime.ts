@@ -103,15 +103,10 @@ export function useScanRealtime(scanId: string) {
     currentPhase: 'pending',
   });
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const fetchingRef = useRef(false);
   const doneRef = useRef(false);
 
-  // Fetch scan data with guard against concurrent fetches
+  // Full fetch for complete data (including large JSONB columns)
   const fetchScan = useCallback(async () => {
-    if (fetchingRef.current) return null;
-    fetchingRef.current = true;
-
     try {
       const { data, error: fetchError } = await supabase
         .from('scans')
@@ -128,16 +123,12 @@ export function useScanRealtime(scanId: string) {
 
       if (dbScan.status === 'completed' || dbScan.status === 'failed') {
         doneRef.current = true;
-        setIsLoading(false);
       }
 
       return dbScan;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch scan');
-      setIsLoading(false);
       return null;
-    } finally {
-      fetchingRef.current = false;
     }
   }, [scanId]);
 
@@ -163,9 +154,12 @@ export function useScanRealtime(scanId: string) {
           setProgress(calculateProgress(dbScan));
 
           if (dbScan.status === 'completed' || dbScan.status === 'failed') {
-            // Realtime payloads may omit large JSONB columns.
-            // Do a full fetch to ensure we have all result data.
-            await fetchScan();
+            // Immediately update scan from payload so UI transitions
+            // (even if payload omits large JSONB, status change unblocks render)
+            setScan(dbScanToScan(dbScan));
+            doneRef.current = true;
+            // Then do a full fetch to backfill any missing JSONB data
+            fetchScan();
           } else {
             setScan(dbScanToScan(dbScan));
           }
@@ -195,5 +189,5 @@ export function useScanRealtime(scanId: string) {
     };
   }, [scanId, fetchScan]);
 
-  return { scan, progress, error, isLoading };
+  return { scan, progress, error };
 }

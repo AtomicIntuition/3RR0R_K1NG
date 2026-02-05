@@ -36,7 +36,7 @@ function groupTechStack(techStack: Scan['resultsTechStack']) {
 
 export function ScanResultsClient({ initialScan, scanId }: ScanResultsClientProps) {
   const startedAtRef = useRef(Date.now());
-  const { scan: realtimeScan, progress, error, isLoading } = useScanRealtime(scanId);
+  const { scan: realtimeScan, progress, error } = useScanRealtime(scanId);
 
   // Use realtime scan if available (has latest data), otherwise initial
   const scan = realtimeScan || initialScan;
@@ -74,7 +74,7 @@ export function ScanResultsClient({ initialScan, scanId }: ScanResultsClientProp
   }
 
   // Loading state
-  if (isLoading || !scan || scan.status === 'pending' || scan.status === 'processing') {
+  if (!scan || scan.status === 'pending' || scan.status === 'processing') {
     return (
       <div className="min-h-screen flex flex-col items-start justify-start px-3 sm:px-4 pt-24 bg-gray-950">
         <LoadingState

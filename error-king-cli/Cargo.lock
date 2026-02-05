@@ -190,6 +190,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "773648b94d0e5d620f64f280777445740e61fe701025087ec8b57f45c791888b"
 
 [[package]]
+name = "crisp-cli"
+version = "0.2.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "colored",
+ "indicatif",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "textwrap",
+ "tokio",
+ "urlencoding",
+]
+
+[[package]]
 name = "displaydoc"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -229,22 +245,6 @@ checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
  "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "error_king"
-version = "0.1.4"
-dependencies = [
- "anyhow",
- "clap",
- "colored",
- "indicatif",
- "reqwest",
- "serde",
- "serde_json",
- "textwrap",
- "tokio",
- "urlencoding",
 ]
 
 [[package]]

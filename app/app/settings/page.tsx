@@ -321,10 +321,10 @@ export default function SettingsPage() {
           <h2 className="text-sm font-medium text-gray-400 mb-3">Install the CLI</h2>
           <div className="border border-gray-800 rounded-lg divide-y divide-gray-800">
             {[
-              { label: 'Cargo (Rust)', cmd: 'cargo install error_king' },
-              { label: 'npm (Node.js)', cmd: 'npm install -g error-king' },
-              { label: 'npx (no install)', cmd: 'npx error-king scan https://example.com' },
-              { label: 'Homebrew (macOS/Linux)', cmd: 'brew install error-king' },
+              { label: 'Cargo (Rust)', cmd: 'cargo install crisp-cli' },
+              { label: 'npm (Node.js)', cmd: 'npm install -g crisp-cli' },
+              { label: 'npx (no install)', cmd: 'npx crisp-cli scan https://example.com' },
+              { label: 'Homebrew (macOS/Linux)', cmd: 'brew install crisp' },
             ].map((item, i) => (
               <div key={i} className="px-5 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                 <span className="text-xs text-gray-500 font-medium">{item.label}</span>
@@ -339,12 +339,11 @@ export default function SettingsPage() {
           <h2 className="text-sm font-medium text-gray-400 mb-3">Usage</h2>
           <div className="border border-gray-800 rounded-lg divide-y divide-gray-800">
             {[
-              { label: 'Set your API key', cmd: 'export ERROR_KING_API_KEY=sk_...' },
-              { label: 'Scan a website (Rust)', cmd: '3rror scan https://example.com' },
-              { label: 'Scan a website (Node)', cmd: 'error-king scan https://example.com' },
-              { label: 'Check scan status', cmd: '3rror status <scan-id>' },
-              { label: 'Search previous scans', cmd: '3rror search stripe.com' },
-              { label: 'Verify your key', cmd: '3rror auth' },
+              { label: 'Set your API key', cmd: 'export CRISP_API_KEY=sk_...' },
+              { label: 'Scan a website', cmd: 'crisp scan https://example.com' },
+              { label: 'Check scan status', cmd: 'crisp status <scan-id>' },
+              { label: 'Search previous scans', cmd: 'crisp search stripe.com' },
+              { label: 'Verify your key', cmd: 'crisp auth' },
             ].map((item, i) => (
               <div key={i} className="px-5 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                 <span className="text-xs text-gray-500">{item.label}</span>

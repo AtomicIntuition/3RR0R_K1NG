@@ -1,13 +1,13 @@
-# 3RROR_K1NG CLI
+# Crisp CLI
 
-Command-line interface for [3RROR_K1NG](https://3rrork1ng.com) - the Website Roast Machine.
+Command-line interface for [Crisp](https://crisp.sh) — website audit tool.
 
-Get your website brutally roasted with AI-powered security, performance, SEO & accessibility audits.
+Run security, performance, SEO & accessibility audits from your terminal.
 
 ## Installation
 
 ```bash
-cargo install error_king
+cargo install crisp-cli
 ```
 
 ## Usage
@@ -15,41 +15,53 @@ cargo install error_king
 ### Scan a website
 
 ```bash
-3rror scan https://example.com
+crisp scan https://example.com
 ```
 
 ### Authenticate with your API key
 
 ```bash
-# Set your API key (get one at https://3rrork1ng.com/settings)
-export ERRORKING_API_KEY=sk_your_key_here
+# Set your API key (get one at https://crisp.sh/settings)
+export CRISP_API_KEY=sk_your_key_here
 
 # Verify authentication
-3rror auth
+crisp auth
 
 # Scan with your account (Pro users get priority)
-3rror scan https://example.com
+crisp scan https://example.com
+```
+
+### Check a previous scan
+
+```bash
+crisp status <scan-id>
+```
+
+### Search for a site
+
+```bash
+crisp search stripe.com
 ```
 
 ### Options
 
 ```bash
-3rror scan <URL> [OPTIONS]
+crisp scan <URL> [OPTIONS]
 
 Options:
-  --api-key <KEY>    API key for authentication (or use ERRORKING_API_KEY env var)
-  --json             Output raw JSON instead of formatted results
+  --api-key <KEY>    API key (or use CRISP_API_KEY env var)
+  --format json      Output raw JSON
+  --format minimal   One-line output
   --help             Show help
 ```
 
 ## Get an API Key
 
-1. Sign up at [3rrork1ng.com](https://3rrork1ng.com)
-2. Go to [Settings](https://3rrork1ng.com/settings)
+1. Sign up at [crisp.sh](https://crisp.sh)
+2. Go to [Settings](https://crisp.sh/settings)
 3. Create an API key
 4. Set it as an environment variable or pass it with `--api-key`
 
 ## Links
 
-- Website: https://3rrork1ng.com
-- Twitter: [@3RROR_K1NG](https://x.com/3RROR_K1NG)
+- Website: https://crisp.sh

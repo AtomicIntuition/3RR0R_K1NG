@@ -1,18 +1,18 @@
 [package]
-name = "error_king"
-version = "0.1.4"
+name = "crisp-cli"
+version = "0.2.0"
 edition = "2021"
-description = "CLI for 3RROR_K1NG - Website Roast Machine. Get your website brutally roasted with AI-powered security, performance, SEO & accessibility audits."
-authors = ["3RROR_K1NG"]
+description = "Crisp CLI — website audit tool. Security, performance, SEO & accessibility audits from your terminal."
+authors = ["Crisp"]
 license = "MIT"
 repository = "https://github.com/AtomicIntuition/3RR0R_K1NG"
-homepage = "https://3rrork1ng.com"
+homepage = "https://crisp.sh"
 keywords = ["website", "audit", "security", "performance", "seo"]
 categories = ["command-line-utilities", "web-programming"]
 readme = "README.md"
 
 [[bin]]
-name = "3rror"
+name = "crisp"
 path = "src/main.rs"
 
 [dependencies]

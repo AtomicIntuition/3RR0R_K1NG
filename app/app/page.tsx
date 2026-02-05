@@ -2,15 +2,15 @@
 
 import { Scanner } from '@/components/Scanner';
 import { ScrollReveal } from '@/components/ScrollReveal';
-import { Check, Shield, Zap, Search, Accessibility, Code, ArrowRight } from 'lucide-react';
+import { Check, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 const CATEGORIES = [
-  { icon: Shield, title: 'Security', color: 'text-red-400', bg: 'bg-red-500/10' },
-  { icon: Zap, title: 'Performance', color: 'text-amber-400', bg: 'bg-amber-500/10' },
-  { icon: Search, title: 'SEO', color: 'text-blue-400', bg: 'bg-blue-500/10' },
-  { icon: Accessibility, title: 'Accessibility', color: 'text-purple-400', bg: 'bg-purple-500/10' },
-  { icon: Code, title: 'Code Quality', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+  { title: 'Security', dot: 'bg-red-400' },
+  { title: 'Performance', dot: 'bg-amber-400' },
+  { title: 'SEO', dot: 'bg-blue-400' },
+  { title: 'Accessibility', dot: 'bg-purple-400' },
+  { title: 'Code Quality', dot: 'bg-emerald-400' },
 ];
 
 export default function HomePage() {
@@ -57,24 +57,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── What you get ─── */}
+      {/* ─── Categories strip ─── */}
       <section className="border-t border-gray-800/60">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <ScrollReveal>
-            <div className="grid grid-cols-2 sm:grid-cols-5 divide-x divide-gray-800/60">
-              {CATEGORIES.map((cat) => {
-                const Icon = cat.icon;
-                return (
-                  <div key={cat.title} className="py-10 sm:py-14 px-4 sm:px-6 text-center">
-                    <div className={`w-9 h-9 rounded-lg ${cat.bg} flex items-center justify-center mx-auto mb-3`}>
-                      <Icon className={`w-4 h-4 ${cat.color}`} />
-                    </div>
-                    <p className="text-sm font-medium text-gray-300">{cat.title}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </ScrollReveal>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+            {CATEGORIES.map((cat) => (
+              <div key={cat.title} className="flex items-center gap-2">
+                <span className={`w-1.5 h-1.5 rounded-full ${cat.dot}`} />
+                <span className="text-sm text-gray-400">{cat.title}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { UserMenu } from './UserMenu';
+import { useAuth } from '@/lib/auth-context';
 
 const NAV_LINKS = [
   { href: '/pricing', label: 'Pricing' },
@@ -14,6 +15,7 @@ const NAV_LINKS = [
 export function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
+  const { user, profile, loading: authLoading, signOut } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -162,8 +164,89 @@ export function Navbar() {
                   </span>
                 </Link>
               ))}
-              <div className="pt-2 border-t border-gray-800/50 mt-2">
-                <UserMenu />
+
+              {/* Auth section — flat links instead of dropdown */}
+              <div className="pt-2 border-t border-gray-800/50 mt-2 space-y-1">
+                {authLoading ? (
+                  <div className="px-3 py-2.5">
+                    <div className="w-24 h-4 bg-gray-800 rounded animate-pulse" />
+                  </div>
+                ) : user ? (
+                  <>
+                    {/* User info */}
+                    <div className="px-3 py-2 mb-1">
+                      <p className="text-sm text-gray-300 font-medium truncate">{user.email}</p>
+                      {profile && (
+                        <p className={`text-xs mt-0.5 ${profile.tier === 'pro' ? 'text-emerald-500' : 'text-gray-500'}`}>
+                          {profile.tier === 'pro' ? 'Pro' : 'Free'} Plan
+                        </p>
+                      )}
+                    </div>
+
+                    {[
+                      { href: '/dashboard', label: 'Dashboard' },
+                      { href: '/scans', label: 'My Reports' },
+                      { href: '/account', label: 'Account Settings' },
+                      { href: '/settings', label: 'API Keys' },
+                    ].map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        prefetch={false}
+                        onClick={() => setMobileOpen(false)}
+                        className={`block px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                          isActive(link.href)
+                            ? 'text-gray-50 bg-gray-800/50'
+                            : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/30'
+                        }`}
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+
+                    {profile?.tier !== 'pro' && (
+                      <Link
+                        href="/pricing"
+                        prefetch={false}
+                        onClick={() => setMobileOpen(false)}
+                        className="block px-3 py-2.5 rounded-lg text-sm font-medium text-emerald-500 hover:bg-emerald-500/10 transition-colors"
+                      >
+                        Upgrade to Pro
+                      </Link>
+                    )}
+
+                    <button
+                      onClick={async () => {
+                        await signOut();
+                        setMobileOpen(false);
+                        const { toast } = await import('sonner');
+                        toast.success('Signed out successfully');
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-gray-500 hover:text-red-400 hover:bg-gray-800/30 transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <div className="flex flex-col gap-2 px-3 pt-1">
+                    <Link
+                      href="/login"
+                      prefetch={false}
+                      onClick={() => setMobileOpen(false)}
+                      className="block py-2.5 text-center text-sm font-medium text-gray-300 border border-gray-800 rounded-lg hover:bg-gray-800/50 transition-colors"
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      href="/signup"
+                      prefetch={false}
+                      onClick={() => setMobileOpen(false)}
+                      className="block py-2.5 text-center text-sm font-semibold bg-white text-gray-950 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      Sign Up
+                    </Link>
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -7,7 +7,7 @@ import {
   Zap, Shield, Search, Accessibility, Code,
   Globe, Image, Database, ArrowRight, AlertTriangle,
   Smartphone, FileText, Link as LinkIcon,
-  ChevronDown, Check, X,
+  ChevronDown, Check, X, ExternalLink,
   type LucideIcon,
 } from 'lucide-react';
 import type {
@@ -28,16 +28,17 @@ const CATEGORY_ICONS: Record<keyof CategoryScores, LucideIcon> = {
   codeQuality: Code,
 };
 
+// Core Web Vitals metric IDs
+const CWV_IDS = new Set(['largest-contentful-paint', 'cumulative-layout-shift', 'total-blocking-time', 'interaction-to-next-paint']);
+
 interface CategorySectionProps {
   category: keyof CategoryScores;
   score: number;
-  // Core data
   findings?: SecurityFinding[];
   metrics?: PerformanceMetric[];
   seoFindings?: SEOFinding[];
   violations?: AccessibilityViolation[];
   issues?: CodeQualityIssue[];
-  // Extended data
   protocol?: ProtocolInfo;
   vulnerabilities?: Scan['resultsVulnerabilities'];
   images?: Scan['resultsImages'];
@@ -160,6 +161,111 @@ function SeverityChips({ findings, violations, issues }: {
   );
 }
 
+/** Category summary stats bar */
+function CategorySummary({ category, score, findings, metrics, seoFindings, violations, issues }: {
+  category: keyof CategoryScores;
+  score: number;
+  findings?: SecurityFinding[];
+  metrics?: PerformanceMetric[];
+  seoFindings?: SEOFinding[];
+  violations?: AccessibilityViolation[];
+  issues?: CodeQualityIssue[];
+}) {
+  switch (category) {
+    case 'security': {
+      if (!findings) return null;
+      const passed = findings.filter(f => f.passed).length;
+      const failed = findings.filter(f => !f.passed).length;
+      const critical = findings.filter(f => !f.passed && (f.severity === 'critical' || f.severity === 'high')).length;
+      const total = passed + failed;
+      const passRate = total > 0 ? Math.round((passed / total) * 100) : 0;
+      return (
+        <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400 mb-3 px-1">
+          <span><strong className="text-gray-200">{passed}</strong> passed</span>
+          <span><strong className="text-gray-200">{failed}</strong> failed</span>
+          {critical > 0 && <span className="text-danger"><strong>{critical}</strong> critical</span>}
+          <div className="flex-1 h-1.5 bg-gray-800 rounded-full overflow-hidden min-w-[60px]">
+            <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${passRate}%` }} />
+          </div>
+        </div>
+      );
+    }
+    case 'performance': {
+      if (!metrics) return null;
+      const cwvMetrics = metrics.filter(m => CWV_IDS.has(m.id));
+      if (cwvMetrics.length === 0) return null;
+      const allGood = cwvMetrics.every(m => m.score >= 90);
+      return (
+        <div className="mb-3 px-1">
+          <div className="flex flex-wrap items-center gap-2">
+            {cwvMetrics.map(m => (
+              <span key={m.id} className={clsx(
+                'px-2 py-1 rounded-lg text-xs font-medium',
+                m.score >= 90 ? 'text-success bg-success/10' :
+                m.score >= 50 ? 'text-warning bg-warning/10' :
+                'text-danger bg-danger/10'
+              )}>
+                {m.name}: <strong>{m.displayValue}</strong>
+              </span>
+            ))}
+            <span className={clsx(
+              'ml-auto px-2 py-0.5 rounded text-[10px] font-semibold uppercase',
+              allGood ? 'text-success bg-success/10' : 'text-warning bg-warning/10'
+            )}>
+              CWV {allGood ? 'Passing' : 'Needs Work'}
+            </span>
+          </div>
+        </div>
+      );
+    }
+    case 'accessibility': {
+      if (!violations || violations.length === 0) return null;
+      const totalNodes = violations.reduce((sum, v) => sum + v.nodes, 0);
+      const critical = violations.filter(v => v.impact === 'critical').length;
+      const serious = violations.filter(v => v.impact === 'serious').length;
+      return (
+        <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400 mb-3 px-1">
+          <span><strong className="text-gray-200">{violations.length}</strong> violation{violations.length !== 1 ? 's' : ''}</span>
+          <span>affecting <strong className="text-gray-200">{totalNodes}</strong> element{totalNodes !== 1 ? 's' : ''}</span>
+          {critical > 0 && <span className="text-danger"><strong>{critical}</strong> critical</span>}
+          {serious > 0 && <span className="text-orange-400"><strong>{serious}</strong> serious</span>}
+        </div>
+      );
+    }
+    case 'seo': {
+      if (!seoFindings) return null;
+      const passed = seoFindings.filter(f => f.passed).length;
+      const total = seoFindings.length;
+      const passRate = total > 0 ? Math.round((passed / total) * 100) : 0;
+      return (
+        <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400 mb-3 px-1">
+          <span><strong className="text-gray-200">{passed}/{total}</strong> checks passing</span>
+          <div className="flex-1 h-1.5 bg-gray-800 rounded-full overflow-hidden min-w-[60px]">
+            <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${passRate}%` }} />
+          </div>
+        </div>
+      );
+    }
+    case 'codeQuality': {
+      if (!issues || issues.length === 0) return null;
+      const typeCounts: Record<string, number> = {};
+      for (const issue of issues) {
+        typeCounts[issue.type] = (typeCounts[issue.type] || 0) + 1;
+      }
+      return (
+        <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400 mb-3 px-1">
+          <span><strong className="text-gray-200">{issues.length}</strong> issue{issues.length !== 1 ? 's' : ''}</span>
+          {Object.entries(typeCounts).map(([type, count]) => (
+            <span key={type} className="capitalize">{count} {type.replace('_', ' ')}</span>
+          ))}
+        </div>
+      );
+    }
+    default:
+      return null;
+  }
+}
+
 export const CategorySection = memo(function CategorySection({
   category,
   score,
@@ -180,6 +286,7 @@ export const CategorySection = memo(function CategorySection({
 }: CategorySectionProps) {
   const autoExpand = score < 70;
   const [isExpanded, setIsExpanded] = useState(autoExpand);
+  const [expandedFindings, setExpandedFindings] = useState<Set<string>>(new Set());
 
   const CategoryIcon = CATEGORY_ICONS[category];
   const displayName = getCategoryDisplayName(category);
@@ -187,8 +294,6 @@ export const CategorySection = memo(function CategorySection({
   const hasCore = findings || metrics || seoFindings || violations || issues;
   const hasExtended = protocol || vulnerabilities || images || caching || redirects || structuredData || links || pwa;
   const hasContent = hasCore || hasExtended;
-
-  const coreItemCount = findings?.length || metrics?.length || seoFindings?.length || violations?.length || issues?.length || 0;
 
   const failedCount = (() => {
     if (findings) return findings.filter(f => !f.passed).length;
@@ -204,9 +309,17 @@ export const CategorySection = memo(function CategorySection({
     return 0;
   })();
 
+  const toggleFinding = (id: string) => {
+    setExpandedFindings(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
   return (
     <div
-      id={`category-${category}`}
       className={clsx(
         'bg-gray-900 border border-gray-800 rounded-xl overflow-hidden transition-all duration-200',
         hasContent && 'hover:shadow-card',
@@ -285,27 +398,50 @@ export const CategorySection = memo(function CategorySection({
         <div className="overflow-hidden">
           {hasContent && (
             <div className="px-4 py-4 border-t border-gray-800 space-y-4">
-              {/* Core findings */}
+              {/* Category Summary Stats */}
+              <CategorySummary
+                category={category}
+                score={score}
+                findings={findings}
+                metrics={metrics}
+                seoFindings={seoFindings}
+                violations={violations}
+                issues={issues}
+              />
+
+              {/* Security findings - expandable */}
               {findings && (
                 <div className="space-y-2">
-                  {/* Failed first */}
-                  {findings.filter(f => !f.passed).map((finding) => (
-                    <div
-                      key={finding.id}
-                      className="p-3 rounded-xl border-l-4 border-danger bg-danger/5 hover:bg-danger/10 transition-all"
-                    >
-                      <div className="flex items-start gap-2">
-                        <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-danger/10 text-danger shrink-0">
-                          {finding.severity?.toUpperCase() || 'FAIL'}
-                        </span>
-                        <span className="text-gray-300 text-sm">{finding.title}</span>
+                  {findings.filter(f => !f.passed).map((finding) => {
+                    const isOpen = expandedFindings.has(finding.id);
+                    return (
+                      <div
+                        key={finding.id}
+                        className="rounded-xl border-l-4 border-danger bg-danger/5 hover:bg-danger/10 transition-all overflow-hidden"
+                      >
+                        <button
+                          onClick={() => toggleFinding(finding.id)}
+                          className="w-full p-3 flex items-start gap-2 text-left"
+                        >
+                          <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-danger/10 text-danger shrink-0">
+                            {finding.severity?.toUpperCase() || 'FAIL'}
+                          </span>
+                          <span className="text-gray-300 text-sm flex-1">{finding.title}</span>
+                          <ChevronDown size={14} className={clsx('text-gray-500 transition-transform shrink-0 mt-0.5', isOpen && 'rotate-180')} />
+                        </button>
+                        {isOpen && (
+                          <div className="px-3 pb-3 space-y-2">
+                            {finding.description && (
+                              <p className="text-xs text-gray-400">{finding.description}</p>
+                            )}
+                            {finding.recommendation && (
+                              <p className="text-xs text-emerald-400/80">Fix: {finding.recommendation}</p>
+                            )}
+                          </div>
+                        )}
                       </div>
-                      {finding.recommendation && (
-                        <p className="mt-2 text-xs text-gray-400 ml-0 sm:ml-16">{finding.recommendation}</p>
-                      )}
-                    </div>
-                  ))}
-                  {/* Passed - collapsed by default */}
+                    );
+                  })}
                   {findings.filter(f => f.passed).length > 0 && (
                     <details className="group">
                       <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-400 py-1">
@@ -329,47 +465,73 @@ export const CategorySection = memo(function CategorySection({
                 </div>
               )}
 
-              {/* Performance metrics */}
+              {/* Performance metrics - horizontal bar chart */}
               {metrics && (
                 <div className="space-y-2">
-                  {metrics.map((metric) => (
-                    <div key={metric.id} className="p-3 rounded-xl bg-gray-800/50 flex items-center justify-between hover:bg-gray-800 transition-colors">
-                      <span className="text-gray-300 text-sm">{metric.name}</span>
-                      <div className="flex items-center gap-2">
-                        <span className={clsx('font-mono text-sm', getScoreColor(metric.score))}>
-                          {metric.displayValue}
-                        </span>
-                        <span className={clsx('text-xs px-2 py-0.5 rounded-md', getScoreBgColor(metric.score))}>
-                          {metric.score}
-                        </span>
+                  {metrics.map((metric) => {
+                    const barWidth = Math.min(100, Math.max(0, metric.score));
+                    return (
+                      <div key={metric.id} className="group">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-gray-300 text-sm">{metric.name}</span>
+                          <div className="flex items-center gap-2">
+                            <span className={clsx('font-mono text-sm', getScoreColor(metric.score))}>
+                              {metric.displayValue}
+                            </span>
+                            <span className={clsx('text-xs px-2 py-0.5 rounded-md', getScoreBgColor(metric.score))}>
+                              {metric.score}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                          <div
+                            className={clsx(
+                              'h-full rounded-full transition-all duration-500',
+                              metric.score >= 90 ? 'bg-emerald-500' :
+                              metric.score >= 70 ? 'bg-yellow-500' :
+                              metric.score >= 50 ? 'bg-orange-500' :
+                              'bg-red-500'
+                            )}
+                            style={{ width: `${barWidth}%` }}
+                          />
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
 
-              {/* SEO findings */}
+              {/* SEO findings - expandable */}
               {seoFindings && (
                 <div className="space-y-2">
-                  {seoFindings.filter(f => !f.passed).map((finding) => (
-                    <div
-                      key={finding.id}
-                      className="p-3 rounded-xl border-l-4 border-warning bg-warning/5 hover:bg-warning/10 transition-all"
-                    >
-                      <div className="flex items-start gap-2">
-                        <span className="text-warning">!</span>
-                        <div className="flex-1 min-w-0">
-                          <span className="text-gray-300 text-sm">{finding.title}</span>
-                          <p className="text-xs text-gray-400 mt-1">{finding.description}</p>
-                          {finding.value && (
-                            <code className="mt-2 block text-xs text-gray-500 bg-gray-950 border border-gray-800 p-2 rounded-lg break-all">
-                              {finding.value}
-                            </code>
-                          )}
-                        </div>
+                  {seoFindings.filter(f => !f.passed).map((finding) => {
+                    const isOpen = expandedFindings.has(finding.id);
+                    return (
+                      <div
+                        key={finding.id}
+                        className="rounded-xl border-l-4 border-warning bg-warning/5 hover:bg-warning/10 transition-all overflow-hidden"
+                      >
+                        <button
+                          onClick={() => toggleFinding(finding.id)}
+                          className="w-full p-3 flex items-start gap-2 text-left"
+                        >
+                          <span className="text-warning shrink-0">!</span>
+                          <span className="text-gray-300 text-sm flex-1">{finding.title}</span>
+                          <ChevronDown size={14} className={clsx('text-gray-500 transition-transform shrink-0 mt-0.5', isOpen && 'rotate-180')} />
+                        </button>
+                        {isOpen && (
+                          <div className="px-3 pb-3 space-y-2">
+                            <p className="text-xs text-gray-400">{finding.description}</p>
+                            {finding.value && (
+                              <code className="block text-xs text-gray-500 bg-gray-950 border border-gray-800 p-2 rounded-lg break-all overflow-x-auto">
+                                {finding.value}
+                              </code>
+                            )}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                   {seoFindings.filter(f => f.passed).length > 0 && (
                     <details className="group">
                       <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-400 py-1">
@@ -390,19 +552,23 @@ export const CategorySection = memo(function CategorySection({
                 </div>
               )}
 
-              {/* Accessibility violations */}
+              {/* Accessibility violations - enhanced */}
               {violations && (
                 <div className="space-y-2">
-                  {violations.map((violation) => (
-                    <div key={violation.id} className={clsx(
-                      'p-3 rounded-xl border-l-4 transition-all',
-                      violation.impact === 'critical' ? 'border-danger bg-danger/5 hover:bg-danger/10' :
-                      violation.impact === 'serious' ? 'border-orange-500 bg-orange-500/5 hover:bg-orange-500/10' :
-                      violation.impact === 'moderate' ? 'border-warning bg-warning/5 hover:bg-warning/10' :
-                      'border-gray-700 bg-gray-800/50 hover:bg-gray-800'
-                    )}>
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
+                  {violations.map((violation) => {
+                    const isOpen = expandedFindings.has(violation.id);
+                    return (
+                      <div key={violation.id} className={clsx(
+                        'rounded-xl border-l-4 transition-all overflow-hidden',
+                        violation.impact === 'critical' ? 'border-danger bg-danger/5 hover:bg-danger/10' :
+                        violation.impact === 'serious' ? 'border-orange-500 bg-orange-500/5 hover:bg-orange-500/10' :
+                        violation.impact === 'moderate' ? 'border-warning bg-warning/5 hover:bg-warning/10' :
+                        'border-gray-700 bg-gray-800/50 hover:bg-gray-800'
+                      )}>
+                        <button
+                          onClick={() => toggleFinding(violation.id)}
+                          className="w-full p-3 text-left"
+                        >
                           <div className="flex items-center gap-2 mb-1">
                             <span className={clsx(
                               'px-2 py-0.5 rounded-md text-xs font-medium uppercase',
@@ -416,13 +582,49 @@ export const CategorySection = memo(function CategorySection({
                             <span className="text-xs text-gray-400">
                               {violation.nodes} element{violation.nodes !== 1 ? 's' : ''}
                             </span>
+                            <ChevronDown size={14} className={clsx('text-gray-500 transition-transform ml-auto shrink-0', isOpen && 'rotate-180')} />
                           </div>
                           <p className="text-gray-300 text-sm">{violation.description}</p>
-                          <p className="text-xs text-gray-400 mt-1">{violation.help}</p>
-                        </div>
+                        </button>
+                        {isOpen && (
+                          <div className="px-3 pb-3 space-y-2">
+                            <p className="text-xs text-gray-400">{violation.help}</p>
+
+                            {/* Failure summary - fix hint */}
+                            {violation.failureSummary && (
+                              <div className="text-xs text-emerald-400/80 bg-emerald-500/5 border border-emerald-500/10 rounded-lg p-2">
+                                <strong className="text-emerald-400">Fix:</strong> {violation.failureSummary}
+                              </div>
+                            )}
+
+                            {/* Selectors */}
+                            {violation.selectors && violation.selectors.length > 0 && (
+                              <div className="space-y-1">
+                                <span className="text-[10px] text-gray-500 uppercase font-medium">Affected elements</span>
+                                <code className="block text-xs text-gray-500 bg-gray-950 border border-gray-800 p-2 rounded-lg break-all overflow-x-auto">
+                                  {violation.selectors.slice(0, 5).join('\n')}
+                                  {violation.selectors.length > 5 && `\n... and ${violation.selectors.length - 5} more`}
+                                </code>
+                              </div>
+                            )}
+
+                            {/* Learn more link */}
+                            {violation.helpUrl && (
+                              <a
+                                href={violation.helpUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300 transition-colors"
+                              >
+                                <ExternalLink size={10} />
+                                Learn more
+                              </a>
+                            )}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
 
@@ -453,7 +655,7 @@ export const CategorySection = memo(function CategorySection({
                       </div>
                       <p className="text-gray-300 text-sm mt-2 break-words">{issue.message}</p>
                       {issue.source && (
-                        <code className="mt-1 block text-xs text-gray-500 break-all">{issue.source}</code>
+                        <code className="mt-1 block text-xs text-gray-500 break-all overflow-x-auto">{issue.source}</code>
                       )}
                     </div>
                   ))}
@@ -583,7 +785,7 @@ export const CategorySection = memo(function CategorySection({
                       <span>Redirects: <strong className="text-warning">{redirects.totalRedirects}</strong></span>
                       <span>Total Time: <strong className="text-gray-200">{redirects.totalTime}ms</strong></span>
                     </div>
-                    <div className="bg-gray-950 border border-gray-800 rounded-lg p-3 font-mono text-xs space-y-2">
+                    <div className="bg-gray-950 border border-gray-800 rounded-lg p-3 font-mono text-xs space-y-2 overflow-x-auto">
                       {redirects.redirectChain.map((hop, i) => (
                         <div key={i} className="flex items-center gap-2">
                           <span className={clsx(

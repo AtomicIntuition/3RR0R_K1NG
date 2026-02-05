@@ -362,6 +362,19 @@
 }
 
 @layer utilities {
+  /* Scrollbar hide utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Scroll margin for sticky header offset */
+  .scroll-mt-28 {
+    scroll-margin-top: 7rem;
+  }
   /* Text gradient */
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r;

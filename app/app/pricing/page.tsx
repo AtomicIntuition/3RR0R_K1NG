@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
 import clsx from 'clsx';
-import { Check, Minus } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { PaymentButton } from '@/components/PaymentButton';
 import { PRICING } from '@/lib/constants';
 
@@ -13,28 +13,6 @@ const PRICE_IDS = {
   proMonthly: process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID || '',
   proYearly: process.env.NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID || '',
 };
-
-function FeatureRow({ label, free, pro }: { label: string; free: string | boolean; pro: string | boolean }) {
-  return (
-    <div className="grid grid-cols-[1fr_72px_72px] items-center py-2.5 border-b border-gray-800/50 last:border-0 text-sm">
-      <span className="text-gray-400">{label}</span>
-      <span className="text-center">
-        {typeof free === 'boolean' ? (
-          free ? <Check className="w-3.5 h-3.5 text-emerald-500 mx-auto" /> : <Minus className="w-3.5 h-3.5 text-gray-700 mx-auto" />
-        ) : (
-          <span className="text-gray-500">{free}</span>
-        )}
-      </span>
-      <span className="text-center">
-        {typeof pro === 'boolean' ? (
-          <Check className="w-3.5 h-3.5 text-emerald-500 mx-auto" />
-        ) : (
-          <span className="text-emerald-400 font-medium">{pro}</span>
-        )}
-      </span>
-    </div>
-  );
-}
 
 export default function PricingPage() {
   const [isYearly, setIsYearly] = useState(true);
@@ -53,19 +31,11 @@ export default function PricingPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center px-4 pb-12">
+    <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-5xl mx-auto">
 
-        {/* Header + Toggle */}
-        <div className="text-center mb-10">
-          <h1 className="text-3xl sm:text-4xl font-black text-gray-50 tracking-tight mb-3">
-            Pricing
-          </h1>
-          <p className="text-gray-400 mb-6">
-            Free gets you started. Pro makes you unstoppable.
-          </p>
-
-          {/* Billing Toggle */}
+        {/* Toggle */}
+        <div className="flex justify-center mb-8">
           <div className="inline-flex bg-gray-900 rounded-lg p-1 border border-gray-800">
             <button
               type="button"
@@ -219,20 +189,6 @@ export default function PricingPage() {
               ))}
             </div>
           </div>
-        </div>
-
-        {/* Compact comparison */}
-        <div className="mt-10 max-w-xl mx-auto bg-gray-900 border border-gray-800 rounded-xl px-5 py-4">
-          <div className="grid grid-cols-[1fr_72px_72px] items-center pb-2.5 border-b border-gray-800 mb-1">
-            <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Compare</span>
-            <span className="text-xs font-medium text-gray-500 text-center">Free</span>
-            <span className="text-xs font-medium text-emerald-400 text-center">Pro</span>
-          </div>
-          <FeatureRow label="Monthly scans" free="~90" pro="200" />
-          <FeatureRow label="Priority queue" free={false} pro={true} />
-          <FeatureRow label="Site monitoring" free={false} pro="5 sites" />
-          <FeatureRow label="Score alerts" free={false} pro={true} />
-          <FeatureRow label="API access" free={false} pro={true} />
         </div>
 
       </div>

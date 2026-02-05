@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use std::env;
 use std::time::Duration;
 
-const API_BASE: &str = "https://crisp.sh/api";
+const API_BASE: &str = "https://3rrork1ng.com/api";
 
 // ── Brand palette (truecolor) ────────────────────────────────────────
 const EMERALD: (u8, u8, u8) = (52, 211, 153);
@@ -504,6 +504,45 @@ fn print_result_body(result: &ScanResult) {
 
 // ── API functions ────────────────────────────────────────────────────
 
+async fn parse_response<T: serde::de::DeserializeOwned>(response: reqwest::Response, context: &str) -> Result<T> {
+    let status = response.status();
+    let url = response.url().clone();
+    let body = response
+        .text()
+        .await
+        .with_context(|| format!("{}: failed to read response body", context))?;
+
+    if body.is_empty() {
+        anyhow::bail!(
+            "{}: server returned empty response (HTTP {}). URL: {}",
+            context,
+            status.as_u16(),
+            url
+        );
+    }
+
+    if !status.is_success() {
+        // Try to extract error message from JSON body
+        if let Ok(err) = serde_json::from_str::<serde_json::Value>(&body) {
+            let msg = err.get("message")
+                .or_else(|| err.get("error"))
+                .and_then(|v| v.as_str())
+                .unwrap_or(&body);
+            anyhow::bail!("{} (HTTP {})", msg, status.as_u16());
+        }
+        anyhow::bail!("{}: HTTP {} — {}", context, status.as_u16(), &body[..body.len().min(200)]);
+    }
+
+    serde_json::from_str(&body).with_context(|| {
+        format!(
+            "{}: invalid JSON response (HTTP {}): {}",
+            context,
+            status.as_u16(),
+            &body[..body.len().min(200)]
+        )
+    })
+}
+
 async fn start_scan(client: &reqwest::Client, url: &str, api_key: Option<&str>) -> Result<String> {
     let mut request = client
         .post(format!("{}/scan", API_BASE))
@@ -520,10 +559,7 @@ async fn start_scan(client: &reqwest::Client, url: &str, api_key: Option<&str>) 
         .await
         .context("Failed to connect to Crisp API")?;
 
-    let scan: ScanResponse = response
-        .json()
-        .await
-        .context("Failed to parse scan response")?;
+    let scan: ScanResponse = parse_response(response, "Failed to parse scan response").await?;
 
     if let Some(error) = &scan.error {
         let msg = scan.message.as_deref().unwrap_or(error);
@@ -540,10 +576,7 @@ async fn get_scan_status(client: &reqwest::Client, id: &str) -> Result<ScanResul
         .await
         .context("Failed to fetch scan status")?;
 
-    let wrapper: ScanResultWrapper = response
-        .json()
-        .await
-        .context("Failed to parse scan result")?;
+    let wrapper: ScanResultWrapper = parse_response(response, "Failed to parse scan result").await?;
 
     Ok(wrapper.scan)
 }
@@ -559,10 +592,7 @@ async fn search_scans(client: &reqwest::Client, query: &str) -> Result<SearchRes
         .await
         .context("Failed to search")?;
 
-    let results: SearchResponse = response
-        .json()
-        .await
-        .context("Failed to parse search results")?;
+    let results: SearchResponse = parse_response(response, "Failed to parse search results").await?;
 
     Ok(results)
 }
@@ -575,10 +605,7 @@ async fn verify_auth(client: &reqwest::Client, api_key: &str) -> Result<AuthResp
         .await
         .context("Failed to verify API key")?;
 
-    let auth: AuthResponse = response
-        .json()
-        .await
-        .context("Failed to parse auth response")?;
+    let auth: AuthResponse = parse_response(response, "Failed to parse auth response").await?;
 
     Ok(auth)
 }

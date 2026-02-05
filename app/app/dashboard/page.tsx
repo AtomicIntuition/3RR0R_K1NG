@@ -161,8 +161,8 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-950">
         <div className="text-center">
-          <div className="w-10 h-10 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-400 font-medium">Loading...</p>
+          <div className="w-8 h-8 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-gray-500 text-sm">Loading...</p>
         </div>
       </div>
     );
@@ -174,193 +174,121 @@ export default function DashboardPage() {
       label: 'Scans Completed',
       value: completedCount,
       icon: Activity,
-      iconColor: 'text-emerald-400',
-      iconBg: 'bg-emerald-500/10',
+      accent: 'text-emerald-400',
     },
     {
       label: 'Current Plan',
       value: profile?.tier === 'pro' ? 'Pro' : 'Free',
       icon: Crown,
-      iconColor:
-        profile?.tier === 'pro' ? 'text-amber-400' : 'text-gray-400',
-      iconBg:
-        profile?.tier === 'pro' ? 'bg-amber-500/10' : 'bg-gray-800',
-      valueColor:
-        profile?.tier === 'pro' ? 'text-amber-400' : 'text-gray-50',
+      accent: profile?.tier === 'pro' ? 'text-amber-400' : 'text-gray-400',
     },
     {
       label: 'Average Score',
       value: avgScore !== null ? avgScore : '—',
       icon: TrendingUp,
-      iconColor:
-        avgScore !== null && avgScore >= 80
-          ? 'text-emerald-400'
-          : avgScore !== null && avgScore >= 60
-            ? 'text-amber-400'
-            : avgScore !== null
-              ? 'text-red-400'
-              : 'text-gray-500',
-      iconBg:
-        avgScore !== null && avgScore >= 80
-          ? 'bg-emerald-500/10'
-          : avgScore !== null && avgScore >= 60
-            ? 'bg-amber-500/10'
-            : avgScore !== null
-              ? 'bg-red-500/10'
-              : 'bg-gray-800',
-      valueColor:
-        avgScore !== null && avgScore >= 80
-          ? 'text-emerald-400'
-          : avgScore !== null && avgScore >= 60
-            ? 'text-amber-400'
-            : avgScore !== null
-              ? 'text-red-400'
-              : 'text-gray-500',
+      accent: getScoreColor(avgScore),
     },
   ];
 
   return (
     <div className="min-h-screen bg-gray-950">
-
-      {/* ══════════════════════════════════════
-          HERO
-          ══════════════════════════════════════ */}
-      <section className="relative overflow-hidden bg-gray-950">
-        {/* Ambient gradient orb */}
-        <div
-          className="absolute -top-32 -right-32 w-[500px] h-[500px] pointer-events-none"
-          aria-hidden
+      {/* Header */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-10 pb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease }}
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
         >
-          <div className="w-full h-full rounded-full bg-emerald-500/[0.04] blur-[100px]" />
-        </div>
-
-        {/* Grid pattern */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          aria-hidden
-          style={{
-            backgroundImage:
-              'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0)',
-            backgroundSize: '40px 40px',
-          }}
-        />
-
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
-          {/* Header row */}
-          <motion.div
-            initial={{ opacity: 0, y: 16, filter: 'blur(8px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            transition={{ duration: 0.6, ease }}
-            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8"
-          >
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-50 tracking-tight mb-1">
-                Dashboard
-              </h1>
-              <p className="text-gray-400">
-                Welcome back, {user?.email?.split('@')[0]}
-              </p>
-            </div>
-            <div className="flex gap-3">
+          <div>
+            <h1 className="text-3xl font-semibold text-white tracking-tight">
+              Dashboard
+            </h1>
+            <p className="text-gray-400 mt-1">
+              Welcome back, {user?.email?.split('@')[0]}
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500 text-emerald-950 font-semibold rounded-xl hover:bg-emerald-400 transition-colors text-sm"
+            >
+              <Plus className="w-4 h-4" />
+              New Scan
+            </Link>
+            {profile?.tier !== 'pro' && (
               <Link
-                href="/"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500 text-emerald-950 font-semibold rounded-xl hover:bg-emerald-400 transition-all active:scale-[0.98]"
+                href="/pricing"
+                className="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-700 text-gray-300 font-medium rounded-xl hover:bg-gray-900 transition-colors text-sm"
               >
-                <Plus className="w-4 h-4" />
-                New Scan
+                Upgrade
+                <ArrowUpRight className="w-4 h-4" />
               </Link>
-              {profile?.tier !== 'pro' && (
-                <Link
-                  href="/pricing"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-800 border border-gray-700 text-gray-200 font-semibold rounded-xl hover:bg-gray-700 transition-all active:scale-[0.98]"
-                >
-                  Upgrade
-                  <ArrowUpRight className="w-4 h-4" />
-                </Link>
-              )}
-            </div>
-          </motion.div>
+            )}
+          </div>
+        </motion.div>
+      </div>
 
-          {/* Stats grid */}
-          <motion.div
-            variants={stagger}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-1 sm:grid-cols-3 gap-4"
-          >
-            {stats.map((s) => {
-              const Icon = s.icon;
-              return (
-                <motion.div
-                  key={s.label}
-                  variants={fadeUp}
-                  className="bg-gray-900 rounded-2xl p-5 sm:p-6 border border-gray-800"
-                >
-                  <div className="flex items-center gap-3 mb-3">
-                    <div
-                      className={clsx(
-                        'w-9 h-9 rounded-lg flex items-center justify-center',
-                        s.iconBg
-                      )}
-                    >
-                      <Icon className={clsx('w-4 h-4', s.iconColor)} />
-                    </div>
-                    <span className="text-sm font-medium text-gray-500">
-                      {s.label}
-                    </span>
-                  </div>
-                  <div
-                    className={clsx(
-                      'text-3xl sm:text-4xl font-black',
-                      s.valueColor || 'text-gray-50'
-                    )}
-                  >
-                    {s.value}
-                  </div>
-                </motion.div>
-              );
-            })}
-          </motion.div>
-        </div>
-      </section>
+      {/* Stats grid */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-8">
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+        >
+          {stats.map((s) => {
+            const Icon = s.icon;
+            return (
+              <motion.div
+                key={s.label}
+                variants={fadeUp}
+                className="bg-gray-900 rounded-xl p-5 border border-gray-800"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm text-gray-400">
+                    {s.label}
+                  </span>
+                  <Icon className={clsx('w-4 h-4', s.accent)} />
+                </div>
+                <div className={clsx('text-3xl font-semibold', s.accent)}>
+                  {s.value}
+                </div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      </div>
 
-      {/* Divider */}
-      <div
-        className="h-px bg-gradient-to-r from-transparent via-gray-800 to-transparent"
-        aria-hidden
-      />
-
-      {/* ══════════════════════════════════════
-          CONTENT
-          ══════════════════════════════════════ */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+      {/* Content */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-16 space-y-6">
         {/* Monitored Sites */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-40px' }}
-          transition={{ duration: 0.5, ease }}
+          transition={{ duration: 0.4, ease }}
         >
           <MonitoredSites />
         </motion.div>
 
-        {/* ——— Scan History ——— */}
+        {/* Scan History */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-40px' }}
-          transition={{ duration: 0.5, ease }}
-          className="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden"
+          transition={{ duration: 0.4, ease }}
+          className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden"
         >
           {/* Header */}
-          <div className="px-5 sm:px-6 py-5 border-b border-gray-800">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <h2 className="text-lg font-bold text-gray-50">
+          <div className="px-5 sm:px-6 py-4 border-b border-gray-800">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <h2 className="text-base font-semibold text-white">
                 Scan History
               </h2>
 
               {/* Filter tabs */}
-              <div className="flex gap-1 bg-gray-950 rounded-xl p-1 border border-gray-800">
+              <div className="flex gap-1 bg-gray-950 rounded-lg p-1 border border-gray-800">
                 {(['all', 'completed', 'failed'] as FilterType[]).map(
                   (f) => (
                     <button
@@ -370,10 +298,10 @@ export default function DashboardPage() {
                         setVisibleCount(SCANS_PER_PAGE);
                       }}
                       className={clsx(
-                        'px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 capitalize',
+                        'px-3 py-1.5 text-sm font-medium rounded-md transition-colors capitalize',
                         filter === f
-                          ? 'bg-gray-800 text-gray-50 shadow-sm'
-                          : 'text-gray-400 hover:text-gray-200'
+                          ? 'bg-gray-800 text-white'
+                          : 'text-gray-500 hover:text-gray-300'
                       )}
                     >
                       {f} (
@@ -393,26 +321,26 @@ export default function DashboardPage() {
           {/* Body */}
           {loadingScans ? (
             <div className="p-16 text-center">
-              <Loader2 className="w-8 h-8 text-emerald-500 animate-spin mx-auto mb-4" />
-              <p className="text-gray-500 font-medium">Loading scans...</p>
+              <Loader2 className="w-6 h-6 text-gray-500 animate-spin mx-auto mb-3" />
+              <p className="text-gray-500 text-sm">Loading scans...</p>
             </div>
           ) : filteredScans.length === 0 ? (
             <div className="p-16 text-center">
-              <div className="w-14 h-14 bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <ClipboardList className="w-7 h-7 text-gray-500" />
+              <div className="w-12 h-12 bg-gray-800 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <ClipboardList className="w-6 h-6 text-gray-500" />
               </div>
-              <p className="text-gray-50 font-semibold text-lg mb-2">
+              <p className="text-white font-medium mb-1">
                 {filter === 'all'
                   ? 'No scans yet'
                   : `No ${filter} scans`}
               </p>
-              <p className="text-gray-400 text-sm mb-6">
+              <p className="text-gray-500 text-sm mb-6">
                 Start scanning websites to see them here
               </p>
               {filter === 'all' && (
                 <Link
                   href="/"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-500 text-emerald-950 font-semibold rounded-xl hover:bg-emerald-400 transition-all active:scale-[0.98]"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500 text-emerald-950 font-semibold rounded-xl hover:bg-emerald-400 transition-colors text-sm"
                 >
                   <Plus className="w-4 h-4" />
                   Run your first scan
@@ -426,19 +354,19 @@ export default function DashboardPage() {
                   <Link
                     key={scan.id}
                     href={`/scan/${scan.id}`}
-                    className="flex items-center px-5 sm:px-6 py-4 hover:bg-gray-800/50 transition-all group border-b border-gray-800/50 last:border-0"
+                    className="flex items-center px-5 sm:px-6 py-4 hover:bg-gray-800/50 transition-colors group border-b border-gray-800/50 last:border-0"
                   >
                     {/* Grade badge */}
                     <div
                       className={clsx(
-                        'flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center mr-4',
+                        'flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center mr-4',
                         scan.status === 'completed' && scan.letter_grade
                           ? getGradeBg(scan.letter_grade)
                           : 'bg-gray-800'
                       )}
                     >
                       {scan.status === 'completed' && scan.letter_grade ? (
-                        <span className="text-base font-bold text-white">
+                        <span className="text-sm font-bold text-white">
                           {scan.letter_grade}
                         </span>
                       ) : scan.status === 'processing' ? (
@@ -446,29 +374,27 @@ export default function DashboardPage() {
                       ) : scan.status === 'failed' ? (
                         <X className="w-4 h-4 text-red-400" />
                       ) : (
-                        <span className="text-gray-500 text-sm font-semibold">
-                          —
-                        </span>
+                        <span className="text-gray-600 text-sm">—</span>
                       )}
                     </div>
 
                     {/* URL & meta */}
                     <div className="flex-1 min-w-0 mr-4">
-                      <p className="text-gray-100 font-semibold truncate group-hover:text-emerald-400 transition-colors">
+                      <p className="text-gray-100 font-medium truncate group-hover:text-emerald-400 transition-colors text-sm">
                         {scan.url
                           .replace(/^https?:\/\//, '')
                           .replace(/\/$/, '')}
                       </p>
-                      <div className="flex items-center gap-2.5 mt-1">
+                      <div className="flex items-center gap-2 mt-1">
                         <span
                           className={clsx(
-                            'px-2 py-0.5 rounded-md text-xs font-semibold capitalize',
+                            'px-2 py-0.5 rounded-md text-xs font-medium capitalize',
                             STATUS_STYLE[scan.status] || STATUS_STYLE.pending
                           )}
                         >
                           {scan.status}
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-600">
                           {formatDate(scan.created_at)}
                         </span>
                       </div>
@@ -480,18 +406,18 @@ export default function DashboardPage() {
                         <div className="hidden sm:block text-right mr-4">
                           <span
                             className={clsx(
-                              'text-2xl font-black tabular-nums',
+                              'text-xl font-semibold tabular-nums',
                               getScoreColor(scan.score_overall)
                             )}
                           >
                             {scan.score_overall}
                           </span>
-                          <p className="text-xs text-gray-500">score</p>
+                          <p className="text-xs text-gray-600">score</p>
                         </div>
                       )}
 
                     {/* Arrow */}
-                    <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    <ChevronRight className="w-4 h-4 text-gray-700 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                   </Link>
                 ))}
               </div>
@@ -503,7 +429,7 @@ export default function DashboardPage() {
                     onClick={() =>
                       setVisibleCount((prev) => prev + SCANS_PER_PAGE)
                     }
-                    className="text-sm text-emerald-400 hover:text-emerald-300 font-semibold transition-colors"
+                    className="text-sm text-emerald-400 hover:text-emerald-300 font-medium transition-colors"
                   >
                     Load more ({filteredScans.length - visibleCount} remaining)
                   </button>

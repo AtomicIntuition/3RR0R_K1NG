@@ -91,6 +91,8 @@ export default function DashboardPage() {
 
   const fetchScans = useCallback(async (userId: string) => {
     setLoadingScans(true);
+    // Refresh auth token if stale — prevents RLS from returning empty on navigation
+    await supabase.auth.getSession();
     const { data, error } = await supabase
       .from('scans')
       .select('id, url, status, score_overall, letter_grade, created_at')
@@ -117,13 +119,18 @@ export default function DashboardPage() {
   }, [user, fetchScans]);
 
   useEffect(() => {
+    const refetch = () => {
+      if (user) fetchScans(user.id);
+    };
     const handleVisibility = () => {
-      if (document.visibilityState === 'visible' && user) {
-        fetchScans(user.id);
-      }
+      if (document.visibilityState === 'visible') refetch();
     };
     document.addEventListener('visibilitychange', handleVisibility);
-    return () => document.removeEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', refetch);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', refetch);
+    };
   }, [user, fetchScans]);
 
   const { filteredScans, visibleScans, hasMore, completedCount, avgScore } =

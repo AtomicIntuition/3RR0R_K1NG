@@ -48,20 +48,20 @@ jobs:
         working-directory: error-king-cli
         run: |
           cross build --release --target ${{ matrix.target }}
-          mv target/${{ matrix.target }}/release/3rror ../3rror-${{ matrix.name }}
+          mv target/${{ matrix.target }}/release/crisp ../crisp-${{ matrix.name }}
 
       - name: Build native
         if: '!matrix.cross'
         working-directory: error-king-cli
         run: |
           cargo build --release --target ${{ matrix.target }}
-          mv target/${{ matrix.target }}/release/3rror ../3rror-${{ matrix.name }}
+          mv target/${{ matrix.target }}/release/crisp ../crisp-${{ matrix.name }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: 3rror-${{ matrix.name }}
-          path: 3rror-${{ matrix.name }}
+          name: crisp-${{ matrix.name }}
+          path: crisp-${{ matrix.name }}
 
   release:
     name: Create Release

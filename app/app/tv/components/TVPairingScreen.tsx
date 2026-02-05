@@ -10,6 +10,9 @@ interface TVPairingScreenProps {
 
 export function TVPairingScreen({ code, expiresAt, onExpired }: TVPairingScreenProps) {
   const [progress, setProgress] = useState(100);
+  const pairUrl = typeof window !== 'undefined'
+    ? window.location.origin.replace(/^https?:\/\//, '') + '/tv/pair'
+    : '/tv/pair';
 
   const updateProgress = useCallback(() => {
     const now = Date.now();
@@ -46,7 +49,7 @@ export function TVPairingScreen({ code, expiresAt, onExpired }: TVPairingScreenP
       {/* Title */}
       <h2 className="text-3xl font-semibold mb-4">Pair Your TV</h2>
       <p className="text-xl text-gray-400 mb-12">
-        Go to <span className="text-primary font-medium">crisp.sh/tv/pair</span> on your phone
+        Go to <span className="text-primary font-medium">{pairUrl}</span> on your phone
       </p>
 
       {/* Code display */}

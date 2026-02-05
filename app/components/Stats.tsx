@@ -54,6 +54,9 @@ export function Stats({ variant = 'default', className = '' }: StatsProps) {
     return num.toString();
   };
 
+  // Total checks = scans * checks per scan
+  const totalChecks = stats.totalScans * stats.checksPerScan;
+
   // Inline variant - single line of text
   if (variant === 'inline') {
     return (
@@ -81,7 +84,7 @@ export function Stats({ variant = 'default', className = '' }: StatsProps) {
         <div className="w-px h-4 bg-gray-700" />
         <div className="flex items-center gap-2">
           <span className="text-xl font-bold font-mono text-primary">{stats.checksPerScan}+</span>
-          <span className="text-xs text-gray-500">checks</span>
+          <span className="text-xs text-gray-500">checks/scan</span>
         </div>
         <div className="w-px h-4 bg-gray-700" />
         <div className="flex items-center gap-2">
@@ -94,24 +97,30 @@ export function Stats({ variant = 'default', className = '' }: StatsProps) {
 
   // Default variant
   return (
-    <div className={`flex flex-wrap justify-center gap-8 text-center ${className}`}>
+    <div className={`grid grid-cols-3 gap-4 sm:gap-8 text-center ${className}`}>
       <div>
-        <div className="text-3xl font-bold font-mono text-primary">
+        <div className="text-2xl sm:text-3xl font-bold font-mono text-primary">
           {isLoading ? (
             <span className="animate-pulse">---</span>
           ) : (
             formatNumber(stats.totalScans)
           )}
         </div>
-        <div className="text-xs text-gray-500">Sites Audited</div>
+        <div className="text-xs text-gray-500 mt-1">Sites Audited</div>
       </div>
       <div>
-        <div className="text-3xl font-bold font-mono text-primary">{stats.checksPerScan}+</div>
-        <div className="text-xs text-gray-500">Security Checks</div>
+        <div className="text-2xl sm:text-3xl font-bold font-mono text-primary">
+          {isLoading ? (
+            <span className="animate-pulse">---</span>
+          ) : (
+            formatNumber(totalChecks)
+          )}
+        </div>
+        <div className="text-xs text-gray-500 mt-1">Checks Run</div>
       </div>
       <div>
-        <div className="text-3xl font-bold font-mono text-success">{stats.accuracy}%</div>
-        <div className="text-xs text-gray-500">Accuracy Rate</div>
+        <div className="text-2xl sm:text-3xl font-bold font-mono text-success">{stats.checksPerScan}+</div>
+        <div className="text-xs text-gray-500 mt-1">Checks Per Scan</div>
       </div>
     </div>
   );

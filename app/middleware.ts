@@ -16,6 +16,8 @@ export function middleware(request: NextRequest) {
                        request.headers.get('Next-Router-Prefetch') === '1' ||
                        request.nextUrl.searchParams.has('_rsc');
   if (isRSCRequest) {
+    // Still strip any platform-default wildcard CORS on RSC responses
+    response.headers.delete('Access-Control-Allow-Origin');
     return response;
   }
 
@@ -76,8 +78,10 @@ export function middleware(request: NextRequest) {
   const requestOrigin = request.headers.get('origin');
   if (requestOrigin && allowedOrigins.includes(requestOrigin)) {
     headers.set('Access-Control-Allow-Origin', requestOrigin);
+  } else {
+    // Explicitly remove any platform-default wildcard (*) CORS header
+    headers.delete('Access-Control-Allow-Origin');
   }
-  // If no origin header or not in allowed list, don't set ACAO at all (block cross-origin)
 
   return response;
 }

@@ -6,7 +6,7 @@ import { getScoreColor, getGrade } from '@/lib/scoring';
 
 interface ScoreRingProps {
   score: number;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'tv';
   label?: string;
   showGrade?: boolean;
   animate?: boolean;
@@ -18,6 +18,7 @@ const SIZES = {
   md: { ring: 120, stroke: 8, text: 'text-3xl', label: 'text-sm' },
   lg: { ring: 160, stroke: 10, text: 'text-4xl', label: 'text-base' },
   xl: { ring: 200, stroke: 12, text: 'text-5xl', label: 'text-lg' },
+  tv: { ring: 280, stroke: 16, text: 'text-7xl', label: 'text-2xl' },
 };
 
 // Get glow color based on score

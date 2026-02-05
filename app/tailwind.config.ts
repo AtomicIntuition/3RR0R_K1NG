@@ -71,6 +71,9 @@ const config: Config = {
         'shimmer': 'shimmer 2s infinite',
         'pulse-soft': 'pulse-soft 2s ease-in-out infinite',
         'float': 'float 3s ease-in-out infinite',
+        'tv-crossfade-in': 'tv-crossfade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'tv-crossfade-out': 'tv-crossfade-out 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'code-pulse': 'code-pulse 2s ease-in-out infinite',
       },
       keyframes: {
         'fade-in': {
@@ -96,6 +99,18 @@ const config: Config = {
         'float': {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-10px)' },
+        },
+        'tv-crossfade-in': {
+          '0%': { opacity: '0', transform: 'scale(0.98)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        'tv-crossfade-out': {
+          '0%': { opacity: '1', transform: 'scale(1)' },
+          '100%': { opacity: '0', transform: 'scale(0.98)' },
+        },
+        'code-pulse': {
+          '0%, 100%': { borderColor: 'rgba(16, 185, 129, 0.4)' },
+          '50%': { borderColor: 'rgba(16, 185, 129, 0.8)' },
         },
       },
       boxShadow: {

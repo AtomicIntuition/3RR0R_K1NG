@@ -185,6 +185,29 @@ export type Database = {
           used_at?: string | null;
         };
       };
+      tv_sessions: {
+        Row: {
+          id: string;
+          code: string;
+          user_id: string | null;
+          status: 'pending' | 'active' | 'expired';
+          expires_at: string;
+          last_seen_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          code: string;
+          user_id?: string | null;
+          status?: 'pending' | 'active' | 'expired';
+          expires_at: string;
+        };
+        Update: {
+          user_id?: string | null;
+          status?: 'pending' | 'active' | 'expired';
+          last_seen_at?: string | null;
+        };
+      };
     };
   };
 };

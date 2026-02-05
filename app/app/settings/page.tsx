@@ -292,7 +292,7 @@ export default function SettingsPage() {
           </div>
           <div className="p-6 space-y-4">
             {[
-              { label: 'Cargo (Rust)', cmd: 'cargo install error-king' },
+              { label: 'Cargo (Rust)', cmd: 'cargo install error_king' },
               { label: 'npm (Node.js)', cmd: 'npm install -g error-king' },
               { label: 'npx (no install)', cmd: 'npx error-king scan https://example.com' },
               { label: 'Homebrew (macOS/Linux)', cmd: 'brew install error-king' },
@@ -315,9 +315,11 @@ export default function SettingsPage() {
           <div className="p-6 space-y-4">
             {[
               { label: 'Set your API key', cmd: 'export ERROR_KING_API_KEY=sk_...' },
-              { label: 'Verify your key', cmd: 'error-king auth' },
-              { label: 'Scan a website', cmd: 'error-king scan https://example.com' },
-              { label: 'Search previous scans', cmd: 'error-king search stripe.com' },
+              { label: 'Scan a website (Rust)', cmd: '3rror scan https://example.com' },
+              { label: 'Scan a website (Node)', cmd: 'error-king scan https://example.com' },
+              { label: 'Check scan status', cmd: '3rror status <scan-id>' },
+              { label: 'Search previous scans', cmd: '3rror search stripe.com' },
+              { label: 'Verify your key', cmd: '3rror auth' },
             ].map((item, i) => (
               <div key={i}>
                 <p className="text-sm text-gray-400 mb-2">{item.label}</p>

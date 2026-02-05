@@ -15,7 +15,7 @@ const PRICE_IDS = {
 };
 
 export default function PricingPage() {
-  const [isYearly, setIsYearly] = useState(true);
+  const [isYearly, setIsYearly] = useState(false);
 
   const handleToggle = useCallback((yearly: boolean) => {
     setIsYearly(yearly);

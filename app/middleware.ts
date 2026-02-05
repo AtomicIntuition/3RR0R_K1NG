@@ -13,6 +13,7 @@ export function middleware(request: NextRequest) {
   // Skip CSP for RSC (React Server Components) requests to avoid navigation errors
   const isRSCRequest = request.headers.get('RSC') === '1' ||
                        request.headers.get('Next-Router-State-Tree') !== null ||
+                       request.headers.get('Next-Router-Prefetch') === '1' ||
                        request.nextUrl.searchParams.has('_rsc');
   if (isRSCRequest) {
     return response;

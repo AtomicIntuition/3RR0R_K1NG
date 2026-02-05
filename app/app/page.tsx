@@ -27,7 +27,7 @@ export default function HomePage() {
         <Scanner className="w-full mb-8" autoFocus />
 
         {/* Trust indicators */}
-        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-gray-500 text-sm">
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-gray-400 text-sm">
           {['Free to use', 'No signup required', 'Results in 30s'].map((text) => (
             <div key={text} className="flex items-center gap-1.5">
               <Check className="w-3.5 h-3.5 text-emerald-500/70" />

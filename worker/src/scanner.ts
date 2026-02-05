@@ -15,6 +15,8 @@ import { runRedirectAudit, type RedirectAuditResult } from './audits/redirects.j
 import { auditDependencies, type DependencyAuditResult } from './audits/dependencies.js';
 import { scanForSecrets, type SecretsAuditResult } from './audits/secrets.js';
 import { scanCodePatterns, type CodePatternsAuditResult } from './audits/codePatterns.js';
+// INP audit (uses Playwright, runs before Lighthouse)
+import { runInteractivityAudit, type InteractivityAuditResult } from './audits/interactivity.js';
 // Phase 3 audits
 import { runPWAAudit, type PWAAuditResult } from './audits/pwa.js';
 import { runStructuredDataAudit, type StructuredDataAuditResult } from './audits/structuredData.js';
@@ -289,6 +291,15 @@ export async function runScan(scanId: string, url: string, _persona: string = 'p
     console.log(`  - Structured Data: ${structuredDataResult.types.length} types found`);
     console.log(`  - Links: ${linksResult.brokenLinks.length} broken, ${linksResult.insecureLinks.length} insecure`);
 
+    // INP audit (must run before Lighthouse closes the Playwright page)
+    let interactivityResult: InteractivityAuditResult | undefined;
+    try {
+      interactivityResult = await runInteractivityAudit(page);
+      console.log(`Interactivity audit complete: INP ${interactivityResult.inp}ms, score ${interactivityResult.score}, supported: ${interactivityResult.supported}`);
+    } catch (error) {
+      console.error('Interactivity audit failed:', error instanceof Error ? error.message : error);
+    }
+
     // Performance audit (Lighthouse - runs separately, most expensive)
     await updatePhase('performance');
     const performanceResult = await runPerformanceAudit(url);
@@ -299,6 +310,18 @@ export async function runScan(scanId: string, url: string, _persona: string = 'p
       completed_phases: completedPhases,
     });
     console.log(`Performance audit complete: ${performanceResult.score}`);
+
+    // Merge INP metric into performance results if available
+    if (interactivityResult?.supported && interactivityResult.interactions.length > 0) {
+      performanceResult.metrics.push({
+        id: 'interaction-to-next-paint',
+        name: 'Interaction to Next Paint',
+        value: interactivityResult.inp,
+        unit: 'ms',
+        score: interactivityResult.score,
+        displayValue: `${interactivityResult.inp} ms`,
+      });
+    }
 
     // Calculate comprehensive score including all audits
     const scoringResult = calculateComprehensiveScore({
@@ -314,6 +337,7 @@ export async function runScan(scanId: string, url: string, _persona: string = 'p
       images: imageResult.score,
       caching: cacheResult.score,
       redirects: getRedirectScore(redirectResult),
+      interactivity: interactivityResult?.supported ? interactivityResult.score : undefined,
       // Phase 3 audits
       pwa: pwaResult.score,
       structuredData: structuredDataResult.score,

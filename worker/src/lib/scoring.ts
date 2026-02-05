@@ -19,6 +19,7 @@ export interface AuditScores {
   images?: number;
   caching?: number;
   redirects?: number;
+  interactivity?: number;
 
   // Phase 3 audits (optional)
   pwa?: number;
@@ -74,10 +75,11 @@ const SUB_WEIGHTS = {
 
   // Performance category breakdown
   performance: {
-    base: 0.50,      // Core Web Vitals (LCP, CLS, TBT, etc.)
-    protocol: 0.15,  // HTTP/2, HTTP/3
-    images: 0.20,    // Image optimization
-    caching: 0.15,   // Cache headers
+    base: 0.40,            // Core Web Vitals (LCP, CLS, TBT, etc.)
+    interactivity: 0.10,   // INP (Interaction to Next Paint)
+    protocol: 0.15,        // HTTP/2, HTTP/3
+    images: 0.20,          // Image optimization
+    caching: 0.15,         // Cache headers
   },
 
   // SEO category breakdown
@@ -183,6 +185,7 @@ export function calculateComprehensiveScore(scores: AuditScores): ScoringResult 
   const performanceCalc = weightedAverage(
     {
       base: scores.performance,
+      interactivity: scores.interactivity,
       protocol: scores.protocol,
       images: scores.images,
       caching: scores.caching,

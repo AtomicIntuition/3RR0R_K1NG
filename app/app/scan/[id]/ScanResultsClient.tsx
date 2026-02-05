@@ -11,7 +11,6 @@ import { LoadingState } from '@/components/LoadingState';
 import { FixList } from '@/components/FixList';
 import { ShareCard } from '@/components/ShareCard';
 import { LLMReport } from '@/components/LLMReport';
-import { ScreenshotButton } from '@/components/ScreenshotButton';
 import { ReportDownloadButton } from '@/components/ReportDownloadButton';
 import { ScrollReveal } from '@/components/ScrollReveal';
 import { useScanRealtime } from '@/lib/useScanRealtime';
@@ -151,19 +150,6 @@ export function ScanResultsClient({ initialScan, scanId }: ScanResultsClientProp
           </div>
           <div className="flex items-center gap-2 screenshot-ignore">
             <ReportDownloadButton scan={scan} />
-            <ScreenshotButton
-              scanData={{
-                url: scan.url,
-                scoreOverall: scan.scoreOverall || 0,
-                letterGrade: scan.letterGrade,
-                scoringBreakdown: scan.scoringBreakdown,
-                analysisTitle: scan.analysisTitle,
-                analysisBody: scan.analysisBody,
-                id: scan.id,
-                fixes: scan.analysisFixes,
-              }}
-              filename={`crisp-audit-${scan.url.replace(/https?:\/\//, '').replace(/[^a-z0-9]/gi, '-').slice(0, 30)}`}
-            />
           </div>
         </motion.div>
 
